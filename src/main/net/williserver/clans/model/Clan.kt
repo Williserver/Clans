@@ -40,4 +40,9 @@ class Clan(private val logger: LogHandler, data: ClanData) {
             throw IllegalArgumentException("Invalid leader UUID (not in clan $name): $leader")
         }
     }
+
+    /**
+     * Convert the object back to a tuple of ClanData. Useful for serialization.
+     */
+    fun toDataTuple(): ClanData = ClanData(name, members, leader)
 }
