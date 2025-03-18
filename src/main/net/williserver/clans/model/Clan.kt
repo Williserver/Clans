@@ -18,7 +18,7 @@ import java.util.*
  * @param leader UUID for player who leads the clan.
  */
 @Serializable
-data class ClanData(val name: String, val members: List<@Contextual UUID>, val leader: @Contextual UUID)
+data class ClanData(val name: String, val members: List<String>, val leader: String)
 
 /**
  * Mutable model for clan.
@@ -29,12 +29,17 @@ data class ClanData(val name: String, val members: List<@Contextual UUID>, val l
  * @author Willmo3
  */
 class Clan(private val logger: LogHandler, data: ClanData) {
-    private var leader = data.leader
     private var name = data.name
-    private var members = data.members
+    private var leader = UUID.fromString(data.leader)
+    private var members = ArrayList<UUID>()
 
     init {
+        // Convert saved json strings.
+        for (member in data.members) {
+            members += UUID.fromString(member)
+        }
         // Membership assertions
+        // These are internal errors and so may throw exceptions -- a failure here indicates a software defect!
         if (leader !in members) {
             logger.err("Invalid leader UUID (not in clan $name): $leader")
             throw IllegalArgumentException("Invalid leader UUID (not in clan $name): $leader")
@@ -43,6 +48,19 @@ class Clan(private val logger: LogHandler, data: ClanData) {
 
     /**
      * Convert the object back to a tuple of ClanData. Useful for serialization.
+     * @return ClanData tuple form of this data.
      */
-    fun asDataTuple(): ClanData = ClanData(name, members, leader)
+    fun asDataTuple(): ClanData {
+        val membersAsStrings = ArrayList<String>()
+        for (member in members) {
+            membersAsStrings += member.toString()
+        }
+        return ClanData(name, membersAsStrings, leader.toString())
+    }
+
+    /**
+     * @param other Object to compare against.
+     * @return Whether other is equal to this clan; i.e. it is a clan with the same name, members, and officers.
+     */
+    override fun equals(other: Any?): Boolean = other is Clan && other.name == name && other.members == members && other.leader == leader
 }
