@@ -32,4 +32,12 @@ class Clan(private val logger: LogHandler, data: ClanData) {
     private var leader = data.leader
     private var name = data.name
     private var members = data.members
+
+    init {
+        // Membership assertions
+        if (leader !in members) {
+            logger.err("Invalid leader UUID (not in clan $name): $leader")
+            throw IllegalArgumentException("Invalid leader UUID (not in clan $name): $leader")
+        }
+    }
 }
