@@ -44,5 +44,5 @@ class Clan(private val logger: LogHandler, data: ClanData) {
     /**
      * Convert the object back to a tuple of ClanData. Useful for serialization.
      */
-    fun toDataTuple(): ClanData = ClanData(name, members, leader)
+    fun asDataTuple(): ClanData = ClanData(name, members, leader)
 }
