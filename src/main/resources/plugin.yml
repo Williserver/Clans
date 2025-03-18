@@ -1,5 +1,5 @@
-name: Teams
-main: net.williserver.teams.TeamsPlugin
+name: Clans
+main: net.williserver.clans.ClansPlugin
 version: 1.0
 api-version: 1.21
 

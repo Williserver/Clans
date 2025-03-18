@@ -1,4 +1,4 @@
-package net.williserver.tiers
+package net.williserver.clans
 
 import java.util.logging.Logger
 
