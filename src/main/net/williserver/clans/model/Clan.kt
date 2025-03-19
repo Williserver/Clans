@@ -1,5 +1,4 @@
 package net.williserver.clans.model
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import net.williserver.clans.LogHandler
 import java.util.*
@@ -31,13 +30,10 @@ data class ClanData(val name: String, val members: List<String>, val leader: Str
 class Clan(private val logger: LogHandler, data: ClanData) {
     private var name = data.name
     private var leader = UUID.fromString(data.leader)
-    private var members = ArrayList<UUID>()
+    // Read serialized UUID strings into clan members.
+    private var members = data.members.map { UUID.fromString(it) }
 
     init {
-        // Convert saved json strings.
-        for (member in data.members) {
-            members += UUID.fromString(member)
-        }
         // Membership assertions
         // These are internal errors and so may throw exceptions -- a failure here indicates a software defect!
         if (leader !in members) {
@@ -50,14 +46,7 @@ class Clan(private val logger: LogHandler, data: ClanData) {
      * Convert the object back to a tuple of ClanData. Useful for serialization.
      * @return ClanData tuple form of this data.
      */
-    fun asDataTuple(): ClanData {
-        val membersAsStrings = ArrayList<String>()
-        for (member in members) {
-            membersAsStrings += member.toString()
-        }
-        return ClanData(name, membersAsStrings, leader.toString())
-    }
-
+    fun asDataTuple(): ClanData = ClanData(name, members.map { it.toString() }, leader.toString())
     /**
      * @param other Object to compare against.
      * @return Whether other is equal to this clan; i.e. it is a clan with the same name, members, and officers.

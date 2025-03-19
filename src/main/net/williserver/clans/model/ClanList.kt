@@ -25,25 +25,14 @@ data class ClanListData(val clanDataTuples: List<ClanData>)
  */
 class ClanList(private val logger: LogHandler, data: ClanListData) {
     // Use ArrayList as type to guarantee mutability.
-    private val clans: MutableList<Clan> = ArrayList()
-    init {
-        for (clanData in data.clanDataTuples) {
-            clans += Clan(logger, clanData)
-        }
-    }
+    private val clans: MutableList<Clan> = data.clanDataTuples.map { Clan(logger, it) } as MutableList<Clan>
 
     /**
      * Convert each clan in the list back into a data tuple.
      *
      * @return data class representing all clans.
      */
-    fun asDataTuple(): ClanListData {
-        val data: MutableList<ClanData> = ArrayList(clans.size)
-        for (clan in clans) {
-            data += clan.asDataTuple()
-        }
-        return ClanListData(data)
-    }
+    fun asDataTuple(): ClanListData = ClanListData(clans.map { it.asDataTuple() })
 
     /**
      * @param other Object to compare against.
