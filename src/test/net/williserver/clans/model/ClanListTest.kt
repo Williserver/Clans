@@ -9,39 +9,24 @@ import kotlin.test.assertEquals
  * @author Willmo3
  */
 class ClanListTest {
-//    fun generateClan(): Clan {
-//        val leader = UUID.randomUUID().toString()
-//        val members = listOf(leader)
-//        return Clan(ClanData("TestClan", members, leader))
-//    }
-
-    @Test
-    fun testConstructClanList() {
+    fun generateClanData(): ClanData {
         val leader = UUID.randomUUID().toString()
-        val clanData = ClanData("TestClan", listOf(leader), leader)
-        val clanListData = ClanListData(listOf(clanData))
-        ClanList(clanListData)
+        val members = listOf(leader)
+        return ClanData("TestClan", members, leader)
     }
 
     @Test
-    fun testAsDataTuple() {
-        val leader = UUID.randomUUID().toString()
-        val clanData = ClanData("TestClan", listOf(leader), leader)
-        val clanListData = ClanListData(listOf(clanData))
-        assertEquals(clanListData, ClanList(clanListData).asDataTuple())
+    fun testConstructClanList() {
+        ClanList(listOf(generateClanData()))
     }
 
     @Test
     fun testReadWrite() {
         val leader = UUID.randomUUID().toString()
         val clanData = ClanData("TestClan", listOf(leader), leader)
-        val clanListData = ClanListData(listOf(clanData))
-        val clanList = ClanList(clanListData)
+        val clanList = ClanList(listOf(clanData))
 
         writeToFile("testClanList.json", clanList)
-        val readDataTuples = readFromFile("testClanList.json")
-
-        val readList = ClanList(readDataTuples)
-        assertEquals(clanList, readList);
+        assertEquals(clanList, readFromFile("testClanList.json"))
     }
 }

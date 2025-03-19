@@ -25,7 +25,7 @@ class ClansPlugin : JavaPlugin() {
         saveDefaultConfig()
 
         // Read base clan list.
-        clanList = ClanList(handler, readFromFile(path))
+        clanList = readFromFile(path)
 
         // Register commands.
         this.getCommand("clans")!!.setExecutor(ClansCommand(handler, clanList))

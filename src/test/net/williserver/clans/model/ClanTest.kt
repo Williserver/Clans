@@ -17,7 +17,7 @@ class ClanTest {
         val data = ClanData("TestClan",
             listOf(leader, UUID.randomUUID().toString()),
             leader)
-        Clan(logHandler, data)
+        Clan(data)
     }
 
     @Test
@@ -25,6 +25,6 @@ class ClanTest {
         val data = ClanData("TestClan",
             listOf(UUID.randomUUID().toString(), UUID.randomUUID().toString()),
             UUID.randomUUID().toString())
-        assertThrows(IllegalArgumentException::class.java) { Clan(logHandler, data) }
+        assertThrows(IllegalArgumentException::class.java) { Clan(data) }
     }
 }

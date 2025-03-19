@@ -1,20 +1,10 @@
 package net.williserver.clans.model
 
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import net.williserver.clans.LogHandler
 import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
 
-/**
- * Persistent serializable form for a list of clans.
- * Invariant: All clans in this list have a unique name.
- *
- * @param clanDataTuples List of clans we represent, in serializable tuple form.
- */
-@Serializable
-data class ClanListData(val clanDataTuples: List<ClanData>)
 
 /**
  * Wrapper for collection of clans. Can represent main collection or subset.
@@ -24,17 +14,13 @@ data class ClanListData(val clanDataTuples: List<ClanData>)
  *
  * @author Willmo3
  */
-class ClanList(data: ClanListData) {
-    // Use ArrayList as type to guarantee mutability.
-    private val clans: MutableList<Clan> = data.clanDataTuples.map { Clan(it) } as MutableList<Clan>
+class ClanList(data: List<ClanData>) {
+    private val clans = data.map { Clan(it) }
 
-    // TODO: check for duplicate clans on initialization.
     /**
-     * Convert each clan in the list back into a data tuple.
-     *
-     * @return data class representing all clans.
+     * @return This list as clan data tuples, suitable to be written as JSON.
      */
-    fun asDataTuple(): ClanListData = ClanListData(clans.map { it.asDataTuple() })
+    fun asDataTuples(): List<ClanData> = clans.map { it.asDataTuple() }
 
     /**
      * Determine whether there is a clan in this list with the given name.
@@ -77,7 +63,7 @@ class ClanList(data: ClanListData) {
  */
 fun writeToFile(path: String, clanList: ClanList) {
     val writer = FileWriter(path)
-    writer.write(Json.encodeToString(clanList.asDataTuple()))
+    writer.write(Json.encodeToString(clanList.asDataTuples()))
     writer.close()
 }
 
@@ -87,12 +73,12 @@ fun writeToFile(path: String, clanList: ClanList) {
  * @param path Location of file.
  * @return ClanList read from file.
  */
-fun readFromFile(path: String): ClanListData {
+fun readFromFile(path: String): ClanList {
     if (!File(path).exists()) {
-        return ClanListData(ArrayList<ClanData>())
+        return ClanList(listOf())
     }
     val reader = FileReader(path)
     val jsonString = reader.readText()
     reader.close()
-    return Json.decodeFromString<ClanListData>(jsonString)
+    return ClanList(Json.decodeFromString<List<ClanData>>(jsonString))
 }
