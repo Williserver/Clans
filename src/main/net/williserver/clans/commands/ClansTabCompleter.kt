@@ -31,6 +31,7 @@ class ClansTabCompleter: TabCompleter {
         // Add all possible suggestions for when the user hasn't finished their first subcommand.
         if (args.size == 1) {
             completions.add("help")
+            completions.add("create")
             // Only add completions that correspond with the subcommand they're typing.
             completions.removeAll{ !it.startsWith(args[0].lowercase()) }
         }
