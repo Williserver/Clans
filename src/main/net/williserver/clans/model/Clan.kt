@@ -22,13 +22,13 @@ data class ClanData(val name: String, val members: List<String>, val leader: Str
 /**
  * Mutable model for clan.
  *
- * @param logger Logging utility.
  * @param data Starting data store.
  *
  * @author Willmo3
  */
-class Clan(private val logger: LogHandler, data: ClanData) {
-    private var name = data.name
+class Clan(data: ClanData) {
+    var name = data.name
+        private set
     private var leader = UUID.fromString(data.leader)
     // Read serialized UUID strings into clan members.
     private var members = data.members.map { UUID.fromString(it) }
@@ -37,7 +37,6 @@ class Clan(private val logger: LogHandler, data: ClanData) {
         // Membership assertions
         // These are internal errors and so may throw exceptions -- a failure here indicates a software defect!
         if (leader !in members) {
-            logger.err("Invalid leader UUID (not in clan $name): $leader")
             throw IllegalArgumentException("Invalid leader UUID (not in clan $name): $leader")
         }
     }

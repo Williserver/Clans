@@ -9,6 +9,7 @@ import java.io.FileWriter
 
 /**
  * Persistent serializable form for a list of clans.
+ * Invariant: All clans in this list have a unique name.
  *
  * @param clanDataTuples List of clans we represent, in serializable tuple form.
  */
@@ -23,16 +24,43 @@ data class ClanListData(val clanDataTuples: List<ClanData>)
  *
  * @author Willmo3
  */
-class ClanList(private val logger: LogHandler, data: ClanListData) {
+class ClanList(data: ClanListData) {
     // Use ArrayList as type to guarantee mutability.
-    private val clans: MutableList<Clan> = data.clanDataTuples.map { Clan(logger, it) } as MutableList<Clan>
+    private val clans: MutableList<Clan> = data.clanDataTuples.map { Clan(it) } as MutableList<Clan>
 
+    // TODO: check for duplicate clans on initialization.
     /**
      * Convert each clan in the list back into a data tuple.
      *
      * @return data class representing all clans.
      */
     fun asDataTuple(): ClanListData = ClanListData(clans.map { it.asDataTuple() })
+
+    /**
+     * Determine whether there is a clan in this list with the given name.
+     *
+     * @param name Name of clan to search for
+     * @return Whether a clan with the given name is in this list.
+     */
+    operator fun contains(name: String): Boolean = clans.any { it.name == name }
+
+    /**
+     * Get the clan with a given name if it's present in this list.
+     * Otherwise, return null.
+     *
+     * @param name Name of clan to search for.
+     * @return The found clan, or null if not present.
+     */
+    fun get(name: String): Clan {
+        if (!contains(name)) throw NoSuchElementException("$name is not a clan, check with `in` helper before calling get.")
+
+        val nameMatches = clans.filter { it.name == name }
+        if (nameMatches.size > 1) {
+            throw IllegalStateException("Two clans with identical name: $name -- very illegal!")
+        }
+
+        return nameMatches.first()
+    }
 
     /**
      * @param other Object to compare against.

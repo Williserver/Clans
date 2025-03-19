@@ -9,12 +9,18 @@ import kotlin.test.assertEquals
  * @author Willmo3
  */
 class ClanListTest {
+//    fun generateClan(): Clan {
+//        val leader = UUID.randomUUID().toString()
+//        val members = listOf(leader)
+//        return Clan(ClanData("TestClan", members, leader))
+//    }
+
     @Test
     fun testConstructClanList() {
         val leader = UUID.randomUUID().toString()
         val clanData = ClanData("TestClan", listOf(leader), leader)
         val clanListData = ClanListData(listOf(clanData))
-        ClanList(LogHandler(null), clanListData)
+        ClanList(clanListData)
     }
 
     @Test
@@ -22,7 +28,7 @@ class ClanListTest {
         val leader = UUID.randomUUID().toString()
         val clanData = ClanData("TestClan", listOf(leader), leader)
         val clanListData = ClanListData(listOf(clanData))
-        assertEquals(clanListData, ClanList(LogHandler(null), clanListData).asDataTuple())
+        assertEquals(clanListData, ClanList(clanListData).asDataTuple())
     }
 
     @Test
@@ -30,12 +36,12 @@ class ClanListTest {
         val leader = UUID.randomUUID().toString()
         val clanData = ClanData("TestClan", listOf(leader), leader)
         val clanListData = ClanListData(listOf(clanData))
-        val clanList = ClanList(LogHandler(null), clanListData)
+        val clanList = ClanList(clanListData)
 
         writeToFile("testClanList.json", clanList)
         val readDataTuples = readFromFile("testClanList.json")
 
-        val readList = ClanList(LogHandler(null), readDataTuples)
+        val readList = ClanList(readDataTuples)
         assertEquals(clanList, readList);
     }
 }
