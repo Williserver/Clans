@@ -8,6 +8,7 @@ import java.io.FileWriter
 
 /**
  * Wrapper for collection of clans. Can represent main collection or subset.
+ * Each clan must have a unique name, or an assertion will be thrown!
  *
  * @param logger Logging manager.
  * @param data Serializable list of clans.
@@ -15,7 +16,18 @@ import java.io.FileWriter
  * @author Willmo3
  */
 class ClanList(data: List<ClanData>) {
-    private val clans = data.map { Clan(it) }
+    private val clans: MutableList<Clan> = ArrayList()
+
+    // Validate that all clan names are unique
+    init {
+        for (datum in data) {
+            val clan = Clan(datum)
+            if (clan in clans) {
+                throw IllegalArgumentException("[CLANS] Internal error -- Clan with name ${datum.name} already exists.")
+            }
+            clans += clan
+        }
+    }
 
     /**
      * @return This list as clan data tuples, suitable to be written as JSON.

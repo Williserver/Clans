@@ -1,7 +1,7 @@
 package net.williserver.clans.model
 
-import net.williserver.clans.LogHandler
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Assertions.assertThrows
 import java.util.*
 import kotlin.test.assertEquals
 
@@ -28,5 +28,10 @@ class ClanListTest {
 
         writeToFile("testClanList.json", clanList)
         assertEquals(clanList, readFromFile("testClanList.json"))
+    }
+
+    @Test
+    fun testNoDuplicateClanNames() {
+        assertThrows(IllegalArgumentException::class.java) { ClanList(listOf(generateClanData(), generateClanData())) }
     }
 }

@@ -48,7 +48,8 @@ class Clan(data: ClanData) {
     fun asDataTuple(): ClanData = ClanData(name, members.map { it.toString() }, leader.toString())
     /**
      * @param other Object to compare against.
-     * @return Whether other is equal to this clan; i.e. it is a clan with the same name, members, and officers.
+     * @return Whether other is equal to this clan; i.e. it is a clan with the same name.
+     * Notice this is a loose notion -- clans are assumed to have unique names!
      */
-    override fun equals(other: Any?): Boolean = other is Clan && other.name == name && other.members == members && other.leader == leader
+    override fun equals(other: Any?): Boolean = other is Clan && other.name == name
 }
