@@ -4,6 +4,9 @@ import kotlinx.serialization.json.Json
 import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
+import java.util.*
+import kotlin.NoSuchElementException
+import kotlin.collections.ArrayList
 
 
 /**
@@ -28,6 +31,13 @@ class ClanList(data: List<ClanData>) {
             clans += clan
         }
     }
+
+    /**
+     * Find the clan in this list that has player as a member.
+     * @param UUID player to search for.
+     * @return The clan UUID is a member of, or null if no such clan exists.
+     */
+    fun playerClan(playerToFind: UUID): Clan? = clans.find { playerToFind in it }
 
     /**
      * @return This list as clan data tuples, suitable to be written as JSON.
