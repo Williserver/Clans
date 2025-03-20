@@ -43,4 +43,22 @@ class ClanListTest {
         assertEquals(Clan(clanData), list.playerClan(UUID.fromString(clanData.leader)))
         assertNull(list.playerClan(UUID.randomUUID()))
     }
+
+    @Test
+    fun testAddClan() {
+        val clanData = generateClanData()
+        val list = ClanList(listOf(clanData))
+
+        // Cannot add duplicate clans.
+        val sameLeaderClan = ClanData("NewTestClan", listOf(clanData.leader), clanData.leader)
+        assertThrows(IllegalArgumentException::class.java) { list.addClan(Clan(sameLeaderClan)) }
+
+        val newLeader = UUID.randomUUID().toString()
+        val sameNameClan = ClanData("TestClan", listOf(newLeader), newLeader)
+        assertThrows(IllegalArgumentException::class.java) { list.addClan(Clan(sameNameClan)) }
+
+        val uniqueClan = ClanData("ThisShouldWork!", listOf(newLeader), newLeader)
+        list.addClan(Clan(uniqueClan))
+        assert(uniqueClan.name in list)
+    }
 }

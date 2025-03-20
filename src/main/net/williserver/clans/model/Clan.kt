@@ -1,6 +1,5 @@
 package net.williserver.clans.model
 import kotlinx.serialization.Serializable
-import net.williserver.clans.LogHandler
 import java.util.*
 
 // -- name
@@ -29,7 +28,7 @@ data class ClanData(val name: String, val members: List<String>, val leader: Str
 class Clan(data: ClanData) {
     var name = data.name
         private set
-    private var leader = UUID.fromString(data.leader)
+    var leader = UUID.fromString(data.leader)
     // Read serialized UUID strings into clan members.
     private var members = data.members.map { UUID.fromString(it) }
 

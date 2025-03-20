@@ -76,7 +76,12 @@ class ClansCommand(private val logger: LogHandler,
             return true
         }
 
-        // Check if the player is already in a clan.
+        // Check if the leader is already in a clan.
+        val leader = s.uniqueId
+        if (clanList.playerClan(leader)!= null) {
+            s.sendMessage(Component.text("[CLANS]: You are already in a clan!", NamedTextColor.RED))
+            return true
+        }
 
         // Create a new clan with this player as its leader and starting member.
 

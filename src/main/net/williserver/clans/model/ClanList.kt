@@ -33,6 +33,27 @@ class ClanList(data: List<ClanData>) {
     }
 
     /**
+     * Add a new clan to the ClanList.
+     *
+     * First ensure that no clans with the same name exist,
+     * and that the new clan's leader is not already in another clan in this list.
+     *
+     * Then, add newClan to the list.
+     *
+     * @param newClan clan to add.
+     * @throws IllegalArgumentException if invariants are violated
+     */
+    fun addClan(newClan: Clan) {
+        if (newClan in clans) {
+            throw IllegalArgumentException("[CLANS] Internal error -- Clan with name ${newClan.name} already exists.")
+        } else if (clans.any { newClan.leader in it}) {
+            throw IllegalArgumentException("[CLANS] Internal error -- Leader already in a clan.")
+        }
+
+        clans += newClan
+    }
+
+    /**
      * Find the clan in this list that has player as a member.
      * @param UUID player to search for.
      * @return The clan UUID is a member of, or null if no such clan exists.
