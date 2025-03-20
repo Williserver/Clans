@@ -21,10 +21,11 @@ data class ClanData(val name: String, val members: List<String>, val leader: Str
 /**
  * Mutable model for clan.
  *
- * @param name Name of clan. Must not change!
+ * @param name Name of clan. Must not change, and must be alphanumeric with minus or underscores.
  * @param leader Leader of clan.
  * @param members List of members of clan.
  *
+ * @throws IllegalArgumentException if names
  * @author Willmo3
  */
 class Clan(val name: String, leader: UUID, private val members: MutableList<UUID>) {
@@ -46,6 +47,9 @@ class Clan(val name: String, leader: UUID, private val members: MutableList<UUID
      * Construction-time assertions, such as ensuring all rank holders are in the clan.
      */
     init {
+        if (!validClanName(name)) {
+            throw IllegalArgumentException("Invalid clan name!")
+        }
         if (leader !in members) {
             throw IllegalArgumentException("Invalid leader UUID (not in clan $name): $leader")
         }

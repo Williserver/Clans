@@ -57,7 +57,7 @@ class ClanListTest {
         val sameNameClan = ClanData("TestClan", listOf(newLeader), newLeader)
         assertThrows(IllegalArgumentException::class.java) { list.addClan(Clan(sameNameClan)) }
 
-        val uniqueClan = ClanData("ThisShouldWork!", listOf(newLeader), newLeader)
+        val uniqueClan = ClanData("ThisShouldWork", listOf(newLeader), newLeader)
         list.addClan(Clan(uniqueClan))
         assert(uniqueClan.name in list)
     }
