@@ -1,6 +1,5 @@
 package net.williserver.clans.model
 
-import net.williserver.clans.LogHandler
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import java.util.*
@@ -9,15 +8,17 @@ import java.util.*
  * @author Willmo3
  */
 class ClanTest {
-    private val logHandler = LogHandler(null);
-
-    @Test
-    fun constructValidClan() {
+    private fun generateValidClan(): Clan {
         val leader = UUID.randomUUID().toString()
         val data = ClanData("TestClan",
             listOf(leader, UUID.randomUUID().toString()),
             leader)
-        Clan(data)
+        return Clan(data)
+    }
+
+    @Test
+    fun constructValidClan() {
+        generateValidClan()
     }
 
     @Test
@@ -26,5 +27,15 @@ class ClanTest {
             listOf(UUID.randomUUID().toString(), UUID.randomUUID().toString()),
             UUID.randomUUID().toString())
         assertThrows(IllegalArgumentException::class.java) { Clan(data) }
+    }
+
+    @Test
+    fun joinClan() {
+        val clan = generateValidClan()
+        val newMember = UUID.randomUUID()
+        assert(newMember !in clan)
+        clan.join(newMember)
+        assert(newMember in clan)
+        assertThrows(IllegalArgumentException::class.java) { clan.join(newMember) }
     }
 }

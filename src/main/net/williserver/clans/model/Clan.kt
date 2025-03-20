@@ -42,10 +42,28 @@ class Clan(data: ClanData) {
     }
 
     /**
+     * Add a new player to the clan.
+     * @param recruit UUID of player to join.
+     */
+    fun join(recruit: UUID) {
+        if (contains(recruit)) {
+            throw IllegalArgumentException("UUID $recruit already in clan $name.")
+        }
+        members += recruit
+    }
+
+    /**
      * Convert the object back to a tuple of ClanData. Useful for serialization.
      * @return ClanData tuple form of this data.
      */
     fun asDataTuple(): ClanData = ClanData(name, members.map { it.toString() }, leader.toString())
+
+    /**
+     * Check whether a UUID is already in the clan.
+     * @param member UUID of member to check.
+     */
+    operator fun contains(member: UUID): Boolean = member in members
+
     /**
      * @param other Object to compare against.
      * @return Whether other is equal to this clan; i.e. it is a clan with the same name.
