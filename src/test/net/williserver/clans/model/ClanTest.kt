@@ -38,4 +38,13 @@ class ClanTest {
         assert(newMember in clan)
         assertThrows(IllegalArgumentException::class.java) { clan.join(newMember) }
     }
+
+    @Test
+    fun validClanName() {
+        assert(validClanName("123Test-Clan_"))
+        assert(!validClanName("\"\""))
+        assert(!validClanName("{123}"))
+        assert(!validClanName(""))
+        assert(!validClanName(" "))
+    }
 }

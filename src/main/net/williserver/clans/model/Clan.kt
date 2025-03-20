@@ -81,3 +81,10 @@ class Clan(val name: String, leader: UUID, private val members: MutableList<UUID
      */
     override fun equals(other: Any?): Boolean = other is Clan && other.name == name
 }
+
+/**
+ * Check whether a clan name is valid -- i.e., contains only alphanumeric characters, underscore, and dash.
+ *
+ * @param name Name to validate.
+ */
+fun validClanName(name: String): Boolean = name.matches("^([a-zA-Z0-9]|-|_)+$".toRegex())
