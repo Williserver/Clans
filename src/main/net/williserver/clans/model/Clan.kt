@@ -21,20 +21,31 @@ data class ClanData(val name: String, val members: List<String>, val leader: Str
 /**
  * Mutable model for clan.
  *
- * @param data Starting data store.
+ * @param name Name of clan. Must not change!
+ * @param leader Leader of clan.
+ * @param members List of members of clan.
  *
  * @author Willmo3
  */
-class Clan(data: ClanData) {
-    var name = data.name
+class Clan(val name: String, leader: UUID, private val members: MutableList<UUID>) {
+    // Leader should be publicly visible, but for now, we restrict set to internal.
+    var leader = leader
         private set
-    var leader = UUID.fromString(data.leader)
-    // Read serialized UUID strings into clan members.
-    private var members = data.members.map { UUID.fromString(it) }
 
+    /**
+     * Data tuple constructor for clan. Applies transformations to serializable data to get a canonical clan.
+     * @param data Tuple containing strings for clan data.
+     */
+    constructor(data: ClanData) : this(
+        data.name,
+        UUID.fromString(data.leader),
+        ArrayList(data.members.map { UUID.fromString(it) })
+    )
+
+    /*
+     * Construction-time assertions, such as ensuring all rank holders are in the clan.
+     */
     init {
-        // Membership assertions
-        // These are internal errors and so may throw exceptions -- a failure here indicates a software defect!
         if (leader !in members) {
             throw IllegalArgumentException("Invalid leader UUID (not in clan $name): $leader")
         }
