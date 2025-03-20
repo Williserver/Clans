@@ -5,10 +5,12 @@ import net.kyori.adventure.text.format.NamedTextColor
 import net.williserver.clans.LogHandler
 import net.williserver.clans.model.Clan
 import net.williserver.clans.model.ClanList
+import net.williserver.clans.model.validClanName
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import java.util.*
 
 /**
  * Base clans command for viewing and modifying clans.
@@ -55,23 +57,29 @@ class ClansCommand(private val logger: LogHandler,
      *
      * @param s Command sender; must be a player.
      * @param args Arguments to command, such as name.
+     *
+     * @return Whether the usage message should not be displayed.
      */
     private fun create(s: CommandSender, args: Array<out String>): Boolean {
-        if (s !is Player) {
+        // Initial validation.
+        if (args.size > 2) {
+            // Returing false here -- this is the only place where the server should send a usage message!
+            return false
+        } else if (args.size < 2) {
+            s.sendMessage(Component.text("[CLANS]: Your clan needs a name!", NamedTextColor.RED))
+            return true
+        } else if (s !is Player) {
             s.sendMessage(Component.text("[CLANS]: You must be a player to create a clan!", NamedTextColor.RED))
-            return false
-        } else if (args.size != 2) {
-            // Special case: A clan name is omitted. Extra help info provided.
-            if (args.size < 2) {
-                s.sendMessage(Component.text("[CLANS]: Your clan needs a name!", NamedTextColor.RED))
-            }
-            return false
+            return true
         }
-        return true
 
-        // Check if the clan name already exists.
+        // Check if the clan name is valid and unique.
         val name = args[1]
-        if (name in clanList) {
+        if (!validClanName(name)) {
+            s.sendMessage(Component.text("[CLANS]: You have specified an invalid clan name.", NamedTextColor.RED))
+            s.sendMessage(Component.text("Use only alphanumeric characters, underscore, and dash.", NamedTextColor.RED))
+            return true
+        } else if (name in clanList) {
             s.sendMessage(Component.text("[CLANS]: The name $name is already taken, try a new one!", NamedTextColor.RED))
             return true
         }
@@ -84,9 +92,13 @@ class ClansCommand(private val logger: LogHandler,
         }
 
         // Create a new clan with this player as its leader and starting member.
-
+        val newClan = Clan(name, leader, arrayListOf(leader))
         // Insert the clan into the main ClanList.
+        clanList.addClan(newClan)
 
+        s.sendMessage(Component.text(
+            "[CLANS]: Congratulations chief ${s.name}, your clan ${newClan.name} has been created!",
+            NamedTextColor.GREEN))
         return true
     }
 }
