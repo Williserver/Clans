@@ -3,6 +3,7 @@ package net.williserver.clans.model
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import java.util.*
+import kotlin.test.assertEquals
 
 /**
  * @author Willmo3
@@ -46,5 +47,17 @@ class ClanTest {
         assert(!validClanName("{123}"))
         assert(!validClanName(""))
         assert(!validClanName(" "))
+    }
+
+    @Test
+    fun testRank() {
+        val leader = UUID.randomUUID()
+        val member = UUID.randomUUID()
+        val members = arrayListOf(leader, member)
+        val clan = Clan("TestClan", leader, members)
+
+        assertEquals(ClanRank.LEADER, clan.rankOfMember(leader))
+        assertEquals(ClanRank.MEMBER, clan.rankOfMember(member))
+        assertThrows(IllegalArgumentException::class.java) { clan.rankOfMember(UUID.randomUUID()) }
     }
 }

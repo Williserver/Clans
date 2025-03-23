@@ -55,9 +55,14 @@ class Clan(val name: String, leader: UUID, private val members: MutableList<UUID
         }
     }
 
+    /*
+     * Clan manipulators.
+     */
+
     /**
      * Add a new player to the clan.
      * @param recruit UUID of player to join.
+     * @throws IllegalArgumentException If recruit already in a clan
      */
     fun join(recruit: UUID) {
         if (contains(recruit)) {
@@ -66,17 +71,41 @@ class Clan(val name: String, leader: UUID, private val members: MutableList<UUID
         members += recruit
     }
 
-    /**
-     * Convert the object back to a tuple of ClanData. Useful for serialization.
-     * @return ClanData tuple form of this data.
+    /*
+     * Member information getters.
      */
-    fun asDataTuple(): ClanData = ClanData(name, members.map { it.toString() }, leader.toString())
+
+    /**
+     * Get the rank of a clan member. Throw an exception if they're not in the clan.
+     *
+     * @param member UUID of member to get rank for.
+     * @return the rank of member in this clan.
+     * @throws IllegalArgumentException If the specified member is not in this clan.
+     */
+    fun rankOfMember(member: UUID): ClanRank =
+        if (member == leader) {
+            ClanRank.LEADER
+        } else if (member in members) {
+            ClanRank.MEMBER
+        } else {
+            throw IllegalArgumentException("Member $member is not in clan $name.")
+        }
 
     /**
      * Check whether a UUID is already in the clan.
      * @param member UUID of member to check.
      */
     operator fun contains(member: UUID): Boolean = member in members
+
+    /*
+     * Assorted helpers.
+     */
+
+    /**
+     * Convert the object back to a tuple of ClanData. Useful for serialization.
+     * @return ClanData tuple form of this data.
+     */
+    fun asDataTuple(): ClanData = ClanData(name, members.map { it.toString() }, leader.toString())
 
     /**
      * @param other Object to compare against.
