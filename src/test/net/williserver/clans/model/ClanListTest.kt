@@ -69,4 +69,16 @@ class ClanListTest {
         list.addClan(Clan(uniqueClan))
         assert(uniqueClan.name in list)
     }
+
+    @Test
+    fun testRemoveClan() {
+        val clanData = generateClanData()
+        val clan = Clan(clanData)
+        val list = ClanList(listOf(clanData))
+
+        assert(clan.name in list)
+        list.removeClan(clan)
+        assert(clan.name !in list)
+        assertThrows(IllegalArgumentException::class.java) { list.removeClan(clan) }
+    }
 }

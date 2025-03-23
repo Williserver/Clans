@@ -32,6 +32,10 @@ class ClanList(data: List<ClanData>) {
         }
     }
 
+    /*
+     * ClanList mutators.
+     */
+
     /**
      * Add a new clan to the ClanList.
      *
@@ -49,8 +53,20 @@ class ClanList(data: List<ClanData>) {
         } else if (clans.any { newClan.leader in it}) {
             throw IllegalArgumentException("[CLANS] Internal error -- Leader already in a clan.")
         }
-
         clans += newClan
+    }
+
+    /**
+     * Remove a clan from the ClanList. This effectively deletes it.
+     *
+     * @param clanToRemove Clan to remove from the list.
+     * @throws IllegalArgumentException If the clan is not in this list.
+     */
+    fun removeClan(clanToRemove: Clan) {
+        if (clanToRemove !in clans) {
+            throw IllegalArgumentException("Clan ${clanToRemove.name} is not in this list!")
+        }
+        clans -= clanToRemove
     }
 
     /**
