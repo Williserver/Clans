@@ -1,16 +1,29 @@
 package net.williserver.clans.model
 
 /**
+ * Named permissions for important clan actions.
+ * @author Willmo3
+ */
+enum class ClanPermission {
+    DISBAND,
+}
+
+/**
  * Represents a rank in a clan -- effectively, a named wrapper around a number representing relative authority.
  *
  * @param rank Digit precedence for rank.
  * @author Willmo3
  */
-enum class ClanRank(val rank: UInt): Comparable<ClanRank> {
-    MEMBER(0u),
-    ELDER(1u),
-    COLEADER(2u),
-    LEADER(3u);
+enum class ClanRank(private val rank: UInt, private val permissions: Array<ClanPermission>): Comparable<ClanRank> {
+    MEMBER(0u, arrayOf()),
+    ELDER(1u, arrayOf()),
+    COLEADER(2u, arrayOf()),
+    LEADER(3u, arrayOf(ClanPermission.DISBAND));
+
+    /**
+     * @return Whether this ClanRank has the specified permission in its permission slist.
+     */
+    fun hasPermission(permission: ClanPermission) = permission in permissions
 
     /**
      * Return the next rank (i.e. that this would be promoted to)

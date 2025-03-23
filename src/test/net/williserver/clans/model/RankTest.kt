@@ -1,5 +1,7 @@
 package net.williserver.clans.model
 
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
@@ -20,5 +22,12 @@ class RankTest {
         assertEquals(ClanRank.MEMBER, ClanRank.ELDER.previousRank())
         assertEquals(ClanRank.ELDER, ClanRank.COLEADER.previousRank())
         assertEquals(ClanRank.COLEADER, ClanRank.LEADER.previousRank())
+    }
+    @Test
+    fun hasDisband() {
+        assertFalse(ClanRank.MEMBER.hasPermission(ClanPermission.DISBAND))
+        assertFalse(ClanRank.ELDER.hasPermission(ClanPermission.DISBAND))
+        assertFalse(ClanRank.COLEADER.hasPermission(ClanPermission.DISBAND))
+        assertTrue(ClanRank.LEADER.hasPermission(ClanPermission.DISBAND))
     }
 }
