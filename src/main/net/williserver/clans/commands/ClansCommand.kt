@@ -23,14 +23,13 @@ import java.util.*
 class ClansCommand(private val logger: LogHandler,
                     private val clanList: ClanList): CommandExecutor {
 
-    override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean =
+    override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean =
         if (args.isNotEmpty()) {
             when(args[0]) {
-                "help" -> help(sender, args)
                 "create" -> create(sender, args)
-                else -> false
+                else -> help(sender, args)
             }
-        } else false
+        } else help(sender, args)
 
     /**
      * Usage information for plugin commands.
@@ -60,7 +59,7 @@ class ClansCommand(private val logger: LogHandler,
      *
      * @return Whether the usage message should not be displayed.
      */
-    private fun create(s: CommandSender, args: Array<out String>): Boolean {
+    private fun create(s: CommandSender, args: Array<String>): Boolean {
         // Initial validation.
         if (args.size > 2) {
             // Returing false here -- this is the only place where the server should send a usage message!
@@ -86,7 +85,7 @@ class ClansCommand(private val logger: LogHandler,
 
         // Check if the leader is already in a clan.
         val leader = s.uniqueId
-        if (clanList.playerClan(leader)!= null) {
+        if (clanList.playerInClan(leader)) {
             s.sendMessage(Component.text("[CLANS]: You are already in a clan!", NamedTextColor.RED))
             return true
         }
@@ -99,6 +98,18 @@ class ClansCommand(private val logger: LogHandler,
         s.sendMessage(Component.text(
             "[CLANS]: Congratulations chief ${s.name}, your clan ${newClan.name} has been created!",
             NamedTextColor.GREEN))
+        return true
+    }
+
+    /**
+     * Disband the sending player's clan, if they have the requisite permissions.
+     */
+    private fun disband(s: CommandSender, args: Array<out String>): Boolean {
+        if (args.size != 1) {
+            return false
+        }
+
+
         return true
     }
 }

@@ -54,11 +54,22 @@ class ClanList(data: List<ClanData>) {
     }
 
     /**
+     * Checks whether a player is in a clan on this list.
+     * Note: this should be called before using playerClan.
+     *
+     * @param playerToFind UUID for player.
+     * @return Whether the player is in a clan in thist list.
+     */
+    fun playerInClan(playerToFind: UUID) = clans.any { playerToFind in it }
+
+    /**
      * Find the clan in this list that has player as a member.
+     *
+     * @throws NullPointerException If no player in clan.
      * @param UUID player to search for.
      * @return The clan UUID is a member of, or null if no such clan exists.
      */
-    fun playerClan(playerToFind: UUID): Clan? = clans.find { playerToFind in it }
+    fun playerClan(playerToFind: UUID): Clan = clans.find { playerToFind in it }!!
 
     /**
      * @return This list as clan data tuples, suitable to be written as JSON.

@@ -1,10 +1,10 @@
 package net.williserver.clans.model
 
-import org.junit.jupiter.api.Assertions.assertNull
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Test
 import java.util.*
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 
 /**
  * @author Willmo3
@@ -40,8 +40,16 @@ class ClanListTest {
     fun testPlayerClan() {
         val clanData = generateClanData()
         val list = ClanList(listOf(clanData))
+        assert(list.playerInClan(UUID.fromString(clanData.leader)))
         assertEquals(Clan(clanData), list.playerClan(UUID.fromString(clanData.leader)))
-        assertNull(list.playerClan(UUID.randomUUID()))
+    }
+
+    @Test
+    fun testPlayerNotInClan() {
+        val clanData = generateClanData()
+        val list = ClanList(listOf(clanData))
+        assertFalse(list.playerInClan(UUID.randomUUID()))
+        assertThrows(NullPointerException::class.java) { list.playerClan(UUID.randomUUID()) }
     }
 
     @Test
