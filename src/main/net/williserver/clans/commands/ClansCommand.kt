@@ -5,7 +5,9 @@ import net.kyori.adventure.text.format.NamedTextColor
 import net.williserver.clans.LogHandler
 import net.williserver.clans.model.Clan
 import net.williserver.clans.model.ClanList
+import net.williserver.clans.model.ClanPermission
 import net.williserver.clans.model.validClanName
+import org.bukkit.Bukkit.broadcast
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
@@ -27,6 +29,7 @@ class ClansCommand(private val logger: LogHandler,
         if (args.isNotEmpty()) {
             when(args[0]) {
                 "create" -> create(sender, args)
+                "disband" -> disband(sender, args)
                 else -> help(sender, args)
             }
         } else help(sender, args)
@@ -46,6 +49,7 @@ class ClansCommand(private val logger: LogHandler,
         help.append("Clans commands:\n")
         help.append("-- /clans help: pull up this help menu.\n")
         help.append("-- /clans create (name): Create a new clan under your visionary leadership.\n")
+        help.append("-- /clans disband: Disband the clan you own, if you have permission.\n")
 
         s.sendMessage(help.toString())
         return true
@@ -95,21 +99,41 @@ class ClansCommand(private val logger: LogHandler,
         // Insert the clan into the main ClanList.
         clanList.addClan(newClan)
 
-        s.sendMessage(Component.text(
-            "[CLANS]: Congratulations chief ${s.name}, your clan ${newClan.name} has been created!",
+        broadcast(Component.text(
+            "[CLANS]: Chief ${s.name} has formed the clan \"${newClan.name}\"!",
             NamedTextColor.GREEN))
         return true
     }
 
     /**
      * Disband the sending player's clan, if they have the requisite permissions.
+     *
+     * @param s Command sender; must be a player.
+     * @param args Arguments to command. Should be none -- implicit argument is the clan player is a member of.
      */
     private fun disband(s: CommandSender, args: Array<out String>): Boolean {
+        // API validation
         if (args.size != 1) {
             return false
+        } else if (s !is Player) {
+            s.sendMessage(Component.text("[CLANS]: You must be a player to disband your clan!", NamedTextColor.RED))
+            return true
         }
 
+        // Validate that player has appropriate permissions in some clan.
+        if (!clanList.playerInClan(s.uniqueId)) {
+            s.sendMessage(Component.text("[CLANS]: You must be in a clan!", NamedTextColor.RED))
+            return true
+        }
+        val clan = clanList.playerClan(s.uniqueId)
+        if (!clan.rankOfMember(s.uniqueId).hasPermission(ClanPermission.DISBAND)) {
+            s.sendMessage(Component.text("[CLANS]: You don't have permission to disband this clan!", NamedTextColor.RED))
+            return true
+        }
 
+        // Delete the clan by removing it from the associated ClanList.
+        clanList.removeClan(clan)
+        broadcast(Component.text("[CLANS]: Clan \"${clan.name}\" has disbanded!", NamedTextColor.DARK_PURPLE))
         return true
     }
 }
