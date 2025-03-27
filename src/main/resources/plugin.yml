@@ -6,4 +6,4 @@ api-version: 1.21
 commands:
   clans:
     description: Base command for interfacing with clans plugin.
-    usage: "Usage: /clans [help | create (name) | disband]"
+    usage: "Usage: /clans [help | create (name) | disband (confirm)?]"

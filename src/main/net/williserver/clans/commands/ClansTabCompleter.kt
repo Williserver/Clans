@@ -35,6 +35,12 @@ class ClansTabCompleter: TabCompleter {
             completions.add("disband")
             // Only add completions that correspond with the subcommand they're typing.
             completions.removeAll{ !it.startsWith(args[0].lowercase()) }
+        } else if (args.size == 2) {
+            if (args[0] == "disband") {
+                completions.add("confirm")
+            }
+            completions.removeAll{ !it.startsWith(args[1].lowercase()) }
+
         }
 
         return completions

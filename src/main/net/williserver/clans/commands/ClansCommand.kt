@@ -25,9 +25,14 @@ import java.util.*
 class ClansCommand(private val logger: LogHandler,
                     private val clanList: ClanList): CommandExecutor {
 
+    /*
+     * Map of clans to timers confirming their deletion.
+     */
+    private val clanConfirmDeleteMap = hashMapOf<Clan, ConfirmTimer>()
+
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean =
         if (args.isNotEmpty()) {
-            when(args[0]) {
+            when(args[0].lowercase(Locale.getDefault())) {
                 "create" -> create(sender, args)
                 "disband" -> disband(sender, args)
                 else -> help(sender, args)
@@ -49,9 +54,10 @@ class ClansCommand(private val logger: LogHandler,
         help.append("Clans commands:\n")
         help.append("-- /clans help: pull up this help menu.\n")
         help.append("-- /clans create (name): Create a new clan under your visionary leadership.\n")
-        help.append("-- /clans disband: Disband the clan you own, if you have permission.\n")
+        help.append("-- /clans disband: Begin to disband the clan you own.\n")
+        help.append("-- /clans disband confirm: Finish disbanding the clan you own.\n")
 
-        s.sendMessage(help.toString())
+        s.sendMessage(Component.text(help.toString(), NamedTextColor.GREEN))
         return true
     }
 
@@ -107,13 +113,15 @@ class ClansCommand(private val logger: LogHandler,
 
     /**
      * Disband the sending player's clan, if they have the requisite permissions.
+     * First, the user must execute /clans disband. This starts a confirmation timer.
+     * Then, the user must execute /clans disband confirm within the required time.
      *
      * @param s Command sender; must be a player.
      * @param args Arguments to command. Should be none -- implicit argument is the clan player is a member of.
      */
     private fun disband(s: CommandSender, args: Array<out String>): Boolean {
         // API validation
-        if (args.size != 1) {
+        if (args.size != 1 && args.size != 2) {
             return false
         } else if (s !is Player) {
             s.sendMessage(Component.text("[CLANS]: You must be a player to disband your clan!", NamedTextColor.RED))
@@ -131,9 +139,46 @@ class ClansCommand(private val logger: LogHandler,
             return true
         }
 
-        // Delete the clan by removing it from the associated ClanList.
-        clanList.removeClan(clan)
-        broadcast(Component.text("[CLANS]: Clan \"${clan.name}\" has disbanded!", NamedTextColor.DARK_PURPLE))
-        return true
+        // Either initiate a new disband attempt, or confirm one if it's done in time.
+        return when(args.size) {
+            1 -> {
+                /*
+                 * Initiate a disband timer, giving the user 60 seconds to confirm clan deletion.
+                 */
+                if (clanConfirmDeleteMap[clan] == null) {
+                    // TODO: add config keeping this from being a magic number.
+                    clanConfirmDeleteMap[clan] = ConfirmTimer(60)
+                }
+
+                s.sendMessage(Component.text("[CLANS]: You have begun to disband your clan!", NamedTextColor.LIGHT_PURPLE))
+                s.sendMessage(Component.text("[CLANS]: Enter /clans disband confirm within 60 seconds to confirm this choice.", NamedTextColor.LIGHT_PURPLE))
+                clanConfirmDeleteMap[clan]!!.reset()
+                clanConfirmDeleteMap[clan]!!.startTimer()
+                true
+            }
+            2 -> {
+                /*
+                 * Confirm that the clan should be disbanded after the timer started.
+                 * If so, remove the clan from this list.
+                 */
+                if (args[1].lowercase(Locale.getDefault()) != "confirm") {
+                    return false
+                } else if (clanConfirmDeleteMap[clan] == null || !clanConfirmDeleteMap[clan]!!.isRunning()) {
+                    s.sendMessage(Component.text("[CLANS]: You have attempted to delete your clan with \"/clan delete confirm\" before starting the deletion timer!", NamedTextColor.RED))
+                    s.sendMessage(Component.text("[CLANS]: Please start the timer with \"/clans disband\" first, or ignore this message to keep your clan.", NamedTextColor.RED))
+                } else if (!clanConfirmDeleteMap[clan]!!.inBounds()) {
+                    s.sendMessage(Component.text("[CLANS]: The timer to disband your clan has expired!", NamedTextColor.RED))
+                    s.sendMessage(Component.text("[CLANS]: To delete your clan, enter \"/clans disband\", or ignore this message to keep your clan.", NamedTextColor.RED))
+                } else {
+                    // Delete the clan by removing it from the associated ClanList.
+                    clanList.removeClan(clan)
+                    broadcast(Component.text("[CLANS]: Clan \"${clan.name}\" has disbanded!", NamedTextColor.DARK_PURPLE))
+                }
+                true
+            }
+            else -> throw IllegalArgumentException("[CLANS]: Internal error: Wrong number of arguments to /clan disband -- this should have been caught earlier!")
+        }
     }
+
+
 }
