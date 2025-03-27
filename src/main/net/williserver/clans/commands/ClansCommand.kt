@@ -37,7 +37,8 @@ class ClansCommand(private val logger: LogHandler,
             when(args[0].lowercase(Locale.getDefault())) {
                 "create" -> create(sender, args)
                 "disband" -> disband(sender, args)
-                else -> help(sender, args)
+                "help" -> help(sender, args)
+                else -> false
             }
         } else help(sender, args)
 
@@ -48,7 +49,8 @@ class ClansCommand(private val logger: LogHandler,
      * @param args Args for command. Since this is the help command, should only be one arg.
      */
     private fun help(s: CommandSender, args: Array<out String>): Boolean {
-        if (args.size != 1) {
+        // Help may be invoked with zero or one arguments.
+        if (args.size > 1) {
             return false
         }
 
@@ -57,7 +59,7 @@ class ClansCommand(private val logger: LogHandler,
         help.append("-- /clans help: pull up this help menu.\n")
         help.append("-- /clans create (name): Create a new clan under your visionary leadership.\n")
         help.append("-- /clans disband: Begin to disband the clan you own.\n")
-        help.append("-- /clans disband confirm: Finish disbanding the clan you own.\n")
+        help.append("-- /clans disband confirm: Finish disbanding the clan you own.")
 
         s.sendMessage(Component.text(help.toString(), NamedTextColor.GREEN))
         return true
