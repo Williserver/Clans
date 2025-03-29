@@ -3,6 +3,7 @@ package net.williserver.clans
 import net.williserver.clans.commands.ClansCommand
 import net.williserver.clans.commands.ClansTabCompleter
 import net.williserver.clans.model.ClanList
+import net.williserver.clans.model.ClansConfigLoader
 import net.williserver.clans.model.readFromFile
 import net.williserver.clans.model.writeToFile
 import org.bukkit.plugin.java.JavaPlugin
@@ -23,12 +24,13 @@ class ClansPlugin : JavaPlugin() {
     override fun onEnable() {
         // Note: even with an empty config, this is necessary to generate the data directory.
         saveDefaultConfig()
+        val config = ClansConfigLoader(handler, config).config
 
         // Read base clan list.
         clanList = readFromFile(path)
 
         // Register commands.
-        this.getCommand("clans")!!.setExecutor(ClansCommand(handler, clanList))
+        this.getCommand("clans")!!.setExecutor(ClansCommand(handler, config, clanList))
         this.getCommand("clans")!!.tabCompleter = ClansTabCompleter()
 
         handler.info("Enabled")

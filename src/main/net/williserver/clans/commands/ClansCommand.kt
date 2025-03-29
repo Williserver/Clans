@@ -3,10 +3,7 @@ package net.williserver.clans.commands
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.williserver.clans.LogHandler
-import net.williserver.clans.model.Clan
-import net.williserver.clans.model.ClanList
-import net.williserver.clans.model.ClanPermission
-import net.williserver.clans.model.validClanName
+import net.williserver.clans.model.*
 import org.bukkit.Bukkit.broadcast
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
@@ -20,12 +17,14 @@ const val commandMessagePrefix = "[CLANS]"
  * Base clans command for viewing and modifying clans.
  *
  * @param logger Logging manager
+ * @param config Configuration options for this session.
  * @param clanList clan model for this session.
  *
  * @author Willmo3
  */
 class ClansCommand(private val logger: LogHandler,
-                    private val clanList: ClanList): CommandExecutor {
+                   private val config: ClansConfig,
+                   private val clanList: ClanList): CommandExecutor {
 
     /*
      * Map of clans to timers confirming their deletion.
@@ -150,12 +149,11 @@ class ClansCommand(private val logger: LogHandler,
                  * Initiate a disband timer, giving the user 60 seconds to confirm clan deletion.
                  */
                 if (clanConfirmDeleteMap[clan] == null) {
-                    // TODO: add config keeping this from being a magic number.
-                    clanConfirmDeleteMap[clan] = ConfirmTimer(60)
+                    clanConfirmDeleteMap[clan] = ConfirmTimer(config.confirmDisbandTime.toLong())
                 }
 
                 s.sendMessage(Component.text("$commandMessagePrefix: You have begun to disband your clan!", NamedTextColor.LIGHT_PURPLE))
-                s.sendMessage(Component.text("$commandMessagePrefix: Enter /clans disband confirm within 60 seconds to confirm this choice.", NamedTextColor.LIGHT_PURPLE))
+                s.sendMessage(Component.text("$commandMessagePrefix: Enter /clans disband confirm within ${config.confirmDisbandTime} seconds to confirm this choice.", NamedTextColor.LIGHT_PURPLE))
                 clanConfirmDeleteMap[clan]!!.reset()
                 clanConfirmDeleteMap[clan]!!.startTimer()
                 true
