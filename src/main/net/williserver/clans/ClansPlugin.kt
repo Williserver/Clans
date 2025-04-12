@@ -31,7 +31,7 @@ class ClansPlugin : JavaPlugin() {
 
         // Register commands.
         this.getCommand("clans")!!.setExecutor(ClansCommand(handler, config, clanList))
-        this.getCommand("clans")!!.tabCompleter = ClansTabCompleter()
+        this.getCommand("clans")!!.tabCompleter = ClansTabCompleter(clanList)
 
         handler.info("Enabled")
     }

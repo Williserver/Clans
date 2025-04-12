@@ -1,10 +1,17 @@
 package net.williserver.clans.commands
 
+import net.williserver.clans.model.ClanList
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
+import java.util.*
 
-class ClansTabCompleter: TabCompleter {
+/**
+ * State for clans tab completion.
+ *
+ * @param clanList list of clans in this session.
+ */
+class ClansTabCompleter(private val clanList: ClanList): TabCompleter {
 
     /**
      * Tab completion for clans command.
@@ -37,8 +44,9 @@ class ClansTabCompleter: TabCompleter {
             // Only add completions that correspond with the subcommand they're typing.
             completions.removeAll{ !it.startsWith(args[0].lowercase()) }
         } else if (args.size == 2) {
-            if (args[0] == "disband") {
-                completions.add("confirm")
+            when (args[0].lowercase()) {
+                "info" -> clanList.forEachClan { completions.add(it.name) }
+                else -> completions.add("confirm")
             }
             completions.removeAll{ !it.startsWith(args[1].lowercase()) }
 

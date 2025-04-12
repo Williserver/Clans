@@ -200,7 +200,7 @@ class ClansCommand(private val logger: LogHandler,
 
         // Validate that clan present in list.
         if (args[1] !in clanList) {
-            s.sendMessage(Component.text("$commandMessagePrefix: Clan ${args[1]} does not exist!", NamedTextColor.RED))
+            s.sendMessage(Component.text("$commandMessagePrefix: Clan \"${args[1]}\" does not exist!", NamedTextColor.RED))
             return true
         }
 
