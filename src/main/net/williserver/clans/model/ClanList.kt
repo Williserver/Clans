@@ -50,8 +50,7 @@ class ClanList(data: List<ClanData>) {
     fun addClan(newClan: Clan) {
         if (newClan in clans) {
             throw IllegalArgumentException("[CLANS] Internal error -- Clan with name ${newClan.name} already exists.")
-        // TODO: switch this to check if any duplicate members at all.
-        } else if (clans.any { newClan.leader in it}) {
+        } else if (duplicateMembers(newClan)) {
             throw IllegalArgumentException("[CLANS] Internal error -- Leader already in a clan.")
         }
         clans += newClan
@@ -143,6 +142,18 @@ class ClanList(data: List<ClanData>) {
      * @return This list as clan data tuples, suitable to be written as JSON.
      */
     fun asDataTuples(): List<ClanData> = clans.map { it.asDataTuple() }
+
+    /*
+     * ClanList internal helpers.
+     */
+
+    /**
+     * Check whether given clan has members that are also in other clans in this list.
+     * In good circumstances, this should never be the case.
+     */
+    private fun duplicateMembers(clan: Clan): Boolean = clans.any {
+            otherClan -> otherClan != clan && otherClan.anyMember { it in clan }
+        }
 }
 
 /**
