@@ -71,11 +71,15 @@ class Clan(val name: String, leader: UUID, private val members: MutableList<UUID
         members += recruit
     }
 
-    // TODO: add way to iterate through members.
-
     /*
      * Member information getters.
      */
+
+    /**
+     * Perform an action for each clan member.
+     * @param action Lambda taking a player UUID and performing action.
+     */
+    fun forEachMember(action: (UUID) -> Unit) = members.forEach(action)
 
     /**
      * Get the rank of a clan member. Throw an exception if they're not in the clan.

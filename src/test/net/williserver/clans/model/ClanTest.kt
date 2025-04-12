@@ -60,4 +60,18 @@ class ClanTest {
         assertEquals(ClanRank.MEMBER, clan.rankOfMember(member))
         assertThrows(IllegalArgumentException::class.java) { clan.rankOfMember(UUID.randomUUID()) }
     }
+
+    @Test
+    fun testForEachMember() {
+        val ids = HashSet<UUID>()
+
+        val leader = UUID.randomUUID()
+        val otherMember = UUID.randomUUID()
+        val clan = Clan("TestClan", leader, mutableListOf(leader, otherMember))
+
+        clan.forEachMember { ids.add(it) }
+        assert(leader in ids)
+        assert(otherMember in ids)
+        assert(UUID.randomUUID() !in ids)
+    }
 }

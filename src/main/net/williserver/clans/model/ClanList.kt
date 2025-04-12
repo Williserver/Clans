@@ -23,7 +23,7 @@ class ClanList(data: List<ClanData>) {
 
     // Validate that all clan names are unique
     init {
-        for (datum in data) {
+        for (datum in data) {    // TODO: add way to iterate through members.
             val clan = Clan(datum)
             if (clan in clans) {
                 throw IllegalArgumentException("[CLANS] Internal error -- Clan with name ${datum.name} already exists.")
@@ -101,8 +101,7 @@ class ClanList(data: List<ClanData>) {
      *
      * @param action Lambda to perform actions with.
      */
-    fun forEachClan(action: (Clan) -> Unit) =
-        clans.forEach(action)
+    fun forEachClan(action: (Clan) -> Unit) = clans.forEach(action)
 
     /**
      * Determine whether there is a clan in this list with the given name.
