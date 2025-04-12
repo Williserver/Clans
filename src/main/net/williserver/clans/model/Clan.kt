@@ -71,6 +71,8 @@ class Clan(val name: String, leader: UUID, private val members: MutableList<UUID
         members += recruit
     }
 
+    // TODO: add way to iterate through members.
+
     /*
      * Member information getters.
      */

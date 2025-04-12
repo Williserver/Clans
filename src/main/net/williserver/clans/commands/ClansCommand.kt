@@ -5,6 +5,7 @@ import net.kyori.adventure.text.format.NamedTextColor
 import net.williserver.clans.LogHandler
 import net.williserver.clans.model.*
 import org.bukkit.Bukkit.broadcast
+import org.bukkit.Bukkit.getOfflinePlayer
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
@@ -37,6 +38,7 @@ class ClansCommand(private val logger: LogHandler,
                 "create" -> create(sender, args)
                 "disband" -> disband(sender, args)
                 "help" -> help(sender, args)
+                "info" -> info(sender, args)
                 else -> false
             }
         } else help(sender, args)
@@ -69,8 +71,6 @@ class ClansCommand(private val logger: LogHandler,
      *
      * @param s Command sender; must be a player.
      * @param args Arguments to command, such as name.
-     *
-     * @return Whether the usage message should not be displayed.
      */
     private fun create(s: CommandSender, args: Array<String>): Boolean {
         // Initial validation.
@@ -182,5 +182,35 @@ class ClansCommand(private val logger: LogHandler,
         }
     }
 
+    /**
+     * Message the sender with a report about the given clan.
+     * Format:
+     *  Clan $clanName:
+     *  Leader: $leadername
+     *  Members: $members
+     *
+     * @param s Command sender. Can be any message receiving entity.
+     * @param args Arguments to command. Should be one -- the name of the clan.
+     */
+    private fun info(s: CommandSender, args: Array<out String>): Boolean {
+        // Ensure arguments conform with expected API
+        if (args.size != 2) {
+            return false // Malformed command -- clan info needs a name!
+        }
 
+        // Validate that clan present in list.
+        if (args[1] !in clanList) {
+            s.sendMessage(Component.text("$commandMessagePrefix: Clan ${args[1]} does not exist!", NamedTextColor.RED))
+            return true
+        }
+
+        // If clan present, prepare and send message with information.
+        val correspondingClan = clanList.get(args[1])
+        val header = Component.text("$commandMessagePrefix: Clan \"${correspondingClan.name}\":\n", NamedTextColor.GOLD)
+        val leaderTitle = Component.text("Leader: ", NamedTextColor.RED)
+        val leaderName = Component.text("${getOfflinePlayer(correspondingClan.leader).name}", NamedTextColor.GREEN)
+
+        s.sendMessage(header.append(leaderTitle).append(leaderName))
+        return true
+    }
 }
