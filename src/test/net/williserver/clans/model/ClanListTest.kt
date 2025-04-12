@@ -79,6 +79,6 @@ class ClanListTest {
         assert(clan.name in list)
         list.removeClan(clan)
         assert(clan.name !in list)
-        assertThrows(IllegalArgumentException::class.java) { list.removeClan(clan) }
+        assertThrows(NoSuchElementException::class.java) { list.removeClan(clan) }
     }
 }

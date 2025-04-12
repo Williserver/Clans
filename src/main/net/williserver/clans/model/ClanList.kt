@@ -60,11 +60,11 @@ class ClanList(data: List<ClanData>) {
      * Remove a clan from the ClanList. This effectively deletes it.
      *
      * @param clanToRemove Clan to remove from the list.
-     * @throws IllegalArgumentException If the clan is not in this list.
+     * @throws NoSuchElementException If the clan is not in this list.
      */
     fun removeClan(clanToRemove: Clan) {
         if (clanToRemove !in clans) {
-            throw IllegalArgumentException("Clan ${clanToRemove.name} is not in this list!")
+            throw NoSuchElementException("Clan ${clanToRemove.name} is not in this list!")
         }
         clans -= clanToRemove
     }
@@ -102,10 +102,10 @@ class ClanList(data: List<ClanData>) {
 
     /**
      * Get the clan with a given name if it's present in this list.
-     * Otherwise, return null.
      *
      * @param name Name of clan to search for.
      * @return The found clan, or null if not present.
+     * @throws NoSuchElementException if a clan with this name is not present.
      */
     fun get(name: String): Clan {
         if (!contains(name)) throw NoSuchElementException("$name is not a clan, check with `in` helper before calling get.")
