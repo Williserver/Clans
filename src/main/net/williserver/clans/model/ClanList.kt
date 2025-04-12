@@ -50,6 +50,7 @@ class ClanList(data: List<ClanData>) {
     fun addClan(newClan: Clan) {
         if (newClan in clans) {
             throw IllegalArgumentException("[CLANS] Internal error -- Clan with name ${newClan.name} already exists.")
+        // TODO: switch this to check if any duplicate members at all.
         } else if (clans.any { newClan.leader in it}) {
             throw IllegalArgumentException("[CLANS] Internal error -- Leader already in a clan.")
         }
@@ -69,6 +70,10 @@ class ClanList(data: List<ClanData>) {
         clans -= clanToRemove
     }
 
+    /*
+     * ClanList player helpers.
+     */
+
     /**
      * Checks whether a player is in a clan on this list.
      * Note: this should be called before using playerClan.
@@ -87,10 +92,17 @@ class ClanList(data: List<ClanData>) {
      */
     fun playerClan(playerToFind: UUID): Clan = clans.find { playerToFind in it }!!
 
-    /**
-     * @return This list as clan data tuples, suitable to be written as JSON.
+    /*
+     * ClanList clan helpers.
      */
-    fun asDataTuples(): List<ClanData> = clans.map { it.asDataTuple() }
+
+    /**
+     * Perform an operation for each clan in this list.
+     *
+     * @param action Lambda to perform actions with.
+     */
+    fun forEachClan(action: (Clan) -> Unit) =
+        clans.forEach(action)
 
     /**
      * Determine whether there is a clan in this list with the given name.
@@ -123,6 +135,15 @@ class ClanList(data: List<ClanData>) {
      * @return whether other is a clanList with the same clans.
      */
     override fun equals(other: Any?): Boolean = other is ClanList && other.clans == clans
+
+    /*
+     * ClanList serialization helpers.
+     */
+
+    /**
+     * @return This list as clan data tuples, suitable to be written as JSON.
+     */
+    fun asDataTuples(): List<ClanData> = clans.map { it.asDataTuple() }
 }
 
 /**

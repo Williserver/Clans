@@ -81,4 +81,22 @@ class ClanListTest {
         assert(clan.name !in list)
         assertThrows(NoSuchElementException::class.java) { list.removeClan(clan) }
     }
+
+    @Test
+    fun testForEachClan() {
+        val names = HashSet<String>()
+
+        val leaderOne = UUID.randomUUID()
+        val clanOne = Clan("TestClan1", leaderOne, mutableListOf(leaderOne))
+
+        val leaderTwo = UUID.randomUUID()
+        val clanTwo = Clan("TestClan2", leaderTwo, mutableListOf(leaderTwo))
+
+        val list = ClanList(listOf(clanOne.asDataTuple(), clanTwo.asDataTuple()))
+        list.forEachClan { names.add(it.name) }
+
+        assert("TestClan1" in names)
+        assert("TestClan2" in names)
+        assert("Sanity" !in names)
+    }
 }
