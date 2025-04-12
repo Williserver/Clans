@@ -82,6 +82,12 @@ class Clan(val name: String, leader: UUID, private val members: MutableList<UUID
     fun forEachMember(action: (UUID) -> Unit) = members.forEach(action)
 
     /**
+     * Check whether any member satisfies some predicate.
+     * @param action Lambda taking a player UUID and evaluating if it satisfies a predicate.
+     */
+    fun anyMember(action: (UUID) -> Boolean) = members.any(action)
+
+    /**
      * Get the rank of a clan member. Throw an exception if they're not in the clan.
      *
      * @param member UUID of member to get rank for.

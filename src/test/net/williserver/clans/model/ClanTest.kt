@@ -1,5 +1,6 @@
 package net.williserver.clans.model
 
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import java.util.*
@@ -73,5 +74,14 @@ class ClanTest {
         assert(leader in ids)
         assert(otherMember in ids)
         assert(UUID.randomUUID() !in ids)
+    }
+
+    @Test
+    fun testAnyMember() {
+        val leader = UUID.randomUUID()
+        val clan = Clan("TestClan", leader, mutableListOf(leader))
+
+        assert(clan.anyMember { it == leader })
+        assertFalse(clan.anyMember { it == UUID.randomUUID() })
     }
 }
