@@ -96,11 +96,9 @@ class ClanList(data: List<ClanData>) {
      */
 
     /**
-     * Perform an operation for each clan in this list.
-     *
-     * @param action Lambda to perform actions with.
+     * @return immutable list of the clans.
      */
-    fun forEachClan(action: (Clan) -> Unit) = clans.forEach(action)
+    fun clans() = clans.toList()
 
     /**
      * Determine whether there is a clan in this list with the given name.
@@ -152,7 +150,7 @@ class ClanList(data: List<ClanData>) {
      * In good circumstances, this should never be the case.
      */
     private fun duplicateMembers(clan: Clan): Boolean = clans.any {
-            otherClan -> otherClan != clan && otherClan.anyMember { it in clan }
+            otherClan -> otherClan != clan && otherClan.members().any { it in clan }
         }
 }
 
