@@ -40,6 +40,7 @@ class ClansCommand(private val logger: LogHandler,
                 "disband" -> disband(sender, args)
                 "help" -> help(sender, args)
                 "info" -> info(sender, args)
+                "list" -> list(sender, args)
                 else -> false
             }
         } else help(sender, args)
@@ -64,6 +65,33 @@ class ClansCommand(private val logger: LogHandler,
         help.append("-- /clans disband confirm: Finish disbanding the clan you own.")
 
         s.sendMessage(Component.text(help.toString(), NamedTextColor.GREEN))
+        return true
+    }
+
+    /**
+     * Send the invoker a message containing a list of all clans.
+     *
+     * @param s Entity invoking commnad; will recieve the list.
+     * @param args Args for list; should be only one.
+     *
+     * TODO: add pages when too many clans.
+     */
+    private fun list(s: CommandSender, args: Array<out String>): Boolean {
+        // List should only be invoked with one argument.
+        if (args.size > 1) {
+            return false
+        }
+
+        val listTitle = Component.text("$pluginMessagePrefix: List:", NamedTextColor.AQUA)
+        val sortedClans = clanList.clans()
+            .sortedBy { it.members().size }
+            .fold(Component.text())
+                { text, thisClan ->
+                    text.append(Component.text("\n- ${thisClan.name}: ", NamedTextColor.GOLD))
+                        .append(Component.text("${thisClan.members().size} members", NamedTextColor.RED))
+                }
+
+        s.sendMessage(listTitle.append(sortedClans))
         return true
     }
 
