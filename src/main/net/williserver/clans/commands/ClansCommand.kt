@@ -208,9 +208,13 @@ class ClansCommand(private val logger: LogHandler,
         val correspondingClan = clanList.get(args[1])
         val header = Component.text("$commandMessagePrefix: Clan \"${correspondingClan.name}\":\n", NamedTextColor.GOLD)
         val leaderTitle = Component.text("Leader: ", NamedTextColor.RED)
-        val leaderName = Component.text("${getOfflinePlayer(correspondingClan.leader).name}", NamedTextColor.GREEN)
+        val leaderName = Component.text("${getOfflinePlayer(correspondingClan.leader).name}\n", NamedTextColor.GREEN)
+        val memberHeader = Component.text("Members: ", NamedTextColor.RED)
+        val members = correspondingClan.members().fold(Component.text()) { members, uuid ->
+            members.append(Component.text("${getOfflinePlayer(uuid).name}, ", NamedTextColor.GREEN))
+        }
 
-        s.sendMessage(header.append(leaderTitle).append(leaderName))
+        s.sendMessage(header.append(leaderTitle).append(leaderName).append(memberHeader).append(members))
         return true
     }
 }
