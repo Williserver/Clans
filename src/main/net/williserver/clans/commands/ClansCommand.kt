@@ -59,10 +59,12 @@ class ClansCommand(private val logger: LogHandler,
 
         val help = StringBuilder()
         help.append("$pluginMessagePrefix: Commands:\n")
-        help.append("-- /clans help: pull up this help menu.\n")
-        help.append("-- /clans create (name): Create a new clan under your visionary leadership.\n")
-        help.append("-- /clans disband: Begin to disband the clan you own.\n")
-        help.append("-- /clans disband confirm: Finish disbanding the clan you own.")
+        help.append("- /clans help: pull up this help menu.\n")
+        help.append("- /clans create (name): Create a new clan under your visionary leadership.\n")
+        help.append("- /clans info (name): get information about a clan.\n")
+        help.append("- /clans list: Produce a list of clans.\n")
+        help.append("- /clans disband: Begin to disband the clan you own.\n")
+        help.append("- /clans disband confirm: Finish disbanding the clan you own.")
 
         s.sendMessage(Component.text(help.toString(), NamedTextColor.GREEN))
         return true
