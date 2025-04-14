@@ -182,7 +182,7 @@ class ClansCommand(private val logger: LogHandler,
                 }
 
                 s.sendMessage(Component.text("$pluginMessagePrefix: You have begun to disband your clan!", NamedTextColor.LIGHT_PURPLE))
-                s.sendMessage(Component.text("$pluginMessagePrefix: Enter /clans disband confirm within ${config.confirmDisbandTime} seconds to confirm this choice.", NamedTextColor.LIGHT_PURPLE))
+                s.sendMessage(Component.text("$pluginMessagePrefix: Enter \"/clans disband confirm\" within ${config.confirmDisbandTime} seconds to confirm this choice.", NamedTextColor.LIGHT_PURPLE))
                 clanConfirmDeleteMap[clan]!!.reset()
                 clanConfirmDeleteMap[clan]!!.startTimer()
                 true
@@ -195,7 +195,7 @@ class ClansCommand(private val logger: LogHandler,
                 if (args[1].lowercase(Locale.getDefault()) != "confirm") {
                     return false
                 } else if (clanConfirmDeleteMap[clan] == null || !clanConfirmDeleteMap[clan]!!.isRunning()) {
-                    s.sendMessage(Component.text("$pluginMessagePrefix: You have attempted to delete your clan with \"/clan delete confirm\" before starting the deletion timer!", NamedTextColor.RED))
+                    s.sendMessage(Component.text("$pluginMessagePrefix: You have attempted to delete your clan with \"/clans disband confirm\" before starting the deletion timer!", NamedTextColor.RED))
                     s.sendMessage(Component.text("$pluginMessagePrefix: Please start the timer with \"/clans disband\" first, or ignore this message to keep your clan.", NamedTextColor.RED))
                 } else if (!clanConfirmDeleteMap[clan]!!.inBounds()) {
                     s.sendMessage(Component.text("$pluginMessagePrefix: The timer to disband your clan has expired!", NamedTextColor.RED))
@@ -207,7 +207,7 @@ class ClansCommand(private val logger: LogHandler,
                 }
                 true
             }
-            else -> throw IllegalArgumentException("$pluginMessagePrefix: Internal error: Wrong number of arguments to /clan disband -- this should have been caught earlier!")
+            else -> throw IllegalArgumentException("$pluginMessagePrefix: Internal error: Wrong number of arguments to /clans disband -- this should have been caught earlier!")
         }
     }
 
