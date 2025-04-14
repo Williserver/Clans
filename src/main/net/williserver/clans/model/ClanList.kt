@@ -13,7 +13,6 @@ import kotlin.collections.ArrayList
  * Wrapper for collection of clans. Can represent main collection or subset.
  * Each clan must have a unique name, or an assertion will be thrown!
  *
- * @param logger Logging manager.
  * @param data Serializable list of clans.
  *
  * @author Willmo3
@@ -23,11 +22,12 @@ class ClanList(data: List<ClanData>) {
 
     // Validate that all clan names are unique
     init {
-        for (datum in data) {    // TODO: add way to iterate through members.
+        for (datum in data) {
             val clan = Clan(datum)
             if (clan in clans) {
                 throw IllegalArgumentException("[CLANS] Internal error -- Clan with name ${datum.name} already exists.")
             }
+            // TODO: add duplicate member check at initialization.
             clans += clan
         }
     }
@@ -116,13 +116,14 @@ class ClanList(data: List<ClanData>) {
      * @throws NoSuchElementException if a clan with this name is not present.
      */
     fun get(name: String): Clan {
-        if (!contains(name)) throw NoSuchElementException("$name is not a clan, check with `in` helper before calling get.")
+        if (!contains(name)) {
+            throw NoSuchElementException("$name is not a clan, check with `in` helper before calling get.")
+        }
 
         val nameMatches = clans.filter { it.name == name }
         if (nameMatches.size > 1) {
             throw IllegalStateException("Two clans with identical name: $name -- very illegal!")
         }
-
         return nameMatches.first()
     }
 
@@ -149,7 +150,8 @@ class ClanList(data: List<ClanData>) {
      * Check whether given clan has members that are also in other clans in this list.
      * In good circumstances, this should never be the case.
      */
-    private fun duplicateMembers(clan: Clan): Boolean = clans.any {
+    private fun duplicateMembers(clan: Clan): Boolean =
+        clans.any {
             otherClan -> otherClan != clan && otherClan.members().any { it in clan }
         }
 }
