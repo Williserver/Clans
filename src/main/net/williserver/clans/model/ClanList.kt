@@ -26,9 +26,9 @@ class ClanList(data: List<ClanData>) {
         for (datum in data) {
             val clan = Clan(datum)
             if (clan in clans) {
-                throw IllegalArgumentException("${pluginMessagePrefix}: Internal error -- Clan with name ${datum.name} already exists.")
+                throw IllegalArgumentException("$pluginMessagePrefix: Internal error -- Clan with name ${datum.name} already exists.")
             } else if (duplicateMembers(clan)) {
-                throw IllegalArgumentException("${pluginMessagePrefix}: A member in clan ${datum.name} is already in another clan.")
+                throw IllegalArgumentException("$pluginMessagePrefix: A member in clan ${datum.name} is already in another clan.")
             }
             clans += clan
         }
@@ -51,9 +51,9 @@ class ClanList(data: List<ClanData>) {
      */
     fun addClan(newClan: Clan) {
         if (newClan in clans) {
-            throw IllegalArgumentException("${pluginMessagePrefix}: Internal error -- Clan with name ${newClan.name} already exists.")
+            throw IllegalArgumentException("$pluginMessagePrefix: Internal error -- Clan with name ${newClan.name} already exists.")
         } else if (duplicateMembers(newClan)) {
-            throw IllegalArgumentException("${pluginMessagePrefix}: Internal error -- Leader already in a clan.")
+            throw IllegalArgumentException("$pluginMessagePrefix: Internal error -- Leader already in a clan.")
         }
         clans += newClan
     }
@@ -66,7 +66,7 @@ class ClanList(data: List<ClanData>) {
      */
     fun removeClan(clanToRemove: Clan) {
         if (clanToRemove !in clans) {
-            throw NoSuchElementException("Clan ${clanToRemove.name} is not in this list!")
+            throw NoSuchElementException("$pluginMessagePrefix: Clan ${clanToRemove.name} is not in this list!")
         }
         clans -= clanToRemove
     }
@@ -119,12 +119,12 @@ class ClanList(data: List<ClanData>) {
      */
     fun get(name: String): Clan {
         if (!contains(name)) {
-            throw NoSuchElementException("$name is not a clan, check with `in` helper before calling get.")
+            throw NoSuchElementException("$pluginMessagePrefix: $name is not a clan, check with `in` helper before calling get.")
         }
 
         val nameMatches = clans.filter { it.name == name }
         if (nameMatches.size > 1) {
-            throw IllegalStateException("Two clans with identical name: $name -- very illegal!")
+            throw IllegalStateException("$pluginMessagePrefix: Two clans with identical name: $name -- very illegal!")
         }
         return nameMatches.first()
     }

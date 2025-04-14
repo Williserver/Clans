@@ -1,5 +1,6 @@
 package net.williserver.clans.model
 import kotlinx.serialization.Serializable
+import net.williserver.clans.pluginMessagePrefix
 import java.util.*
 
 // -- name
@@ -25,7 +26,7 @@ data class ClanData(val name: String, val members: List<String>, val leader: Str
  * @param leader Leader of clan.
  * @param members List of members of clan.
  *
- * @throws IllegalArgumentException if names
+ * @throws IllegalArgumentException if there are duplicate members between clans or clans with duplicate names.
  * @author Willmo3
  */
 class Clan(val name: String, leader: UUID, private val members: MutableList<UUID>) {
@@ -48,10 +49,10 @@ class Clan(val name: String, leader: UUID, private val members: MutableList<UUID
      */
     init {
         if (!validClanName(name)) {
-            throw IllegalArgumentException("Invalid clan name!")
+            throw IllegalArgumentException("$pluginMessagePrefix: Invalid clan name!")
         }
         if (leader !in members) {
-            throw IllegalArgumentException("Invalid leader UUID (not in clan $name): $leader")
+            throw IllegalArgumentException("$pluginMessagePrefix: Invalid leader UUID (not in clan $name): $leader")
         }
     }
 
@@ -66,7 +67,7 @@ class Clan(val name: String, leader: UUID, private val members: MutableList<UUID
      */
     fun join(recruit: UUID) {
         if (contains(recruit)) {
-            throw IllegalArgumentException("UUID $recruit already in clan $name.")
+            throw IllegalArgumentException("$pluginMessagePrefix: UUID $recruit already in clan $name.")
         }
         members += recruit
     }
@@ -93,7 +94,7 @@ class Clan(val name: String, leader: UUID, private val members: MutableList<UUID
         } else if (member in members) {
             ClanRank.MEMBER
         } else {
-            throw IllegalArgumentException("Member $member is not in clan $name.")
+            throw IllegalArgumentException("$pluginMessagePrefix: Member $member is not in clan $name.")
         }
 
     /**

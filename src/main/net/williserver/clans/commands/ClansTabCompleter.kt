@@ -4,7 +4,6 @@ import net.williserver.clans.model.ClanList
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
-import java.util.*
 
 /**
  * State for clans tab completion.

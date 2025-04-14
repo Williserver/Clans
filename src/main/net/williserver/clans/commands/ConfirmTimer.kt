@@ -1,5 +1,6 @@
 package net.williserver.clans.commands
 
+import net.williserver.clans.pluginMessagePrefix
 import java.util.Date
 
 /**
@@ -23,7 +24,7 @@ class ConfirmTimer(private val secondsToConfirm: Long) {
      */
     fun inBounds(): Boolean {
         if (!isRunning()) {
-            throw IllegalStateException("Timer must be started before checking if in bounds!")
+            throw IllegalStateException("$pluginMessagePrefix: Timer must be started before checking if in bounds!")
         }
         return Date(System.currentTimeMillis()).before(timerMaximum!!)
     }
