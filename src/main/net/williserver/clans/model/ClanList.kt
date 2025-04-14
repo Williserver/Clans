@@ -1,6 +1,7 @@
 package net.williserver.clans.model
 
 import kotlinx.serialization.json.Json
+import net.williserver.clans.pluginMessagePrefix
 import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
@@ -25,9 +26,9 @@ class ClanList(data: List<ClanData>) {
         for (datum in data) {
             val clan = Clan(datum)
             if (clan in clans) {
-                throw IllegalArgumentException("[CLANS] Internal error -- Clan with name ${datum.name} already exists.")
+                throw IllegalArgumentException("${pluginMessagePrefix}: Internal error -- Clan with name ${datum.name} already exists.")
             } else if (duplicateMembers(clan)) {
-                throw IllegalArgumentException("[CLANS] A member in clan ${datum.name} is already in another clan.")
+                throw IllegalArgumentException("${pluginMessagePrefix}: A member in clan ${datum.name} is already in another clan.")
             }
             clans += clan
         }
@@ -50,9 +51,9 @@ class ClanList(data: List<ClanData>) {
      */
     fun addClan(newClan: Clan) {
         if (newClan in clans) {
-            throw IllegalArgumentException("[CLANS] Internal error -- Clan with name ${newClan.name} already exists.")
+            throw IllegalArgumentException("${pluginMessagePrefix}: Internal error -- Clan with name ${newClan.name} already exists.")
         } else if (duplicateMembers(newClan)) {
-            throw IllegalArgumentException("[CLANS] Internal error -- Leader already in a clan.")
+            throw IllegalArgumentException("${pluginMessagePrefix}: Internal error -- Leader already in a clan.")
         }
         clans += newClan
     }

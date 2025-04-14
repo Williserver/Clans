@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.williserver.clans.LogHandler
 import net.williserver.clans.model.*
+import net.williserver.clans.pluginMessagePrefix
 import org.bukkit.Bukkit.broadcast
 import org.bukkit.Bukkit.getOfflinePlayer
 import org.bukkit.command.Command
@@ -12,7 +13,7 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import java.util.*
 
-const val commandMessagePrefix = "[CLANS]"
+
 
 /**
  * Base clans command for viewing and modifying clans.
@@ -56,7 +57,7 @@ class ClansCommand(private val logger: LogHandler,
         }
 
         val help = StringBuilder()
-        help.append("$commandMessagePrefix: Commands:\n")
+        help.append("$pluginMessagePrefix: Commands:\n")
         help.append("-- /clans help: pull up this help menu.\n")
         help.append("-- /clans create (name): Create a new clan under your visionary leadership.\n")
         help.append("-- /clans disband: Begin to disband the clan you own.\n")
@@ -78,28 +79,28 @@ class ClansCommand(private val logger: LogHandler,
             // Returing false here -- this is the only place where the server should send a usage message!
             return false
         } else if (args.size < 2) {
-            s.sendMessage(Component.text("$commandMessagePrefix: Your clan needs a name!", NamedTextColor.RED))
+            s.sendMessage(Component.text("$pluginMessagePrefix: Your clan needs a name!", NamedTextColor.RED))
             return true
         } else if (s !is Player) {
-            s.sendMessage(Component.text("$commandMessagePrefix: You must be a player to create a clan!", NamedTextColor.RED))
+            s.sendMessage(Component.text("$pluginMessagePrefix: You must be a player to create a clan!", NamedTextColor.RED))
             return true
         }
 
         // Check if the clan name is valid and unique.
         val name = args[1]
         if (!validClanName(name)) {
-            s.sendMessage(Component.text("$commandMessagePrefix: You have specified an invalid clan name.", NamedTextColor.RED))
+            s.sendMessage(Component.text("$pluginMessagePrefix: You have specified an invalid clan name.", NamedTextColor.RED))
             s.sendMessage(Component.text("Use only alphanumeric characters, underscore, and dash.", NamedTextColor.RED))
             return true
         } else if (name in clanList) {
-            s.sendMessage(Component.text("$commandMessagePrefix: The name $name is already taken, try a new one!", NamedTextColor.RED))
+            s.sendMessage(Component.text("$pluginMessagePrefix: The name $name is already taken, try a new one!", NamedTextColor.RED))
             return true
         }
 
         // Check if the leader is already in a clan.
         val leader = s.uniqueId
         if (clanList.playerInClan(leader)) {
-            s.sendMessage(Component.text("$commandMessagePrefix: You are already in a clan!", NamedTextColor.RED))
+            s.sendMessage(Component.text("$pluginMessagePrefix: You are already in a clan!", NamedTextColor.RED))
             return true
         }
 
@@ -109,7 +110,7 @@ class ClansCommand(private val logger: LogHandler,
         clanList.addClan(newClan)
 
         broadcast(Component.text(
-            "$commandMessagePrefix: Chief ${s.name} has formed the clan \"${newClan.name}\"!",
+            "$pluginMessagePrefix: Chief ${s.name} has formed the clan \"${newClan.name}\"!",
             NamedTextColor.GREEN))
         return true
     }
@@ -127,18 +128,18 @@ class ClansCommand(private val logger: LogHandler,
         if (args.size != 1 && args.size != 2) {
             return false
         } else if (s !is Player) {
-            s.sendMessage(Component.text("$commandMessagePrefix: You must be a player to disband your clan!", NamedTextColor.RED))
+            s.sendMessage(Component.text("$pluginMessagePrefix: You must be a player to disband your clan!", NamedTextColor.RED))
             return true
         }
 
         // Validate that player has appropriate permissions in some clan.
         if (!clanList.playerInClan(s.uniqueId)) {
-            s.sendMessage(Component.text("$commandMessagePrefix: You must be in a clan!", NamedTextColor.RED))
+            s.sendMessage(Component.text("$pluginMessagePrefix: You must be in a clan!", NamedTextColor.RED))
             return true
         }
         val clan = clanList.playerClan(s.uniqueId)
         if (!clan.rankOfMember(s.uniqueId).hasPermission(ClanPermission.DISBAND)) {
-            s.sendMessage(Component.text("$commandMessagePrefix: You don't have permission to disband this clan!", NamedTextColor.RED))
+            s.sendMessage(Component.text("$pluginMessagePrefix: You don't have permission to disband this clan!", NamedTextColor.RED))
             return true
         }
 
@@ -152,8 +153,8 @@ class ClansCommand(private val logger: LogHandler,
                     clanConfirmDeleteMap[clan] = ConfirmTimer(config.confirmDisbandTime.toLong())
                 }
 
-                s.sendMessage(Component.text("$commandMessagePrefix: You have begun to disband your clan!", NamedTextColor.LIGHT_PURPLE))
-                s.sendMessage(Component.text("$commandMessagePrefix: Enter /clans disband confirm within ${config.confirmDisbandTime} seconds to confirm this choice.", NamedTextColor.LIGHT_PURPLE))
+                s.sendMessage(Component.text("$pluginMessagePrefix: You have begun to disband your clan!", NamedTextColor.LIGHT_PURPLE))
+                s.sendMessage(Component.text("$pluginMessagePrefix: Enter /clans disband confirm within ${config.confirmDisbandTime} seconds to confirm this choice.", NamedTextColor.LIGHT_PURPLE))
                 clanConfirmDeleteMap[clan]!!.reset()
                 clanConfirmDeleteMap[clan]!!.startTimer()
                 true
@@ -166,19 +167,19 @@ class ClansCommand(private val logger: LogHandler,
                 if (args[1].lowercase(Locale.getDefault()) != "confirm") {
                     return false
                 } else if (clanConfirmDeleteMap[clan] == null || !clanConfirmDeleteMap[clan]!!.isRunning()) {
-                    s.sendMessage(Component.text("$commandMessagePrefix: You have attempted to delete your clan with \"/clan delete confirm\" before starting the deletion timer!", NamedTextColor.RED))
-                    s.sendMessage(Component.text("$commandMessagePrefix: Please start the timer with \"/clans disband\" first, or ignore this message to keep your clan.", NamedTextColor.RED))
+                    s.sendMessage(Component.text("$pluginMessagePrefix: You have attempted to delete your clan with \"/clan delete confirm\" before starting the deletion timer!", NamedTextColor.RED))
+                    s.sendMessage(Component.text("$pluginMessagePrefix: Please start the timer with \"/clans disband\" first, or ignore this message to keep your clan.", NamedTextColor.RED))
                 } else if (!clanConfirmDeleteMap[clan]!!.inBounds()) {
-                    s.sendMessage(Component.text("$commandMessagePrefix: The timer to disband your clan has expired!", NamedTextColor.RED))
-                    s.sendMessage(Component.text("$commandMessagePrefix: To delete your clan, enter \"/clans disband\", or ignore this message to keep your clan.", NamedTextColor.RED))
+                    s.sendMessage(Component.text("$pluginMessagePrefix: The timer to disband your clan has expired!", NamedTextColor.RED))
+                    s.sendMessage(Component.text("$pluginMessagePrefix: To delete your clan, enter \"/clans disband\", or ignore this message to keep your clan.", NamedTextColor.RED))
                 } else {
                     // Delete the clan by removing it from the associated ClanList.
                     clanList.removeClan(clan)
-                    broadcast(Component.text("$commandMessagePrefix: Clan \"${clan.name}\" has disbanded!", NamedTextColor.DARK_PURPLE))
+                    broadcast(Component.text("$pluginMessagePrefix: Clan \"${clan.name}\" has disbanded!", NamedTextColor.DARK_PURPLE))
                 }
                 true
             }
-            else -> throw IllegalArgumentException("$commandMessagePrefix: Internal error: Wrong number of arguments to /clan disband -- this should have been caught earlier!")
+            else -> throw IllegalArgumentException("$pluginMessagePrefix: Internal error: Wrong number of arguments to /clan disband -- this should have been caught earlier!")
         }
     }
 
@@ -200,13 +201,13 @@ class ClansCommand(private val logger: LogHandler,
 
         // Validate that clan present in list.
         if (args[1] !in clanList) {
-            s.sendMessage(Component.text("$commandMessagePrefix: Clan \"${args[1]}\" does not exist!", NamedTextColor.RED))
+            s.sendMessage(Component.text("$pluginMessagePrefix: Clan \"${args[1]}\" does not exist!", NamedTextColor.RED))
             return true
         }
 
         // If clan present, prepare and send message with information.
         val correspondingClan = clanList.get(args[1])
-        val header = Component.text("$commandMessagePrefix: Clan \"${correspondingClan.name}\":\n", NamedTextColor.GOLD)
+        val header = Component.text("$pluginMessagePrefix: Clan \"${correspondingClan.name}\":\n", NamedTextColor.GOLD)
         val leaderTitle = Component.text("Leader: ", NamedTextColor.RED)
         val leaderName = Component.text("${getOfflinePlayer(correspondingClan.leader).name}\n", NamedTextColor.GREEN)
         val memberHeader = Component.text("Members: ", NamedTextColor.RED)

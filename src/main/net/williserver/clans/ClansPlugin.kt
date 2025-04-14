@@ -9,6 +9,8 @@ import net.williserver.clans.model.writeToFile
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 
+const val pluginMessagePrefix = "[CLANS]"
+
 /**
  * ClansPlugin. A lightweight predecessor to Polis, designed for user-oriented teams management.
  *
