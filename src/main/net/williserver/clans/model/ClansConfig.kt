@@ -33,7 +33,7 @@ class ClansConfigLoader(private val handler: LogHandler,
         val confirmDisbandTime = if (loadedDisbandTime > 0 && loadedDisbandTime.toUInt() > MINIMUM_DISBAND_TIME) {
             loadedDisbandTime.toUInt()
         } else {
-            handler.err("$pluginMessagePrefix: Disband confirmation time $loadedDisbandTime is less than minimum time $MINIMUM_DISBAND_TIME, using $MINIMUM_DISBAND_TIME")
+            handler.err("Disband confirmation time $loadedDisbandTime is less than minimum time $MINIMUM_DISBAND_TIME, using $MINIMUM_DISBAND_TIME")
             MINIMUM_DISBAND_TIME
         }
         config = ClansConfig(confirmDisbandTime)
