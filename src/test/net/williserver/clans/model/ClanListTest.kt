@@ -37,6 +37,17 @@ class ClanListTest {
     }
 
     @Test
+    fun testNoInitWithDuplicateMembers() {
+        val dup = UUID.randomUUID()
+        val leader1 = UUID.randomUUID()
+        val leader2 = UUID.randomUUID()
+        val clan1 = Clan("Clan1", leader1, mutableListOf(leader1, dup))
+        val clan2 = Clan("Clan2", leader2, mutableListOf(leader2, dup))
+
+        assertThrows(IllegalArgumentException::class.java) { ClanList(listOf(clan1.asDataTuple(), clan2.asDataTuple())) }
+    }
+
+    @Test
     fun testPlayerClan() {
         val clanData = generateClanData()
         val list = ClanList(listOf(clanData))

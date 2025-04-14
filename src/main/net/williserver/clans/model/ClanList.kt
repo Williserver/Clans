@@ -26,8 +26,9 @@ class ClanList(data: List<ClanData>) {
             val clan = Clan(datum)
             if (clan in clans) {
                 throw IllegalArgumentException("[CLANS] Internal error -- Clan with name ${datum.name} already exists.")
+            } else if (duplicateMembers(clan)) {
+                throw IllegalArgumentException("[CLANS] A member in clan ${datum.name} is already in another clan.")
             }
-            // TODO: add duplicate member check at initialization.
             clans += clan
         }
     }
