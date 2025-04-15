@@ -59,16 +59,27 @@ class ClansCommand(private val logger: LogHandler,
             return false
         }
 
-        val help = StringBuilder()
-        help.append("$pluginMessagePrefix: Commands:\n")
-        help.append("- /clans help: pull up this help menu.\n")
-        help.append("- /clans create (name): Create a new clan under your visionary leadership.\n")
-        help.append("- /clans info (name): get information about a clan.\n")
-        help.append("- /clans list: Produce a list of clans.\n")
-        help.append("- /clans disband: Begin to disband the clan you own.\n")
-        help.append("- /clans disband confirm: Finish disbanding the clan you own.")
+        val header = prefixedMessage(Component.text("Commands:"))
+        val bullet = Component.text("\n- /clans ", NamedTextColor.GOLD)
 
-        s.sendMessage(Component.text(help.toString(), NamedTextColor.GREEN))
+        fun generateCommandHelp(name: String, text: String)
+            = bullet.append(Component.text("$name: ", NamedTextColor.RED).append(Component.text(text, NamedTextColor.GRAY)))
+
+        val help = generateCommandHelp("help", "pull up this help menu.")
+        val create = generateCommandHelp("create (name)", "create a new clan under your visionary leadership.")
+        val disband = generateCommandHelp("disband", "begin to disband the clan you own.")
+        val disbandConfirm = generateCommandHelp("disband confirm", "finish disbanding the clan you own.")
+        val info = generateCommandHelp("info (name)", "get information about a clan.")
+        val list = generateCommandHelp("list", "output a list of clans.")
+
+        s.sendMessage(header
+            .append(help)
+            .append(create)
+            .append(disband)
+            .append(disbandConfirm)
+            .append(info)
+            .append(list)
+        )
         return true
     }
 
@@ -254,11 +265,23 @@ class ClansCommand(private val logger: LogHandler,
      */
 
     /**
+     * Append a message prefix component onto a message component.
+     *
      * @param message Message to append the plugin prefix to.
      * @return A new component with the plugin prefix appended.
      */
     private fun prefixedMessage(message: Component)
         = Component.text("$pluginMessagePrefix: ", NamedTextColor.GOLD).append(message)
+
+    /**
+     * Convert a string into a colored message component and prefix it.
+     *
+     * @param message Message to format.
+     * @param color Color for message.
+     * @return A component of the prefixed message.
+     */
+    private fun prefixedMessage(message: String, color: NamedTextColor)
+        = prefixedMessage(Component.text(message, color))
 
     /**
      * Send a prefixed message component to a target.
@@ -277,7 +300,7 @@ class ClansCommand(private val logger: LogHandler,
      * @param color kyori component color to send message in.
      */
     private fun sendPrefixedMessage(target: CommandSender, message: String, color: NamedTextColor)
-        = sendPrefixedMessage(target, Component.text(message, color))
+        = target.sendMessage(prefixedMessage(message, color))
 
     /**
      * Send a red-colored error message to a target.
