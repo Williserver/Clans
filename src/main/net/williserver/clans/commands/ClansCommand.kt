@@ -13,8 +13,6 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import java.util.*
 
-
-
 /**
  * Base clans command for viewing and modifying clans.
  *
@@ -113,28 +111,28 @@ class ClansCommand(private val logger: LogHandler,
             // Returing false here -- this is the only place where the server should send a usage message!
             return false
         } else if (args.size < 2) {
-            sendPrefixedMessage(s, "Your clan needs a name!", NamedTextColor.RED)
+            sendErrorMessage(s, "Your clan needs a name!")
             return true
         } else if (s !is Player) {
-            sendPrefixedMessage(s, "You must be a player to create a clan!", NamedTextColor.RED)
+            sendErrorMessage(s, "You must be a player to create a clan!")
             return true
         }
 
         // Check if the clan name is valid and unique.
         val name = args[1]
         if (!validClanName(name)) {
-            sendPrefixedMessage(s, "You have specified an invalid clan name.", NamedTextColor.RED)
-            sendPrefixedMessage(s, "Use only alphanumeric characters, underscore, and dash.", NamedTextColor.RED)
+            sendErrorMessage(s, "You have specified an invalid clan name.")
+            sendErrorMessage(s, "Use only alphanumeric characters, underscore, and dash.")
             return true
         } else if (name in clanList) {
-            sendPrefixedMessage(s, "The name $name is already taken, try a new one!", NamedTextColor.RED)
+            sendErrorMessage(s, "The name $name is already taken, try a new one!")
             return true
         }
 
         // Check if the leader is already in a clan.
         val leader = s.uniqueId
         if (clanList.playerInClan(leader)) {
-            sendPrefixedMessage(s, "You are already in a clan!", NamedTextColor.RED)
+            sendErrorMessage(s, "You are already in a clan!")
             return true
         }
 
@@ -160,18 +158,18 @@ class ClansCommand(private val logger: LogHandler,
         if (args.size != 1 && args.size != 2) {
             return false
         } else if (s !is Player) {
-            sendPrefixedMessage(s, "You must be a player to disband your clan!", NamedTextColor.RED)
+            sendErrorMessage(s, "You must be a player to disband your clan!")
             return true
         }
 
         // Validate that player has appropriate permissions in some clan.
         if (!clanList.playerInClan(s.uniqueId)) {
-            sendPrefixedMessage(s, "You must be in a clan!", NamedTextColor.RED)
+            sendErrorMessage(s, "You must be in a clan!")
             return true
         }
         val clan = clanList.playerClan(s.uniqueId)
         if (!clan.rankOfMember(s.uniqueId).hasPermission(ClanPermission.DISBAND)) {
-            sendPrefixedMessage(s, "You don't have permission to disband this clan!", NamedTextColor.RED)
+            sendErrorMessage(s, "You don't have permission to disband this clan!")
             return true
         }
 
@@ -199,11 +197,11 @@ class ClansCommand(private val logger: LogHandler,
                 if (args[1].lowercase(Locale.getDefault()) != "confirm") {
                     return false
                 } else if (clanConfirmDeleteMap[clan] == null || !clanConfirmDeleteMap[clan]!!.isRunning()) {
-                    sendPrefixedMessage(s, "You have attempted to delete your clan with \"/clans disband confirm\" before starting the deletion timer!", NamedTextColor.RED)
-                    sendPrefixedMessage(s, "Please start the timer with \"/clans disband\" first, or ignore this message to keep your clan.", NamedTextColor.RED)
+                    sendErrorMessage(s, "You have attempted to delete your clan with \"/clans disband confirm\" before starting the deletion timer!")
+                    sendErrorMessage(s, "Please start the timer with \"/clans disband\" first, or ignore this message to keep your clan.")
                 } else if (!clanConfirmDeleteMap[clan]!!.inBounds()) {
-                    sendPrefixedMessage(s, "The timer to disband your clan has expired!", NamedTextColor.RED)
-                    sendPrefixedMessage(s, "To delete your clan, enter \"/clans disband\", or ignore this message to keep your clan.", NamedTextColor.RED)
+                    sendErrorMessage(s, "The timer to disband your clan has expired!")
+                    sendErrorMessage(s, "To delete your clan, enter \"/clans disband\", or ignore this message to keep your clan.")
                 } else {
                     // Delete the clan by removing it from the associated ClanList.
                     clanList.removeClan(clan)
@@ -233,7 +231,7 @@ class ClansCommand(private val logger: LogHandler,
 
         // Validate that clan present in list.
         if (args[1] !in clanList) {
-            sendPrefixedMessage(s, "Clan \"${args[1]}\" does not exist!", NamedTextColor.RED)
+            sendErrorMessage(s, "Clan \"${args[1]}\" does not exist!")
             return true
         }
 
@@ -280,6 +278,15 @@ class ClansCommand(private val logger: LogHandler,
      */
     private fun sendPrefixedMessage(target: CommandSender, message: String, color: NamedTextColor)
         = sendPrefixedMessage(target, Component.text(message, color))
+
+    /**
+     * Send a red-colored error message to a target.
+     *
+     * @param target Entity to receive error.
+     * @param message Error to format and send to target.
+     */
+    private fun sendErrorMessage(target: CommandSender, message: String)
+        = target.sendMessage(prefixedMessage(Component.text(message, NamedTextColor.RED)))
 
     /**
      * Broadcast a colored string message.
