@@ -1,5 +1,7 @@
 package net.williserver.clans
 
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import net.williserver.clans.commands.ClansCommand
 import net.williserver.clans.commands.ClansTabCompleter
 import net.williserver.clans.model.ClanList
