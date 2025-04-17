@@ -5,6 +5,7 @@ import net.kyori.adventure.text.format.NamedTextColor
 import net.williserver.clans.LogHandler
 import net.williserver.clans.model.*
 import net.williserver.clans.pluginMessagePrefix
+import net.williserver.clans.session.ConfirmTimer
 import org.bukkit.Bukkit.broadcast
 import org.bukkit.Bukkit.getOfflinePlayer
 import org.bukkit.command.Command

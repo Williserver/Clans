@@ -1,4 +1,4 @@
-package net.williserver.clans.commands
+package net.williserver.clans.session
 
 import net.williserver.clans.pluginMessagePrefix
 import java.util.Date
