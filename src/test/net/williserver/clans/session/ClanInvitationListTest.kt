@@ -1,6 +1,7 @@
 package net.williserver.clans.session
 
 import net.williserver.clans.model.ClanList
+import net.williserver.clans.session.invite.ClanInvitationList
 import org.junit.jupiter.api.Test
 
 class ClanInvitationListTest {
