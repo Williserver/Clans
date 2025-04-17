@@ -18,9 +18,11 @@ class ClanInvitationList(private val list: ClanList) {
      */
     fun add(player: UUID, invitation: ClanInvitation) {
         playerToInvitations.putIfAbsent(player, emptySet())
+        // TODO: validate that no active invitation is outgoing.
 //        if (invitation in playerToInvitations[player]!!) {
 //
 //        }
+        // Add the invitation
     }
 
 }

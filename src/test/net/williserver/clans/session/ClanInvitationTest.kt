@@ -2,10 +2,8 @@ package net.williserver.clans.session
 
 import net.williserver.clans.model.Clan
 import net.williserver.clans.session.invite.TimedClanInvitation
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import java.lang.Thread.sleep
 import java.util.*
 
 class ClanInvitationTest {

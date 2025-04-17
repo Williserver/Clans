@@ -24,10 +24,10 @@ open class ClanInvitation(val player: UUID, val clan: Clan) {
      * @return whether the invitations refer to the same clan and are both still valid
      */
     override fun equals(other: Any?): Boolean = other is ClanInvitation
-            && player == other.player && clan == other.clan && validInvite() == other.validInvite()
+            && player == other.player && clan == other.clan
 
     /*
-     * Automatically generated hashcode function.
+     * Automatically generated hashcode implementation.
      */
     override fun hashCode(): Int {
         var result = player.hashCode()
@@ -54,7 +54,22 @@ class TimedClanInvitation(player: UUID, clan: Clan, val timer: ConfirmTimer): Cl
     }
 
     /**
+     * Timed invitations are only equal if they also share the same timer.
+     */
+    override fun equals(other: Any?): Boolean =
+        super.equals(other) && other is TimedClanInvitation && timer == other.timer
+
+    /**
      * @return Whether this invitation is still open, or if the timer has expired.
      */
     override fun validInvite() = timer.inBounds()
+
+    /*
+     * Automatically generated hashcode implementation.
+     */
+    override fun hashCode(): Int {
+        var result = super.hashCode()
+        result = 31 * result + timer.hashCode()
+        return result
+    }
 }
