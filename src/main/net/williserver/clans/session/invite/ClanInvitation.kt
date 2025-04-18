@@ -41,8 +41,8 @@ open class ClanInvitation(val player: UUID, val clan: Clan) {
  *
  * @param player ID of invited player.
  * @param clan Clan invitation is for.
- * @param timer preconfigured timer representing how long the invite may remain valid.
- * We will start the timer at construction time.
+ *
+ * @throws IllegalStateException if timer has already been started.
  */
 class TimedClanInvitation(player: UUID, clan: Clan, val timer: ConfirmTimer): ClanInvitation(player, clan) {
     init {
