@@ -5,7 +5,7 @@ import net.kyori.adventure.text.format.NamedTextColor
 import net.williserver.clans.LogHandler
 import net.williserver.clans.model.*
 import net.williserver.clans.pluginMessagePrefix
-import net.williserver.clans.session.ConfirmTimer
+import net.williserver.clans.session.SessionManager
 import org.bukkit.Bukkit.broadcast
 import org.bukkit.Bukkit.getOfflinePlayer
 import org.bukkit.command.Command
@@ -25,12 +25,8 @@ import java.util.*
  */
 class ClansCommand(private val logger: LogHandler,
                    private val config: ClansConfig,
-                   private val clanList: ClanList): CommandExecutor {
-
-    /*
-     * Map of clans to timers confirming their deletion.
-     */
-    private val clanConfirmDeleteMap = hashMapOf<Clan, ConfirmTimer>()
+                   private val clanList: ClanList,
+                   private val session: SessionManager): CommandExecutor {
 
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean =
         if (args.isNotEmpty()) {
@@ -188,17 +184,10 @@ class ClansCommand(private val logger: LogHandler,
         // Either initiate a new disband attempt, or confirm one if it's done in time.
         return when(args.size) {
             1 -> {
-                /*
-                 * Initiate a disband timer, giving the user 60 seconds to confirm clan deletion.
-                 */
-                if (clanConfirmDeleteMap[clan] == null) {
-                    clanConfirmDeleteMap[clan] = ConfirmTimer(config.confirmDisbandTime.toLong())
-                }
-
+                session.registerClanDisbandTimer(clan, config.confirmDisbandTime.toLong())
                 sendPrefixedMessage(s, "You have begun to disband your clan!", NamedTextColor.LIGHT_PURPLE)
                 sendPrefixedMessage(s, "Enter \"/clans disband confirm\" within ${config.confirmDisbandTime} seconds to confirm this choice.", NamedTextColor.LIGHT_PURPLE)
-                clanConfirmDeleteMap[clan]!!.reset()
-                clanConfirmDeleteMap[clan]!!.startTimer()
+                session.startClanDisbandTimer(clan)
                 true
             }
             2 -> {
@@ -208,10 +197,10 @@ class ClansCommand(private val logger: LogHandler,
                  */
                 if (args[1].lowercase(Locale.getDefault()) != "confirm") {
                     return false
-                } else if (clanConfirmDeleteMap[clan] == null || !clanConfirmDeleteMap[clan]!!.isRunning()) {
+                } else if (!session.clanDisbandTimerRegistered(clan)) {
                     sendErrorMessage(s, "You have attempted to delete your clan with \"/clans disband confirm\" before starting the deletion timer!")
                     sendErrorMessage(s, "Please start the timer with \"/clans disband\" first, or ignore this message to keep your clan.")
-                } else if (!clanConfirmDeleteMap[clan]!!.inBounds()) {
+                } else if (!session.checkDisbandTimerInBounds(clan)) {
                     sendErrorMessage(s, "The timer to disband your clan has expired!")
                     sendErrorMessage(s, "To delete your clan, enter \"/clans disband\", or ignore this message to keep your clan.")
                 } else {
