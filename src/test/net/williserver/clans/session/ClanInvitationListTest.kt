@@ -22,7 +22,7 @@ class ClanInvitationListTest {
         val clan = Clan("TestClan", leader, mutableListOf(leader))
 
         assertFalse(invitations.hasActiveInvitation(rando, clan))
-        invitations.add(TimedClanInvitation(rando, clan, ConfirmTimer(10)))
+        invitations.add(TimedClanInvitation(rando, clan, 10))
         assert(invitations.hasActiveInvitation(rando, clan))
     }
 
@@ -34,7 +34,7 @@ class ClanInvitationListTest {
         val clan = Clan("TestClan", leader, mutableListOf(leader))
 
         assertFalse(invitations.hasActiveInvitation(rando, clan))
-        invitations.add(TimedClanInvitation(rando, clan, ConfirmTimer(0)))
+        invitations.add(TimedClanInvitation(rando, clan, 0))
         assertFalse(invitations.hasActiveInvitation(rando, clan))
     }
 

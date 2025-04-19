@@ -41,15 +41,14 @@ open class ClanInvitation(val player: UUID, val clan: Clan) {
  *
  * @param player ID of invited player.
  * @param clan Clan invitation is for.
+ * @param time Amount of time for clan timer, started on initialization.
  *
  * @throws IllegalStateException if timer has already been started.
  */
-class TimedClanInvitation(player: UUID, clan: Clan, val timer: ConfirmTimer): ClanInvitation(player, clan) {
+class TimedClanInvitation(player: UUID, clan: Clan, val time: Long): ClanInvitation(player, clan) {
+    private val timer = ConfirmTimer(time)
+
     init {
-        if (timer.isRunning()) {
-            throw IllegalStateException("Provided timer has already been started!")
-        }
-        // The actual time bound of the timer will be provided elsewhere, but we start the timer here.
         timer.startTimer()
     }
 

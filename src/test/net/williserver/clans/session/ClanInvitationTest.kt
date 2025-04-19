@@ -12,17 +12,7 @@ class ClanInvitationTest {
     fun testConstructTimed() {
         val leader = UUID.randomUUID()
         val clan = Clan("TestClan", leader, mutableListOf(leader));
-        val timer = ConfirmTimer(1)
-        TimedClanInvitation(UUID.randomUUID(), clan, timer)
-    }
-
-    @Test
-    fun testRejectRunningTimer() {
-        val leader = UUID.randomUUID()
-        val clan = Clan("TestClan", leader, mutableListOf(leader))
-        val timer = ConfirmTimer(1)
-        timer.startTimer()
-        assertThrows(IllegalStateException::class.java) { TimedClanInvitation(UUID.randomUUID(), clan, timer) }
+        TimedClanInvitation(UUID.randomUUID(), clan, 1)
     }
 
     @Test
@@ -31,10 +21,9 @@ class ClanInvitationTest {
         val clan = Clan("TestClan", leader, mutableListOf(leader))
         // One invitation will be created with a 10 second long timer
         // this is more than enough time for the invite to be valid.
-        val longTimer = ConfirmTimer(10)
-        assert(TimedClanInvitation(UUID.randomUUID(), clan, longTimer).validInvite())
+        assert(TimedClanInvitation(UUID.randomUUID(), clan, 10).validInvite())
         val shortTimer = ConfirmTimer(0)
-        val expiredInvite = TimedClanInvitation(UUID.randomUUID(), clan, shortTimer)
+        val expiredInvite = TimedClanInvitation(UUID.randomUUID(), clan, 0)
         assertFalse(expiredInvite.validInvite())
     }
 }
