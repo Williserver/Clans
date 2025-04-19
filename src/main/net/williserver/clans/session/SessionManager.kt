@@ -1,6 +1,9 @@
 package net.williserver.clans.session
 
 import net.williserver.clans.model.Clan
+import net.williserver.clans.session.invite.ClanInvitation
+import net.williserver.clans.session.invite.ClanInvitationList
+import java.util.*
 
 /**
  * Manage a single server session's non-persistent data, like confirmation timers.
@@ -8,11 +11,38 @@ import net.williserver.clans.model.Clan
  * @author Willmo3
  */
 class SessionManager {
-
     /*
      * Map of clans to timers confirming their deletion.
      */
     private val clanConfirmDeleteMap = hashMapOf<Clan, ConfirmTimer>()
+
+    /*
+     * List of active clan invitations.
+     */
+    private val clanInvitations = ClanInvitationList()
+
+    /*
+     * Clan invitation helpers.
+     */
+
+    /**
+     * Register an invitation mapping a player to a clan.
+     * @param invitation New invite to add to invite list.
+     */
+    fun addClanInvite(invitation: ClanInvitation) {
+        clanInvitations.add(invitation)
+    }
+
+    /**
+     * @param player Player whose invite should be checked.
+     * @param clan Clan to check if invite open.
+     * @return whether a clan invite is live.
+     */
+    fun activeClanInvite(player: UUID, clan: Clan) = clanInvitations.hasActiveInvitation(player, clan)
+
+    /*
+     * Clan disband helpers.
+     */
 
     /**
      * Register a disband timer for a clan.

@@ -1,6 +1,7 @@
 package net.williserver.clans.session
 
 import net.williserver.clans.model.Clan
+import net.williserver.clans.session.invite.TimedClanInvitation
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
@@ -24,7 +25,7 @@ class SessionManagerTest {
     }
 
     @Test
-    fun testTimerInBounds() {
+    fun testDisbandTimerInBounds() {
         val leader = UUID.randomUUID()
         val clan = Clan("TestClan", leader, mutableListOf(leader))
         val session = SessionManager()
@@ -41,7 +42,7 @@ class SessionManagerTest {
     }
 
     @Test
-    fun testTimerNotInBounds() {
+    fun testDisbandTimerNotInBounds() {
         val leader = UUID.randomUUID()
         val clan = Clan("TestClan", leader, mutableListOf(leader))
         val session = SessionManager()
@@ -51,6 +52,20 @@ class SessionManagerTest {
         assertFalse(session.checkDisbandTimerInBounds(clan))
     }
 
+    @Test
+    fun testAddInvitation() {
+        val leader = UUID.randomUUID()
+        val clan = Clan("TestClan", leader, mutableListOf(leader))
+        val session = SessionManager()
+
+        val rando = UUID.randomUUID()
+        assertFalse(session.activeClanInvite(rando, clan))
+        // An invite with an expired timer fails!
+        session.addClanInvite(TimedClanInvitation(rando, clan, 0))
+        assertFalse(session.activeClanInvite(rando, clan))
+        session.addClanInvite(TimedClanInvitation(rando, clan, 10))
+        assert(session.activeClanInvite(rando, clan))
+    }
+
     // TODO: tests for deleting clans.
-    // TODO: tests for inviting new members to clans.
 }
