@@ -214,6 +214,31 @@ class ClansCommand(private val logger: LogHandler,
         }
     }
 
+    /*
+    /**
+     * Invite a player to our clan.
+     *
+     * @param s Player who invoked the command.
+     * @param args Arguments to command. Should be one: the player invited.
+     * @return Whether the command was invoked with the correct number of arguments.
+     */
+    private fun invite(s: CommandSender, args: Array<out String>): Boolean {
+        // API validation
+        true
+    }
+
+    /**
+     * Leave our clan.
+     *
+     * @param s Player who invoked the command, will leave their clan.
+     * @param args Arguments to command. Should be none.
+     * @return Whether the command was invoked with the correct number of arguments.
+     */
+    private fun leave(s: CommandSender, args: Array<out String>): Boolean {
+        true
+    }
+    */
+
     /**
      * Message the sender with a report about the given clan.
      * Format:
