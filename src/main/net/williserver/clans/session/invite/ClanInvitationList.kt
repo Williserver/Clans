@@ -22,6 +22,14 @@ class ClanInvitationList {
         val clanInvitedTo = invitation.clan
         playerToInvitations.putIfAbsent(invitedPlayer, mutableSetOf())
 
+        // Clear all expired invites for this player.
+        // Note that this will result in no changes to the external API -- only active invitations count!
+        playerToInvitations[invitedPlayer]!!.forEach {
+            if (!it.validInvite()) {
+                playerToInvitations[invitedPlayer]!! -= it
+            }
+        }
+
         // This function should only be invoked if no invitation is yet active -- use the hasActiveInvitation helper!
         if (hasActiveInvitation(invitedPlayer, clanInvitedTo)) {
             throw IllegalArgumentException("Player $invitedPlayer is already invited to $clanInvitedTo")
