@@ -6,8 +6,8 @@ import net.williserver.clans.LogHandler
 import net.williserver.clans.model.*
 import net.williserver.clans.pluginMessagePrefix
 import net.williserver.clans.session.SessionManager
-import net.williserver.clans.session.lifecycle.ClanEvent
-import net.williserver.clans.session.lifecycle.ClanEventBus
+import net.williserver.clans.lifecycle.ClanEvent
+import net.williserver.clans.lifecycle.ClanEventBus
 import org.bukkit.Bukkit.broadcast
 import org.bukkit.Bukkit.getOfflinePlayer
 import org.bukkit.command.Command
@@ -31,7 +31,8 @@ class ClansCommand(private val logger: LogHandler,
                    private val config: ClansConfig,
                    private val clanList: ClanList,
                    private val session: SessionManager,
-                   private val bus: ClanEventBus): CommandExecutor {
+                   private val bus: ClanEventBus
+): CommandExecutor {
 
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean =
         if (args.isNotEmpty()) {

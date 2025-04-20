@@ -2,10 +2,10 @@ package net.williserver.clans.session
 
 import net.williserver.clans.model.Clan
 import net.williserver.clans.model.ClanList
-import net.williserver.clans.session.lifecycle.ClanEvent
-import net.williserver.clans.session.lifecycle.ClanEventBus
-import net.williserver.clans.session.lifecycle.createAddClanToModel
-import net.williserver.clans.session.lifecycle.disbandRemoveClanFromModel
+import net.williserver.clans.lifecycle.ClanEvent
+import net.williserver.clans.lifecycle.ClanEventBus
+import net.williserver.clans.lifecycle.createAddClanToModel
+import net.williserver.clans.lifecycle.disbandRemoveClanFromModel
 import org.junit.jupiter.api.Test
 import java.util.UUID
 import kotlin.test.assertFalse

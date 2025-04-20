@@ -1,4 +1,4 @@
-package net.williserver.clans.session.lifecycle
+package net.williserver.clans.lifecycle
 
 import net.williserver.clans.model.Clan
 import net.williserver.clans.model.ClanList

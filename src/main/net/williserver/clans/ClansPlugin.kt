@@ -9,10 +9,10 @@ import net.williserver.clans.model.ClansConfigLoader
 import net.williserver.clans.model.readFromFile
 import net.williserver.clans.model.writeToFile
 import net.williserver.clans.session.SessionManager
-import net.williserver.clans.session.lifecycle.ClanEvent
-import net.williserver.clans.session.lifecycle.ClanEventBus
-import net.williserver.clans.session.lifecycle.createAddClanToModel
-import net.williserver.clans.session.lifecycle.disbandRemoveClanFromModel
+import net.williserver.clans.lifecycle.ClanEvent
+import net.williserver.clans.lifecycle.ClanEventBus
+import net.williserver.clans.lifecycle.createAddClanToModel
+import net.williserver.clans.lifecycle.disbandRemoveClanFromModel
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 
