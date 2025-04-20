@@ -20,9 +20,9 @@ enum class ClanEvent {
  * Clan and agent parameters are provided -- additional required state should be closed around.
  * @param model List of clans in this session.
  * @param clan Clan to which the event is occuring.
- * @param agent Player performing the action in the clan lifecycle.
+ * @param agent Player performing the action in the clan lifecycle, or none -- may be server initiated.
  */
-typealias ClanLifecycleListener = (model: ClanList, clan: Clan, agent: UUID) -> Unit
+typealias ClanLifecycleListener = (model: ClanList, clan: Clan, agent: UUID?) -> Unit
 
 /**
  * Event bus for major events in a clan's lifecycle.
@@ -57,7 +57,7 @@ class ClanEventBus {
      * @param clan Clan affected by event.
      * @param agent player who initiated event.
      */
-    fun fireEvent(event: ClanEvent, clans: ClanList, clan: Clan, agent: UUID) {
+    fun fireEvent(event: ClanEvent, clans: ClanList, clan: Clan, agent: UUID?) {
         listeners[event]!!.forEach { it(clans, clan, agent) }
     }
 }

@@ -9,6 +9,10 @@ import net.williserver.clans.model.ClansConfigLoader
 import net.williserver.clans.model.readFromFile
 import net.williserver.clans.model.writeToFile
 import net.williserver.clans.session.SessionManager
+import net.williserver.clans.session.lifecycle.ClanEvent
+import net.williserver.clans.session.lifecycle.ClanEventBus
+import net.williserver.clans.session.lifecycle.createAddClanToModel
+import net.williserver.clans.session.lifecycle.disbandRemoveClanFromModel
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 
@@ -33,11 +37,17 @@ class ClansPlugin : JavaPlugin() {
 
         // Read base clan list.
         clanList = readFromFile(path)
+
         // Initiate this session.
         val session = SessionManager()
 
+        // Register major events in clan lifecycle.
+        val bus = ClanEventBus()
+        bus.registerListener(ClanEvent.CREATE, ::createAddClanToModel)
+        bus.registerListener(ClanEvent.DISBAND, ::disbandRemoveClanFromModel)
+
         // Register commands.
-        this.getCommand("clans")!!.setExecutor(ClansCommand(handler, config, clanList, session))
+        this.getCommand("clans")!!.setExecutor(ClansCommand(handler, config, clanList, session, bus))
         this.getCommand("clans")!!.tabCompleter = ClansTabCompleter(clanList)
 
         handler.info("Enabled")

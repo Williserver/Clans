@@ -10,13 +10,13 @@ import java.util.*
  *
  * @param model List of clans to remove this clan from.
  * @param clan Clan being disbanded.
- * @param agent Player initating the disband.
  *
+ * @throws NullPointerException if not invoked with an agent.
  * @throws IllegalStateException if the agent does not have permission to remove the clan.
  * @throws NoSuchElementException if this clan is not already in the list.
  */
-fun disbandRemoveClanFromModel(model: ClanList, clan: Clan, agent: UUID) {
-    if (!clan.rankOfMember(agent).hasPermission(ClanPermission.DISBAND)) {
+fun disbandRemoveClanFromModel(model: ClanList, clan: Clan, agent: UUID?) {
+    if (!clan.rankOfMember(agent!!).hasPermission(ClanPermission.DISBAND)) {
         throw IllegalStateException("Player $agent does not have permission to delete this clan!")
     }
     model.removeClan(clan)

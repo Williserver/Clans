@@ -6,6 +6,8 @@ import net.williserver.clans.LogHandler
 import net.williserver.clans.model.*
 import net.williserver.clans.pluginMessagePrefix
 import net.williserver.clans.session.SessionManager
+import net.williserver.clans.session.lifecycle.ClanEvent
+import net.williserver.clans.session.lifecycle.ClanEventBus
 import org.bukkit.Bukkit.broadcast
 import org.bukkit.Bukkit.getOfflinePlayer
 import org.bukkit.command.Command
@@ -20,13 +22,16 @@ import java.util.*
  * @param logger Logging manager
  * @param config Configuration options for this session.
  * @param clanList clan model for this session.
+ * @param session Session-specific data, like timers.
+ * @param bus Event bus with registered listeners for events in clan lifecycle that may be caused by command invocation.
  *
  * @author Willmo3
  */
 class ClansCommand(private val logger: LogHandler,
                    private val config: ClansConfig,
                    private val clanList: ClanList,
-                   private val session: SessionManager): CommandExecutor {
+                   private val session: SessionManager,
+                   private val bus: ClanEventBus): CommandExecutor {
 
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean =
         if (args.isNotEmpty()) {
@@ -146,8 +151,7 @@ class ClansCommand(private val logger: LogHandler,
 
         // Create a new clan with this player as its leader and starting member.
         val newClan = Clan(name, leader, arrayListOf(leader))
-        // Insert the clan into the main ClanList.
-        clanList.addClan(newClan)
+        bus.fireEvent(ClanEvent.CREATE, clanList, newClan, leader)
 
         broadcastPrefixedMessage("Chief ${s.name} has formed the clan \"${newClan.name}\"!", NamedTextColor.GREEN)
         return true
@@ -204,8 +208,8 @@ class ClansCommand(private val logger: LogHandler,
                     sendErrorMessage(s, "The timer to disband your clan has expired!")
                     sendErrorMessage(s, "To delete your clan, enter \"/clans disband\", or ignore this message to keep your clan.")
                 } else {
-                    // Delete the clan by removing it from the associated ClanList.
-                    clanList.removeClan(clan)
+                    // Confirm the deletion of the clan, firing all relevant listeners.
+                    bus.fireEvent(ClanEvent.DISBAND, clanList, clan, s.uniqueId)
                     broadcastPrefixedMessage("Clan \"${clan.name}\" has disbanded!", NamedTextColor.DARK_PURPLE)
                 }
                 true
