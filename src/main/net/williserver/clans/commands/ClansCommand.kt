@@ -8,8 +8,9 @@ import net.williserver.clans.pluginMessagePrefix
 import net.williserver.clans.session.SessionManager
 import net.williserver.clans.lifecycle.ClanEvent
 import net.williserver.clans.lifecycle.ClanEventBus
-import org.bukkit.Bukkit.broadcast
-import org.bukkit.Bukkit.getOfflinePlayer
+import net.williserver.clans.session.invite.ClanInvitation
+import net.williserver.clans.session.invite.TimedClanInvitation
+import org.bukkit.Bukkit.*
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
@@ -219,7 +220,6 @@ class ClansCommand(private val logger: LogHandler,
         }
     }
 
-    /*
     /**
      * Invite a player to our clan.
      *
@@ -228,7 +228,53 @@ class ClansCommand(private val logger: LogHandler,
      * @return Whether the command was invoked with the correct number of arguments.
      */
     private fun invite(s: CommandSender, args: Array<out String>): Boolean {
-        // API validation
+        // API validation: 2 args (subcommand, target)
+        if (args.size != 2) {
+            return false
+        } else if (s !is Player) {
+            sendErrorMessage(s, "You must be a player to invite members to your clan!")
+            return true
+        } else if (!clanList.playerInClan(s.uniqueId)) {
+            sendErrorMessage(s, "You must be in a clan!")
+            return true
+        }
+
+        // Ensure player has correct permissions in their clan.
+        val targetClan = clanList.playerClan(s.uniqueId)
+        if (!targetClan.rankOfMember(s.uniqueId).hasPermission(ClanPermission.INVITE)) {
+            sendErrorMessage(s, "You do not have permission to invite new members to the clan!")
+            return true
+        }
+
+        // Find the UUID of the target player and validate that they are an eligible bachelor.
+        val targetPlayer = getPlayer(args[1])
+        if (targetPlayer == null) {
+            sendErrorMessage(s, "Player \"${args[1]}\" not found -- are they online?")
+            return true
+        } else if (clanList.playerInClan(targetPlayer.uniqueId)) {
+            sendErrorMessage(s, "${targetPlayer.name} is already in a clan!")
+        } else if (session.activeClanInvite(targetPlayer.uniqueId, targetClan)) {
+            sendErrorMessage(s, "${targetPlayer.name} is already waiting on an invitation from you.")
+            return true
+        }
+
+        sendPrefixedMessage(s, "You have invited ${s.name} to your clan!", NamedTextColor.GREEN)
+        sendPrefixedMessage(targetPlayer, "${s.name} has invited you to clan ${targetClan.name}!", NamedTextColor.GREEN)
+        sendPrefixedMessage(targetPlayer, "You have 30 seconds to accept your invitation.", NamedTextColor.GREEN)
+        // TODO: configure time for invite.
+        session.addClanInvite(TimedClanInvitation(targetPlayer.uniqueId, targetClan, 30))
+        return true
+    }
+
+    /*
+    /**
+     * Join a new clan.
+     *
+     * @param s Player who invoked the command, will join the target clan if an invitation is active.
+     * @param args Arguments to command. Should be one: the name of the clan to join.
+     * @return Whether the command was invoked with the correct number of arguments.
+     */
+    private fun join(s: CommandSender, args: Array<out String>): Boolean {
         true
     }
 
