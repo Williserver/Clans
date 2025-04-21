@@ -165,6 +165,7 @@ class ClanList(data: List<ClanData>) {
  * @param clanList clanlist object to write.
  */
 fun writeToFile(path: String, clanList: ClanList) {
+    // TODO: add logging to mention writing list.
     val writer = FileWriter(path)
     writer.write(Json.encodeToString(clanList.asDataTuples()))
     writer.close()
@@ -177,6 +178,7 @@ fun writeToFile(path: String, clanList: ClanList) {
  * @return ClanList read from file.
  */
 fun readFromFile(path: String): ClanList {
+    // TODO: add logging if resorting to default list, or properly reading list.
     if (!File(path).exists()) {
         return ClanList(listOf())
     }
