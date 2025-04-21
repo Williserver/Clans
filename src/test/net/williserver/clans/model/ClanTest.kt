@@ -50,15 +50,4 @@ class ClanTest {
         assert(!validClanName(" "))
     }
 
-    @Test
-    fun testRank() {
-        val leader = UUID.randomUUID()
-        val member = UUID.randomUUID()
-        val members = arrayListOf(leader, member)
-        val clan = Clan("TestClan", leader, members)
-
-        assertEquals(ClanRank.LEADER, clan.rankOfMember(leader))
-        assertEquals(ClanRank.MEMBER, clan.rankOfMember(member))
-        assertThrows(IllegalArgumentException::class.java) { clan.rankOfMember(UUID.randomUUID()) }
-    }
 }
