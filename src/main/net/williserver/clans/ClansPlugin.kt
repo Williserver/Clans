@@ -1,7 +1,5 @@
 package net.williserver.clans
 
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.NamedTextColor
 import net.williserver.clans.commands.ClansCommand
 import net.williserver.clans.commands.ClansTabCompleter
 import net.williserver.clans.model.ClanList
@@ -24,7 +22,7 @@ const val pluginMessagePrefix = "[CLANS]"
  * @author Willmo3
  */
 class ClansPlugin : JavaPlugin() {
-    private val handler = LogHandler(super.getLogger())
+    private val logger = LogHandler(super.getLogger())
     // Default data path
     private val path = "$dataFolder${File.separator}clans.json"
     // clanList model.
@@ -33,10 +31,10 @@ class ClansPlugin : JavaPlugin() {
     override fun onEnable() {
         // Note: even with an empty config, this is necessary to generate the data directory.
         saveDefaultConfig()
-        val config = ClansConfigLoader(handler, config).config
+        val config = ClansConfigLoader(logger, config).config
 
         // Read base clan list.
-        clanList = readFromFile(handler, path)
+        clanList = readFromFile(logger, path)
 
         // Initiate this session.
         val session = SessionManager()
@@ -47,16 +45,16 @@ class ClansPlugin : JavaPlugin() {
         bus.registerListener(ClanEvent.DISBAND, ::disbandRemoveClanFromModel)
 
         // Register commands.
-        this.getCommand("clans")!!.setExecutor(ClansCommand(handler, config, clanList, session, bus))
+        this.getCommand("clans")!!.setExecutor(ClansCommand(logger, config, clanList, session, bus))
         this.getCommand("clans")!!.tabCompleter = ClansTabCompleter(clanList)
 
-        handler.info("Enabled")
+        logger.info("Enabled")
     }
 
     override fun onDisable() {
         // Save model settings.
-        writeToFile(handler, path, clanList)
+        writeToFile(logger, path, clanList)
 
-        handler.info("Disabled")
+        logger.info("Disabled")
     }
 }

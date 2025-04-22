@@ -14,7 +14,7 @@ class LogHandler(private val logger: Logger?) {
     fun err(message: String) {
         logger?.warning(message) ?: System.err.println("$pluginMessagePrefix: $message")
     }
-    
+
     /**
      * Report a message to server console or to stdout if no console present.
      * @param message Message to report.
