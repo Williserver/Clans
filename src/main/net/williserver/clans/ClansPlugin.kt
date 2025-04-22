@@ -32,21 +32,26 @@ class ClansPlugin : JavaPlugin() {
         // Note: even with an empty config, this is necessary to generate the data directory.
         saveDefaultConfig()
         val config = ClansConfigLoader(logger, config).config
+        logger.info("Loaded config")
 
         // Read base clan list.
         clanList = readFromFile(logger, path)
+        logger.info("Initialized clanList")
 
         // Initiate this session.
         val session = SessionManager()
+        logger.info("Initialized session")
 
         // Register major events in clan lifecycle.
         val bus = ClanEventBus()
         bus.registerListener(ClanEvent.CREATE, ::createAddClanToModel)
         bus.registerListener(ClanEvent.DISBAND, ::disbandRemoveClanFromModel)
+        logger.info("Registered clan lifecycle listeners")
 
         // Register commands.
         this.getCommand("clans")!!.setExecutor(ClansCommand(logger, config, clanList, session, bus))
         this.getCommand("clans")!!.tabCompleter = ClansTabCompleter(clanList)
+        logger.info("Registered commands")
 
         logger.info("Enabled")
     }
