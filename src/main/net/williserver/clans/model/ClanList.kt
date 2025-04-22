@@ -1,6 +1,7 @@
 package net.williserver.clans.model
 
 import kotlinx.serialization.json.Json
+import net.williserver.clans.LogHandler
 import net.williserver.clans.pluginMessagePrefix
 import java.io.File
 import java.io.FileReader
@@ -164,10 +165,10 @@ class ClanList(data: List<ClanData>) {
  * @param path Destination for file.
  * @param clanList clanlist object to write.
  */
-fun writeToFile(path: String, clanList: ClanList) {
-    // TODO: add logging to mention writing list.
+fun writeToFile(logger: LogHandler, path: String, clanList: ClanList) {
     val writer = FileWriter(path)
     writer.write(Json.encodeToString(clanList.asDataTuples()))
+    logger.info("Saved clan list to $path")
     writer.close()
 }
 
@@ -177,13 +178,14 @@ fun writeToFile(path: String, clanList: ClanList) {
  * @param path Location of file.
  * @return ClanList read from file.
  */
-fun readFromFile(path: String): ClanList {
-    // TODO: add logging if resorting to default list, or properly reading list.
+fun readFromFile(logger: LogHandler, path: String): ClanList {
     if (!File(path).exists()) {
+        logger.info("Found no clan list at $path\nReturning new empty list.")
         return ClanList(listOf())
     }
     val reader = FileReader(path)
     val jsonString = reader.readText()
     reader.close()
+    logger.info("Loaded clan list from $path")
     return ClanList(Json.decodeFromString<List<ClanData>>(jsonString))
 }

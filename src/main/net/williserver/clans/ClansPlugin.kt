@@ -36,7 +36,7 @@ class ClansPlugin : JavaPlugin() {
         val config = ClansConfigLoader(handler, config).config
 
         // Read base clan list.
-        clanList = readFromFile(path)
+        clanList = readFromFile(handler, path)
 
         // Initiate this session.
         val session = SessionManager()
@@ -55,7 +55,7 @@ class ClansPlugin : JavaPlugin() {
 
     override fun onDisable() {
         // Save model settings.
-        writeToFile(path, clanList)
+        writeToFile(handler, path, clanList)
 
         handler.info("Disabled")
     }

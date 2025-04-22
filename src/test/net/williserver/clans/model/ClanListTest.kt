@@ -1,5 +1,6 @@
 package net.williserver.clans.model
 
+import net.williserver.clans.LogHandler
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import java.util.*
@@ -27,8 +28,8 @@ class ClanListTest {
         val clanData = ClanData("TestClan", listOf(leader), leader)
         val clanList = ClanList(listOf(clanData))
 
-        writeToFile("testClanList.json", clanList)
-        assertEquals(clanList, readFromFile("testClanList.json"))
+        writeToFile(LogHandler(null), "testClanList.json", clanList)
+        assertEquals(clanList, readFromFile(LogHandler(null), "testClanList.json"))
     }
 
     @Test
