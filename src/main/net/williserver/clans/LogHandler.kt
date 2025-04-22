@@ -12,13 +12,14 @@ class LogHandler(private val logger: Logger?) {
      * @param message Message to report.
      */
     fun err(message: String) {
-        logger?.warning("$pluginMessagePrefix:$message") ?: System.err.println("$pluginMessagePrefix:$message")
+        logger?.warning(message) ?: System.err.println("$pluginMessagePrefix: $message")
     }
+    
     /**
      * Report a message to server console or to stdout if no console present.
      * @param message Message to report.
      */
     fun info(message: String) {
-        logger?.info("$pluginMessagePrefix:$message") ?: println("$pluginMessagePrefix:$message")
+        logger?.info(message) ?: println("$pluginMessagePrefix: $message")
     }
 }
