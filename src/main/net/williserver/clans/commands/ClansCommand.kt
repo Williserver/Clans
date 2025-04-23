@@ -42,6 +42,7 @@ class ClansCommand(private val logger: LogHandler,
                 "disband" -> disband(sender, args)
                 "info" -> info(sender, args)
                 "invite" -> invite(sender, args)
+                "join" -> join(sender, args)
                 "help" -> help(sender, args)
                 "list" -> list(sender, args)
                 else -> false
@@ -76,6 +77,7 @@ class ClansCommand(private val logger: LogHandler,
         val disbandConfirm = generateCommandHelp("disband confirm", "finish disbanding the clan you own.")
         val info = generateCommandHelp("info (name)", "get information about a clan.")
         val invite = generateCommandHelp("invite (user)", "invite a member to your clan.")
+        val join = generateCommandHelp("join (clan name)", "join a clan.")
         val list = generateCommandHelp("list", "output a list of clans.")
 
         s.sendMessage(header
@@ -85,6 +87,7 @@ class ClansCommand(private val logger: LogHandler,
             .append(disbandConfirm)
             .append(info)
             .append(invite)
+            .append(join)
             .append(list)
         )
         return true
@@ -270,7 +273,6 @@ class ClansCommand(private val logger: LogHandler,
         return true
     }
 
-    /*
     /**
      * Join a new clan.
      *
@@ -279,8 +281,36 @@ class ClansCommand(private val logger: LogHandler,
      * @return Whether the command was invoked with the correct number of arguments.
      */
     private fun join(s: CommandSender, args: Array<out String>): Boolean {
-        true
+        // API validation: 2 args (subcommand, target)
+        if (args.size != 2) {
+            return false
+        }
+        // Ensure player and clan are eligible.
+        if (s !is Player) {
+            sendErrorMessage(s, "You must be a player to join a clan!")
+            return true
+        } else if (clanList.playerInClan(s.uniqueId)) {
+            sendErrorMessage(s, "You are already in a clan!")
+            return true
+        } else if (args[1] !in clanList) {
+            sendErrorMessage(s, "Clan ${args[1]} not found!")
+            return true
+        }
+        // Ensure player has an active invite to the clan.
+        val clan = clanList.get(args[1])
+        if (!session.activeClanInvite(s.uniqueId, clan)) {
+            sendErrorMessage(s, "You do not have an active invite to ${clan.name}.")
+            return true
+        }
+        // Add player to the clan.
+        // TODO: setup event listener to handle update in model.
+        // TODO: setup listener to remove any active invites when you join.
+        broadcastPrefixedMessage("${s.name} has joined clan ${clan.name}!", NamedTextColor.DARK_PURPLE)
+        sendPrefixedMessage(s, "Welcome to clan ${clan.name}!", NamedTextColor.GREEN)
+        return true
     }
+
+    /*
 
     /**
      * Leave our clan.
