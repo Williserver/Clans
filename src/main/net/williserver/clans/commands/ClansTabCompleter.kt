@@ -1,6 +1,7 @@
 package net.williserver.clans.commands
 
 import net.williserver.clans.model.ClanList
+import org.bukkit.Bukkit.getOnlinePlayers
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
@@ -40,16 +41,18 @@ class ClansTabCompleter(private val clanList: ClanList): TabCompleter {
             completions.add("create")
             completions.add("disband")
             completions.add("info")
+            completions.add("invite")
             completions.add("list")
             // Only add completions that correspond with the subcommand they're typing.
             completions.removeAll{ !it.startsWith(args[0].lowercase()) }
         } else if (args.size == 2) {
             when (args[0].lowercase()) {
                 "info" -> clanList.clans().forEach { completions.add(it.name) }
+                "invite" -> getOnlinePlayers().forEach { completions.add(it.name) }
                 "disband" -> completions.add("confirm")
                 else -> {}
             }
-            completions.removeAll{ !it.startsWith(args[1].lowercase()) }
+            completions.removeAll{ !it.startsWith(args[1]) }
         }
 
         return completions

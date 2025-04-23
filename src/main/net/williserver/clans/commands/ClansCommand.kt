@@ -40,8 +40,9 @@ class ClansCommand(private val logger: LogHandler,
             when(args[0].lowercase(Locale.getDefault())) {
                 "create" -> create(sender, args)
                 "disband" -> disband(sender, args)
-                "help" -> help(sender, args)
                 "info" -> info(sender, args)
+                "invite" -> invite(sender, args)
+                "help" -> help(sender, args)
                 "list" -> list(sender, args)
                 else -> false
             }
@@ -74,6 +75,7 @@ class ClansCommand(private val logger: LogHandler,
         val disband = generateCommandHelp("disband", "begin to disband the clan you own.")
         val disbandConfirm = generateCommandHelp("disband confirm", "finish disbanding the clan you own.")
         val info = generateCommandHelp("info (name)", "get information about a clan.")
+        val invite = generateCommandHelp("invite (user)", "invite a member to your clan.")
         val list = generateCommandHelp("list", "output a list of clans.")
 
         s.sendMessage(header
@@ -82,6 +84,7 @@ class ClansCommand(private val logger: LogHandler,
             .append(disband)
             .append(disbandConfirm)
             .append(info)
+            .append(invite)
             .append(list)
         )
         return true
@@ -253,6 +256,7 @@ class ClansCommand(private val logger: LogHandler,
             return true
         } else if (clanList.playerInClan(targetPlayer.uniqueId)) {
             sendErrorMessage(s, "${targetPlayer.name} is already in a clan!")
+            return true
         } else if (session.activeClanInvite(targetPlayer.uniqueId, targetClan)) {
             sendErrorMessage(s, "${targetPlayer.name} is already waiting on an invitation from you.")
             return true
