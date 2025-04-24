@@ -161,8 +161,6 @@ class ClanList(data: List<ClanData>) {
         clan.join(agent)
     }
 
-    /*
-
     /**
      * Construct leave listener to remove a player from clan in this model.
      * Fire when a player leaves a clan.
@@ -172,9 +170,8 @@ class ClanList(data: List<ClanData>) {
         if (!contains(clan.name)) {
             throw IllegalArgumentException("$pluginMessagePrefix: Clan ${clan.name} is not in this list!")
         }
+        clan.leave(agent)
     }
-
-    */
 
     /**
      * Construct create listener to add a clan to this model.

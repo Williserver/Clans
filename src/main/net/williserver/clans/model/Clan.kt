@@ -80,6 +80,8 @@ class Clan(val name: String, leader: UUID, private val members: MutableList<UUID
     fun leave(member: UUID) {
         if (!contains(member)) {
             throw IllegalArgumentException("$pluginMessagePrefix: Member $member does not exist!")
+        } else if (member == leader) {
+            throw IllegalArgumentException("$pluginMessagePrefix: Member $member leads this clan!")
         }
         members -= member
     }

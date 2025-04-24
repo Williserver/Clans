@@ -2,6 +2,7 @@ package net.williserver.clans.session
 
 import net.williserver.clans.model.Clan
 import net.williserver.clans.model.ClanList
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import java.util.UUID
 import kotlin.test.assertFalse
@@ -48,5 +49,28 @@ class ClanEventBusTest {
         val newMember = UUID.randomUUID()
         bus.fireEvent(ClanEvent.JOIN, newClan, newMember)
         assert(newMember in newClan)
+    }
+
+    @Test
+    fun testRegisterFireLeaveClan() {
+        val bus = ClanEventBus()
+        val list = ClanList(mutableListOf())
+
+        val newLeader = UUID.randomUUID()
+        val newClan = Clan("TestClan", newLeader, mutableListOf(newLeader))
+        list.addClan(newClan)
+
+        val newMember = UUID.randomUUID()
+        newClan.join(newMember)
+        assert(newMember in newClan)
+
+        // When leave fires, the listener should register the change.
+        bus.registerListener(ClanEvent.LEAVE, list.constructLeaveListener())
+        bus.fireEvent(ClanEvent.LEAVE, newClan, newMember)
+        assert(newMember !in newClan)
+
+        // Only non-leader members who are in the clan should be able to leave.
+        assertThrows(IllegalArgumentException::class.java) { newClan.leave(newMember) }
+        assertThrows(IllegalArgumentException::class.java) { newClan.leave(newLeader) }
     }
 }

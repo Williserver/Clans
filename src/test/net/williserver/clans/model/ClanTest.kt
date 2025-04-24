@@ -50,6 +50,7 @@ class ClanTest {
         clan.leave(newMember)
         assert(newMember !in clan)
         assertThrows(IllegalArgumentException::class.java) { clan.leave(newMember) }
+        assertThrows(IllegalArgumentException::class.java) { clan.leave(clan.leader) }
     }
 
     @Test
