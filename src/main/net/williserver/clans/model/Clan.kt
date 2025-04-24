@@ -50,8 +50,7 @@ class Clan(val name: String, leader: UUID, private val members: MutableList<UUID
     init {
         if (!validClanName(name)) {
             throw IllegalArgumentException("$pluginMessagePrefix: Invalid clan name!")
-        }
-        if (leader !in members) {
+        } else if (leader !in members) {
             throw IllegalArgumentException("$pluginMessagePrefix: Invalid leader UUID (not in clan $name): $leader")
         }
     }
@@ -103,12 +102,16 @@ class Clan(val name: String, leader: UUID, private val members: MutableList<UUID
      * @throws IllegalArgumentException If the specified member is not in this clan.
      */
     fun rankOfMember(member: UUID): ClanRank =
-        if (member == leader) {
-            ClanRank.LEADER
-        } else if (member in members) {
-            ClanRank.MEMBER
-        } else {
-            throw IllegalArgumentException("$pluginMessagePrefix: Member $member is not in clan $name.")
+        when (member) {
+            leader -> {
+                ClanRank.LEADER
+            }
+            in members -> {
+                ClanRank.MEMBER
+            }
+            else -> {
+                throw IllegalArgumentException("$pluginMessagePrefix: Member $member is not in clan $name.")
+            }
         }
 
     /**
@@ -133,6 +136,11 @@ class Clan(val name: String, leader: UUID, private val members: MutableList<UUID
      * Notice this is a loose notion -- clans are assumed to have unique names!
      */
     override fun equals(other: Any?): Boolean = other is Clan && other.name == name
+
+    /*
+     * Automatically generated hash function.
+     */
+    override fun hashCode(): Int = name.hashCode()
 }
 
 /**
