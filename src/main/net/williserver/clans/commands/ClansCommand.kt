@@ -6,9 +6,8 @@ import net.williserver.clans.LogHandler
 import net.williserver.clans.model.*
 import net.williserver.clans.pluginMessagePrefix
 import net.williserver.clans.session.SessionManager
-import net.williserver.clans.lifecycle.ClanEvent
-import net.williserver.clans.lifecycle.ClanEventBus
-import net.williserver.clans.session.invite.ClanInvitation
+import net.williserver.clans.session.ClanEvent
+import net.williserver.clans.session.ClanEventBus
 import net.williserver.clans.session.invite.TimedClanInvitation
 import org.bukkit.Bukkit.*
 import org.bukkit.command.Command
@@ -159,7 +158,7 @@ class ClansCommand(private val logger: LogHandler,
 
         // Create a new clan with this player as its leader and starting member.
         val newClan = Clan(name, leader, arrayListOf(leader))
-        bus.fireEvent(ClanEvent.CREATE, clanList, newClan, leader)
+        bus.fireEvent(ClanEvent.CREATE, newClan, leader)
 
         broadcastPrefixedMessage("Chief ${s.name} has formed the clan \"${newClan.name}\"!", NamedTextColor.GREEN)
         return true
@@ -217,7 +216,7 @@ class ClansCommand(private val logger: LogHandler,
                     sendErrorMessage(s, "To delete your clan, enter \"/clans disband\", or ignore this message to keep your clan.")
                 } else {
                     // Confirm the deletion of the clan, firing all relevant listeners.
-                    bus.fireEvent(ClanEvent.DISBAND, clanList, clan, s.uniqueId)
+                    bus.fireEvent(ClanEvent.DISBAND, clan, s.uniqueId)
                     broadcastPrefixedMessage("Clan \"${clan.name}\" has disbanded!", NamedTextColor.DARK_PURPLE)
                 }
                 true
@@ -303,7 +302,7 @@ class ClansCommand(private val logger: LogHandler,
             return true
         }
         // Add player to the clan.
-        bus.fireEvent(ClanEvent.JOIN, clanList, clan, s.uniqueId)
+        bus.fireEvent(ClanEvent.JOIN, clan, s.uniqueId)
         // TODO: setup listener to remove any active invites when you join.
         broadcastPrefixedMessage("${s.name} has joined clan ${clan.name}!", NamedTextColor.DARK_PURPLE)
         sendPrefixedMessage(s, "Welcome to clan ${clan.name}!", NamedTextColor.GREEN)

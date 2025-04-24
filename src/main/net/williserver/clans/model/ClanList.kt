@@ -146,6 +146,41 @@ class ClanList(data: List<ClanData>) {
     fun asDataTuples(): List<ClanData> = clans.map { it.asDataTuple() }
 
     /*
+     * Clans event listener factories.
+     */
+
+    /**
+     * Construct join listener to add a player to a clan in this model.
+     * Fire when a player joins a clan.
+     * @return the listener
+     */
+    fun constructJoinListener() = { clan: Clan, agent: UUID ->
+        if (!contains(clan.name)) {
+            throw IllegalArgumentException("$pluginMessagePrefix: Clan ${clan.name} is not in this list!")
+        }
+        clan.join(agent)
+    }
+
+    /**
+     * Construct create listener to add a clan to this model.
+     * Fire when a new clan is created.
+     * @return the listener
+     */
+    fun constructCreateListener() = { clan: Clan, _: UUID -> addClan(clan) }
+
+    /**
+     * Construct disband listener to remove from this model.
+     * Fire when a clan is disbanded.
+     * @return the listener
+     */
+    fun constructDisbandListener() = { clan: Clan, agent: UUID ->
+        if (!clan.rankOfMember(agent).hasPermission(ClanPermission.DISBAND)) {
+            throw IllegalArgumentException("Disband attempted by member with insufficient permissions!")
+        }
+        removeClan(clan)
+    }
+
+    /*
      * ClanList internal helpers.
      */
 
