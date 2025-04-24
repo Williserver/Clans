@@ -1,8 +1,6 @@
 package net.williserver.clans.session
 
 import net.williserver.clans.model.Clan
-import net.williserver.clans.session.invite.ClanInvitation
-import net.williserver.clans.session.invite.ClanInvitationList
 import java.util.*
 
 /**
