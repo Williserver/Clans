@@ -19,124 +19,84 @@ class SessionManager {
     /*
      * Map of players to timers confirming their decision to leave their clans.
      */
-    private val clanConfirmLeaveMap = hashMapOf<UUID, ConfirmTimer>()
-
-    /*
-     * List of active clan invitations.
-     */
-    private val clanInvitations = ClanInvitationList()
-
-    /*
-     * Clan invitation helpers.
-     */
+    private val playerConfirmLeaveMap = hashMapOf<UUID, ConfirmTimer>()
 
     /**
-     * Register an invitation mapping a player to a clan.
-     * @param invitation New invite to add to invite list.
+     * Map of clans and their invited players.
      */
-    fun addClanInvite(invitation: ClanInvitation) {
-        clanInvitations.add(invitation)
-    }
+    private val clanInvitePlayerMap = hashMapOf<Pair<UUID, Clan>, ConfirmTimer>()
 
     /**
-     * @param player Player whose invite should be checked.
-     * @param clan Clan to check if invite open.
-     * @return whether a clan invite is live.
-     */
-    fun activeClanInvite(player: UUID, clan: Clan) = clanInvitations.hasActiveInvitation(player, clan)
-
-    /*
-     * Clan leaving helpers.
-     */
-
-    /*
-
-    /**
-     * Register a clan leave timer for a player.
-     * NOTE: this timer should be invalidated when the player leaves the clan!
-     * NOTE: if invoked with a timer already registered, does nothing.
+     * Register a timer for some event and key.
      *
-     * @param player Player to register timer for.
-     * @param maxTime time threshold for clan leave.
-     * @return whether a new timer was registered.
+     * @param event Event corresponding to timer.
+     * @param key Key to register timer under.
+     * @param maxTime Time for timer.
+     * @throws ClassCastException if key type does not correspond to event map.
      */
-    fun registerClanLeaveTimer(player: UUID, maxTime: Long): Boolean {
-        return true
-    }
+    fun registerTimer(event: ClanEvent, key: Any, maxTime: Long) =
+        when (event) {
+            ClanEvent.CREATE -> false // TODO: implement or remove
+            ClanEvent.JOIN -> registerTimer(clanInvitePlayerMap, key as Pair<UUID, Clan>, maxTime)
+            ClanEvent.LEAVE -> false // TODO: implement or remove
+            ClanEvent.DISBAND -> registerTimer(clanConfirmDeleteMap, key as Clan, maxTime)
+        }
 
     /**
-     * Deregister a clan leave timer.
-     * NOTE: this should be done when a player leaves their clan.
-     * NOTE: if invoked when no timer is yet registered, does nothing.
+     * Evaluate whether a timer is registered under some event and key.
      *
-     * @param player Player to deregister timer for.
-     * @return whether a timer was removed.
+     * @param event Event to check corresponding timer for.
+     * @param key Key to check if timer is registered to.
+     * @throws ClassCastException if key type does not correspond to event map.
      */
-    fun deregisterClanLeaveTimer(player: UUID): Boolean {
-        return true
-    }
+    fun isTimerRegistered(event: ClanEvent, key: Any) = getTimer(event, key) != null
 
     /**
-     * Reset and start the clan leave timer for a player.
+     * Start a timer corresponding to some event and key.
      *
-     * @param player Player whose timer should be started.
-     * @throws NullPointerException if no timer has yet been registered.
+     * @param event Event to check corresponding timer for.
+     * @param key Key to the map.
+     * @throws ClassCastException if key doesn't correspond to event map.
+     * @throws NullPointerException if timer has not yet been registered.
      */
-    fun startClanLeaveTimer(player: UUID) {
-
+    fun startTimer(event: ClanEvent, key: Any) {
+        val timer = getTimer(event, key)!!
+        timer.reset()
+        timer.startTimer()
     }
 
     /**
-     * @param player Player to check leave timer for.
-     * @return whether the timer is running and in bounds.
-     * @throws NullPointerException if the timer has not already been registered.
+     * Check whether a timer corresponding to some event and key is in bounds.
+     *
+     * @param event Event to check corresponding timer for.
+     * @param key Key to the map.
+     * @throws ClassCastException if key doesn't correspond to event map.
      */
-    fun checkClanLeaveTimerInBounds(player: UUID): Boolean {
-        return true
+    fun isTimerInBounds(event: ClanEvent, key: Any): Boolean {
+        val timer = getTimer(event, key)
+        return timer != null && timer.isRunning() && timer.inBounds()
     }
-
-    */
 
     /*
-     * Clan disband helpers.
+     * Internal helpers.
      */
 
+    // get timer corresponding to some event.
+    private fun getTimer(event: ClanEvent, key: Any) = when(event) {
+        ClanEvent.CREATE -> TODO()
+        ClanEvent.JOIN -> clanInvitePlayerMap[key as Pair<UUID, Clan>]
+        ClanEvent.LEAVE -> TODO()
+        ClanEvent.DISBAND -> clanConfirmDeleteMap[key as Clan]
+    }
+
     /**
-     * Register a disband timer for a clan.
-     * NOTE: the first timer registered this way will remain for the rest of the session.
-     *
-     * @param clan Clan to register timer for.
-     * @param maxTime Time threshold for confirmation timer.
-     * @return whether a new timer was registered.
+     * @param map mutable map to add the element to.
+     * @param key Key to add the timer under
+     * @param maxTime Time to put in timer.
      */
-    fun registerClanDisbandTimer(clan: Clan, maxTime: Long) =
-        if (!clanDisbandTimerRegistered(clan)) {
-            clanConfirmDeleteMap[clan] = ConfirmTimer(maxTime)
+    private fun <K> registerTimer(map: MutableMap<K, ConfirmTimer>, key: K, maxTime: Long) =
+        if (key !in map) {
+            map[key] = ConfirmTimer(maxTime)
             true
         } else false
-
-    /**
-     * @param clan Clan to check timer for.
-     * @return whether a disband timer has been registered for the clan.
-     */
-    fun clanDisbandTimerRegistered(clan: Clan) = clan in clanConfirmDeleteMap
-
-    /**
-     * Reset and start the disband timer for a given clan.
-     *
-     * @param clan Clan to start disband timer for.
-     * @throws NullPointerException if timer has not already been registered.
-     */
-    fun startClanDisbandTimer(clan: Clan) {
-        clanConfirmDeleteMap[clan]!!.reset()
-        clanConfirmDeleteMap[clan]!!.startTimer()
-    }
-
-    /**
-     * @param clan Clan to check timer for.
-     * @return whether the timer is running and in bounds
-     * @throws NullPointerException if timer has not already been registered.
-     */
-    fun checkDisbandTimerInBounds(clan: Clan) =
-        clanConfirmDeleteMap[clan]!!.isRunning() && clanConfirmDeleteMap[clan]!!.inBounds()
 }

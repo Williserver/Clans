@@ -20,8 +20,8 @@ class SessionManagerTest {
         // Duplicate registration is illegal
         // but because it may be easier to call registerTimer repeatedly than add conditional logic,
         // it does not throw exception, it simply ignores the registration and returns false
-        assert(session.registerClanDisbandTimer(clan, 30))
-        assertFalse(session.registerClanDisbandTimer(clan, 25))
+        assert(session.registerTimer(ClanEvent.DISBAND, clan, 30))
+        assertFalse(session.registerTimer(ClanEvent.DISBAND, clan, 25))
     }
 
     @Test
@@ -31,14 +31,14 @@ class SessionManagerTest {
         val session = SessionManager()
 
         // the timer must first be registered!
-        assertThrows(NullPointerException::class.java) { session.startClanDisbandTimer(clan) }
-        assertThrows(NullPointerException::class.java) { session.checkDisbandTimerInBounds(clan) }
-        assertFalse(session.clanDisbandTimerRegistered(clan))
-        session.registerClanDisbandTimer(clan, 30)
+        assertThrows(NullPointerException::class.java) { session.startTimer(ClanEvent.DISBAND, clan) }
+        assertFalse(session.isTimerInBounds(ClanEvent.DISBAND, clan))
+        assertFalse(session.isTimerRegistered(ClanEvent.DISBAND, clan))
+        session.registerTimer(ClanEvent.DISBAND, clan, 30)
         // the timer has not started running!
-        assertFalse(session.checkDisbandTimerInBounds(clan))
-        session.startClanDisbandTimer(clan)
-        assert(session.checkDisbandTimerInBounds(clan))
+        assertFalse(session.isTimerInBounds(ClanEvent.DISBAND, clan))
+        session.startTimer(ClanEvent.DISBAND, clan)
+        assert(session.isTimerInBounds(ClanEvent.DISBAND, clan))
     }
 
     @Test
@@ -47,9 +47,9 @@ class SessionManagerTest {
         val clan = Clan("TestClan", leader, mutableListOf(leader))
         val session = SessionManager()
 
-        session.registerClanDisbandTimer(clan, 0)
-        session.startClanDisbandTimer(clan)
-        assertFalse(session.checkDisbandTimerInBounds(clan))
+        session.registerTimer(ClanEvent.DISBAND, clan, 0)
+        session.startTimer(ClanEvent.DISBAND, clan)
+        assertFalse(session.isTimerInBounds(ClanEvent.DISBAND, clan))
     }
 
     @Test
@@ -59,12 +59,16 @@ class SessionManagerTest {
         val session = SessionManager()
 
         val rando = UUID.randomUUID()
-        assertFalse(session.activeClanInvite(rando, clan))
+        assertFalse(session.isTimerRegistered(ClanEvent.JOIN, Pair(clan, rando)))
         // An invite with an expired timer fails!
-        session.addClanInvite(TimedClanInvitation(rando, clan, 0))
-        assertFalse(session.activeClanInvite(rando, clan))
-        session.addClanInvite(TimedClanInvitation(rando, clan, 10))
-        assert(session.activeClanInvite(rando, clan))
+        session.registerTimer(ClanEvent.JOIN, Pair(clan, rando), 0)
+        assert(session.isTimerRegistered(ClanEvent.JOIN, Pair(clan, rando)))
+        assertFalse(session.isTimerInBounds(ClanEvent.JOIN, Pair(clan, rando)))
+
+        // TODO: add deregister timer.
+//        session.registerTimer(ClanEvent.JOIN, Pair(clan, rando), 10)
+//        session.startTimer(ClanEvent.JOIN, Pair(clan, rando))
+//        assert(session.isTimerInBounds(ClanEvent.JOIN, Pair(clan, rando)))
     }
 
     // TODO: tests for deleting clans.

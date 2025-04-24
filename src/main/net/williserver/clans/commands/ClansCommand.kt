@@ -195,10 +195,10 @@ class ClansCommand(private val logger: LogHandler,
         // Either initiate a new disband attempt, or confirm one if it's done in time.
         return when(args.size) {
             1 -> {
-                session.registerClanDisbandTimer(clan, config.confirmDisbandTime.toLong())
+                session.registerTimer(ClanEvent.DISBAND, clan, config.confirmDisbandTime.toLong())
                 sendPrefixedMessage(s, "You have begun to disband your clan!", NamedTextColor.LIGHT_PURPLE)
                 sendPrefixedMessage(s, "Enter \"/clans disband confirm\" within ${config.confirmDisbandTime} seconds to confirm this choice.", NamedTextColor.LIGHT_PURPLE)
-                session.startClanDisbandTimer(clan)
+                session.startTimer(ClanEvent.DISBAND, clan)
                 true
             }
             2 -> {
@@ -208,10 +208,10 @@ class ClansCommand(private val logger: LogHandler,
                  */
                 if (args[1].lowercase(Locale.getDefault()) != "confirm") {
                     return false
-                } else if (!session.clanDisbandTimerRegistered(clan)) {
+                } else if (!session.isTimerRegistered(ClanEvent.DISBAND, clan)) {
                     sendErrorMessage(s, "You have attempted to delete your clan with \"/clans disband confirm\" before starting the deletion timer!")
                     sendErrorMessage(s, "Please start the timer with \"/clans disband\" first, or ignore this message to keep your clan.")
-                } else if (!session.checkDisbandTimerInBounds(clan)) {
+                } else if (!session.isTimerInBounds(ClanEvent.DISBAND, clan)) {
                     sendErrorMessage(s, "The timer to disband your clan has expired!")
                     sendErrorMessage(s, "To delete your clan, enter \"/clans disband\", or ignore this message to keep your clan.")
                 } else {
@@ -221,7 +221,7 @@ class ClansCommand(private val logger: LogHandler,
                 }
                 true
             }
-            else -> throw IllegalArgumentException("$pluginMessagePrefix: Internal error: Wrong number of arguments to /clans disband -- this should have been caught earlier!")
+            else -> throw IllegalStateException("$pluginMessagePrefix: Internal error: Wrong number of arguments to /clans disband -- this should have been caught earlier!")
         }
     }
 
@@ -259,7 +259,7 @@ class ClansCommand(private val logger: LogHandler,
         } else if (clanList.playerInClan(targetPlayer.uniqueId)) {
             sendErrorMessage(s, "${targetPlayer.name} is already in a clan!")
             return true
-        } else if (session.activeClanInvite(targetPlayer.uniqueId, targetClan)) {
+        } else if (session.isTimerInBounds(ClanEvent.JOIN, Pair(targetClan, s.uniqueId))) {
             sendErrorMessage(s, "${targetPlayer.name} is already waiting on an invitation from you.")
             return true
         }
@@ -268,7 +268,7 @@ class ClansCommand(private val logger: LogHandler,
         sendPrefixedMessage(targetPlayer, "${s.name} has invited you to clan ${targetClan.name}!", NamedTextColor.GREEN)
         sendPrefixedMessage(targetPlayer, "You have 30 seconds to accept your invitation.", NamedTextColor.GREEN)
         // TODO: configure time for invite.
-        session.addClanInvite(TimedClanInvitation(targetPlayer.uniqueId, targetClan, 30))
+        session.registerTimer(ClanEvent.JOIN, Pair(targetClan, s.uniqueId), 30)
         return true
     }
 
@@ -297,7 +297,7 @@ class ClansCommand(private val logger: LogHandler,
         }
         // Ensure player has an active invite to the clan.
         val clan = clanList.get(args[1])
-        if (!session.activeClanInvite(s.uniqueId, clan)) {
+        if (!session.isTimerInBounds(ClanEvent.JOIN, Pair(clan, s.uniqueId))) {
             sendErrorMessage(s, "You do not have an active invite to ${clan.name}.")
             return true
         }
@@ -309,19 +309,42 @@ class ClansCommand(private val logger: LogHandler,
         return true
     }
 
-    /*
+    // TODO: constant for only subcommand # args (1)
+    // TODO: add API validation helper.
 
     /**
-     * Leave our clan.
+     * Make a player leave their clan.
+     * First, the user executes /clans leave. This starts the leave timer.
+     * Then the user executes /clans leave confirm.
      *
      * @param s Player who invoked the command, will leave their clan.
      * @param args Arguments to command. Should be none.
      * @return Whether the command was invoked with the correct number of arguments.
      */
     private fun leave(s: CommandSender, args: Array<out String>): Boolean {
-        true
+        // API validation: two args (subcommand, optional: confirm)
+        if (args.size != 1 && args.size != 2) {
+            return false
+        } else if (s !is Player) {
+            sendErrorMessage(s, "You must be a player to leave a clan!")
+            return true
+        } else if (!clanList.playerInClan(s.uniqueId)) {
+            sendErrorMessage(s, "You are not in a clan!")
+            return true
+        }
+
+        return when(args.size) {
+            // Prompt the user to confirm within the confirmation threshold.
+            1 -> {
+                true
+            }
+            // Leave the user's clan.
+            2 -> {
+                true
+            }
+            else -> throw IllegalStateException("$pluginMessagePrefix: Internal error: Wrong number of arguments to /clans disband -- this should have been caught earlier!")
+        }
     }
-    */
 
     /**
      * Message the sender with a report about the given clan.
