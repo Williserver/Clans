@@ -41,6 +41,22 @@ class SessionManager {
         }
 
     /**
+     * Deregister a timer for some event and key.
+     *
+     * @param event Event corresponding to timer.
+     * @param key Key to deregister timer for.
+     * @throws ClassCastException if key type does not corresponding to event map.
+     */
+    fun deregisterTimer(event: ClanEvent, key: Any) {
+        when (event) {
+            ClanEvent.CREATE -> {} // TODO: implement or remove
+            ClanEvent.JOIN -> clanInvitePlayerMap -= key as Pair<UUID, Clan>
+            ClanEvent.LEAVE -> {} // TODO: implement or remove
+            ClanEvent.DISBAND -> clanConfirmDeleteMap -= key as Clan
+        }
+    }
+
+    /**
      * Evaluate whether a timer is registered under some event and key.
      *
      * @param event Event to check corresponding timer for.

@@ -1,7 +1,6 @@
 package net.williserver.clans.session
 
 import net.williserver.clans.model.Clan
-import net.williserver.clans.session.invite.TimedClanInvitation
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
@@ -65,10 +64,10 @@ class SessionManagerTest {
         assert(session.isTimerRegistered(ClanEvent.JOIN, Pair(clan, rando)))
         assertFalse(session.isTimerInBounds(ClanEvent.JOIN, Pair(clan, rando)))
 
-        // TODO: add deregister timer.
-//        session.registerTimer(ClanEvent.JOIN, Pair(clan, rando), 10)
-//        session.startTimer(ClanEvent.JOIN, Pair(clan, rando))
-//        assert(session.isTimerInBounds(ClanEvent.JOIN, Pair(clan, rando)))
+        session.deregisterTimer(ClanEvent.JOIN, Pair(clan, rando))
+        session.registerTimer(ClanEvent.JOIN, Pair(clan, rando), 10)
+        session.startTimer(ClanEvent.JOIN, Pair(clan, rando))
+        assert(session.isTimerInBounds(ClanEvent.JOIN, Pair(clan, rando)))
     }
 
     // TODO: tests for deleting clans.

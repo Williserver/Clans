@@ -8,7 +8,6 @@ import net.williserver.clans.pluginMessagePrefix
 import net.williserver.clans.session.SessionManager
 import net.williserver.clans.session.ClanEvent
 import net.williserver.clans.session.ClanEventBus
-import net.williserver.clans.session.invite.TimedClanInvitation
 import org.bukkit.Bukkit.*
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
