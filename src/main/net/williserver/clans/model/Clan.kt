@@ -72,6 +72,18 @@ class Clan(val name: String, leader: UUID, private val members: MutableList<UUID
         members += recruit
     }
 
+    /**
+     * Remove a member from the clan.
+     * @param member Member leaving the clan.
+     * @throws IllegalArgumentException If member not in this clan.
+     */
+    fun leave(member: UUID) {
+        if (!contains(member)) {
+            throw IllegalArgumentException("$pluginMessagePrefix: Member $member does not exist!")
+        }
+        members -= member
+    }
+
     /*
      * Member information getters.
      */

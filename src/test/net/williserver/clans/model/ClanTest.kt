@@ -42,6 +42,17 @@ class ClanTest {
     }
 
     @Test
+    fun leaveClan() {
+        val clan = generateValidClan()
+        val newMember = UUID.randomUUID()
+        clan.join(newMember)
+        assert(newMember in clan)
+        clan.leave(newMember)
+        assert(newMember !in clan)
+        assertThrows(IllegalArgumentException::class.java) { clan.leave(newMember) }
+    }
+
+    @Test
     fun validClanName() {
         assert(validClanName("123Test-Clan_"))
         assert(!validClanName("\"\""))
