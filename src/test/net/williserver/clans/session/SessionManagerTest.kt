@@ -58,16 +58,16 @@ class SessionManagerTest {
         val session = SessionManager()
 
         val rando = UUID.randomUUID()
-        assertFalse(session.isTimerRegistered(ClanEvent.JOIN, Pair(clan, rando)))
+        assertFalse(session.isTimerRegistered(ClanEvent.JOIN, Pair(rando, clan)))
         // An invite with an expired timer fails!
-        session.registerTimer(ClanEvent.JOIN, Pair(clan, rando), 0)
-        assert(session.isTimerRegistered(ClanEvent.JOIN, Pair(clan, rando)))
-        assertFalse(session.isTimerInBounds(ClanEvent.JOIN, Pair(clan, rando)))
+        session.registerTimer(ClanEvent.JOIN, Pair(rando, clan), 0)
+        assert(session.isTimerRegistered(ClanEvent.JOIN, Pair(rando, clan)))
+        assertFalse(session.isTimerInBounds(ClanEvent.JOIN, Pair(rando, clan)))
 
-        session.deregisterTimer(ClanEvent.JOIN, Pair(clan, rando))
-        session.registerTimer(ClanEvent.JOIN, Pair(clan, rando), 10)
-        session.startTimer(ClanEvent.JOIN, Pair(clan, rando))
-        assert(session.isTimerInBounds(ClanEvent.JOIN, Pair(clan, rando)))
+        session.deregisterTimer(ClanEvent.JOIN, Pair(rando, clan))
+        session.registerTimer(ClanEvent.JOIN, Pair(rando, clan), 10)
+        session.startTimer(ClanEvent.JOIN, Pair(rando, clan))
+        assert(session.isTimerInBounds(ClanEvent.JOIN, Pair(rando, clan)))
     }
 
     // TODO: tests for deleting clans.

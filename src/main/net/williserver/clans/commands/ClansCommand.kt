@@ -296,7 +296,7 @@ class ClansCommand(private val logger: LogHandler,
         }
         // Ensure player has an active invite to the clan.
         val clan = clanList.get(args[1])
-        if (!session.isTimerInBounds(ClanEvent.JOIN, Pair(clan, s.uniqueId))) {
+        if (!session.isTimerInBounds(ClanEvent.JOIN, Pair(s.uniqueId, clan))) {
             sendErrorMessage(s, "You do not have an active invite to ${clan.name}.")
             return true
         }
