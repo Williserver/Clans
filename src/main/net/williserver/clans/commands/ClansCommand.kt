@@ -258,7 +258,7 @@ class ClansCommand(private val logger: LogHandler,
         } else if (clanList.playerInClan(targetPlayer.uniqueId)) {
             sendErrorMessage(s, "${targetPlayer.name} is already in a clan!")
             return true
-        } else if (session.isTimerInBounds(ClanEvent.JOIN, Pair(targetClan, s.uniqueId))) {
+        } else if (session.isTimerInBounds(ClanEvent.JOIN, Pair(s.uniqueId, targetClan))) {
             sendErrorMessage(s, "${targetPlayer.name} is already waiting on an invitation from you.")
             return true
         }
@@ -267,7 +267,9 @@ class ClansCommand(private val logger: LogHandler,
         sendPrefixedMessage(targetPlayer, "${s.name} has invited you to clan ${targetClan.name}!", NamedTextColor.GREEN)
         sendPrefixedMessage(targetPlayer, "You have 30 seconds to accept your invitation.", NamedTextColor.GREEN)
         // TODO: configure time for invite.
-        session.registerTimer(ClanEvent.JOIN, Pair(targetClan, s.uniqueId), 30)
+        session.registerTimer(ClanEvent.JOIN, Pair(targetPlayer.uniqueId, targetClan), 30)
+        // Invitation timer starts immediately after timer registered.
+        session.startTimer(ClanEvent.JOIN, Pair(targetPlayer.uniqueId, targetClan))
         return true
     }
 
