@@ -2,15 +2,12 @@ package net.williserver.clans
 
 import net.williserver.clans.commands.ClansCommand
 import net.williserver.clans.commands.ClansTabCompleter
+import net.williserver.clans.lifecycle.*
 import net.williserver.clans.model.ClanList
 import net.williserver.clans.model.ClansConfigLoader
 import net.williserver.clans.model.readFromFile
 import net.williserver.clans.model.writeToFile
 import net.williserver.clans.session.SessionManager
-import net.williserver.clans.lifecycle.ClanEvent
-import net.williserver.clans.lifecycle.ClanEventBus
-import net.williserver.clans.lifecycle.createAddClanToModel
-import net.williserver.clans.lifecycle.disbandRemoveClanFromModel
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 
@@ -45,6 +42,7 @@ class ClansPlugin : JavaPlugin() {
         // Register major events in clan lifecycle.
         val bus = ClanEventBus()
         bus.registerListener(ClanEvent.CREATE, ::createAddClanToModel)
+        bus.registerListener(ClanEvent.JOIN, ::joinAddPlayerToClan)
         bus.registerListener(ClanEvent.DISBAND, ::disbandRemoveClanFromModel)
         logger.info("Registered clan lifecycle listeners")
 

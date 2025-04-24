@@ -303,7 +303,7 @@ class ClansCommand(private val logger: LogHandler,
             return true
         }
         // Add player to the clan.
-        // TODO: setup event listener to handle update in model.
+        bus.fireEvent(ClanEvent.JOIN, clanList, clan, s.uniqueId)
         // TODO: setup listener to remove any active invites when you join.
         broadcastPrefixedMessage("${s.name} has joined clan ${clan.name}!", NamedTextColor.DARK_PURPLE)
         sendPrefixedMessage(s, "Welcome to clan ${clan.name}!", NamedTextColor.GREEN)
