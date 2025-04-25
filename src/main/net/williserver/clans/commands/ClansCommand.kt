@@ -263,7 +263,7 @@ class ClansCommand(private val logger: LogHandler,
             return true
         }
 
-        sendPrefixedMessage(s, "You have invited ${s.name} to your clan!", NamedTextColor.GREEN)
+        sendPrefixedMessage(s, "You have invited ${targetPlayer.name} to your clan!", NamedTextColor.GREEN)
         sendPrefixedMessage(targetPlayer, "${s.name} has invited you to clan ${targetClan.name}!", NamedTextColor.GREEN)
         sendPrefixedMessage(targetPlayer, "You have 30 seconds to accept your invitation.", NamedTextColor.GREEN)
         // TODO: configure time for invite.
