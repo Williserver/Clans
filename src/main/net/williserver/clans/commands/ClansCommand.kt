@@ -125,17 +125,20 @@ class ClansCommand(private val logger: LogHandler,
      * @param args Arguments to command, such as name.
      */
     private fun create(s: CommandSender, args: Array<String>): Boolean {
-        // Initial validation.
+        // Argument structure validation. Two args: subcommand and new clan name.
         if (args.size > 2) {
             // Returing false here -- this is the only place where the server should send a usage message!
             return false
         } else if (args.size < 2) {
             sendErrorMessage(s, "Your clan needs a name!")
             return true
-        } else if (!validPlayer(s)) {
-            return true
         }
 
+        // Argument semantics validation
+        if (!validPlayer(s)
+            || !assertPlayerNotInClan(s, clanList, (s as Player).uniqueId, "You are already in a clan!")) {
+            return true
+        }
         // Check if the clan name is valid and unique.
         val name = args[1]
         if (!validClanName(name)) {
@@ -147,14 +150,8 @@ class ClansCommand(private val logger: LogHandler,
             return true
         }
 
-        // Check if the leader is already in a clan.
-        val leader = (s as Player).uniqueId
-        if (clanList.playerInClan(leader)) {
-            sendErrorMessage(s, "You are already in a clan!")
-            return true
-        }
-
         // Create a new clan with this player as its leader and starting member.
+        val leader = s.uniqueId
         val newClan = Clan(name, leader, arrayListOf(leader))
         bus.fireEvent(ClanEvent.CREATE, newClan, leader)
 
@@ -234,7 +231,8 @@ class ClansCommand(private val logger: LogHandler,
             return false
         }
         // Argument semantics validation.
-        if (!validPlayer(s) || !assertPlayerInClan(s, clanList, (s as Player).uniqueId)) {
+        if (!validPlayer(s)
+            || !assertPlayerInClan(s, clanList, (s as Player).uniqueId)) {
             return true
         }
 
@@ -250,8 +248,8 @@ class ClansCommand(private val logger: LogHandler,
         if (targetPlayer == null) {
             sendErrorMessage(s, "Player \"${args[1]}\" not found -- are they online?")
             return true
-        } else if (clanList.playerInClan(targetPlayer.uniqueId)) {
-            sendErrorMessage(s, "${targetPlayer.name} is already in a clan!")
+        } else if (!assertPlayerNotInClan(s, clanList, targetPlayer.uniqueId,
+                "${targetPlayer.name} is already in a clan!")) {
             return true
         } else if (session.isTimerInBounds(ClanEvent.JOIN, Pair(s.uniqueId, targetClan))) {
             sendErrorMessage(s, "${targetPlayer.name} is already waiting on an invitation from you.")
@@ -280,11 +278,9 @@ class ClansCommand(private val logger: LogHandler,
         if (args.size != 2) {
             return false
         }
-        // Ensure player and clan are eligible.
-        if (!validPlayer(s)) {
-            return true
-        } else if (clanList.playerInClan((s as Player).uniqueId)) {
-            sendErrorMessage(s, "You are already in a clan!")
+        // Argument semantics validation.
+        if (!validPlayer(s)
+            || !assertPlayerNotInClan(s, clanList, (s as Player).uniqueId, "You are already in a clan!")) {
             return true
         } else if (args[1] !in clanList) {
             sendErrorMessage(s, "Clan ${args[1]} not found!")

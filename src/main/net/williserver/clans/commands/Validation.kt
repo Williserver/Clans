@@ -34,3 +34,18 @@ fun assertPlayerInClan(s: CommandSender, clans: ClanList, player: UUID) =
         sendErrorMessage(s, "You must be in a clan to invoke this command.")
         false
     } else true
+
+/**
+ * Check whether a player is not in a clan. if they are in a clan, send an error message.
+ *
+ * @param s Sender to report errors to.
+ * @param clans List of clans for this session.
+ * @param player UUID of player to search for.
+ *
+ * @return whether the player was in one of the clans in list @clans.
+ */
+fun assertPlayerNotInClan(s: CommandSender, clans: ClanList, player: UUID, message: String) =
+    if (clans.playerInClan(player)) {
+        sendErrorMessage(s, message)
+        false
+    } else true
