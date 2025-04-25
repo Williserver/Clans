@@ -1,8 +1,5 @@
 package net.williserver.clans.session
 
-import net.williserver.clans.model.Clan
-import java.util.*
-
 /**
  * Manage a single server session's non-persistent data, like confirmation timers.
  *
@@ -10,34 +7,34 @@ import java.util.*
  */
 class SessionManager {
     /*
-     * Map of clans to timers confirming their deletion.
+     * Map of events to registrations of each value.
      */
-    private val clanConfirmDeleteMap = hashMapOf<Clan, ConfirmTimer>()
-
-    /*
-     * Map of players to timers confirming their decision to leave their clans.
-     */
-    private val playerConfirmLeaveMap = hashMapOf<UUID, ConfirmTimer>()
-
-    /**
-     * Map of clans and their invited players.
-     */
-    private val clanInvitePlayerMap = hashMapOf<Pair<UUID, Clan>, ConfirmTimer>()
+    private val timerTable = mapOf<ClanEvent, MutableMap<Any, ConfirmTimer>>(
+        // Norm: Pair<UUID, Clan>
+        ClanEvent.JOIN to mutableMapOf(),
+        // Norm: UUID
+        ClanEvent.LEAVE to mutableMapOf(),
+        // Norm: clan
+        ClanEvent.DISBAND to mutableMapOf(),
+    )
 
     /**
      * Register a timer for some event and key.
      *
      * @param event Event corresponding to timer.
-     * @param key Key to register timer under.
+     * @param key Key to register timer under. UUID, Clan, or (UUID, Clan)
      * @param maxTime Time for timer.
-     * @throws ClassCastException if key type does not correspond to event map.
+     *
+     * @return Whether the timer was registered -- do not registered if one already registered.
+     * @throws NullPointerException if event is not tracked.
      */
     fun registerTimer(event: ClanEvent, key: Any, maxTime: Long) =
-        when (event) {
-            ClanEvent.CREATE -> false // TODO: implement or remove
-            ClanEvent.JOIN -> registerTimer(clanInvitePlayerMap, key as Pair<UUID, Clan>, maxTime)
-            ClanEvent.LEAVE -> false // TODO: implement or remove
-            ClanEvent.DISBAND -> registerTimer(clanConfirmDeleteMap, key as Clan, maxTime)
+        if (key in timerTable[event]!!) {
+            // Fail with error (but not crash) if key already registered.
+            false
+        } else {
+            timerTable[event]!![key] = ConfirmTimer(maxTime)
+            true
         }
 
     /**
@@ -45,36 +42,40 @@ class SessionManager {
      *
      * @param event Event corresponding to timer.
      * @param key Key to deregister timer for.
-     * @throws ClassCastException if key type does not corresponding to event map.
+     *
+     * @return Whether the timer was deregistered.
+     * @throws NullPointerException if event is not tracked.
      */
-    fun deregisterTimer(event: ClanEvent, key: Any) {
-        when (event) {
-            ClanEvent.CREATE -> {} // TODO: implement or remove
-            ClanEvent.JOIN -> clanInvitePlayerMap -= key as Pair<UUID, Clan>
-            ClanEvent.LEAVE -> {} // TODO: implement or remove
-            ClanEvent.DISBAND -> clanConfirmDeleteMap -= key as Clan
+    fun deregisterTimer(event: ClanEvent, key: Any) =
+        if (key !in timerTable[event]!!) {
+            // Fail with error (but not crash) if key not present
+            false
+        } else {
+            timerTable[event]!! -= key
+            true
         }
-    }
 
     /**
      * Evaluate whether a timer is registered under some event and key.
      *
      * @param event Event to check corresponding timer for.
      * @param key Key to check if timer is registered to.
-     * @throws ClassCastException if key type does not correspond to event map.
+     *
+     * @return whether a timer is registered under the given key for the given event.
+     * @throws NullPointerException if the event is not tracked.
      */
-    fun isTimerRegistered(event: ClanEvent, key: Any) = getTimer(event, key) != null
+    fun isTimerRegistered(event: ClanEvent, key: Any) = key in timerTable[event]!!
 
     /**
      * Start a timer corresponding to some event and key.
      *
      * @param event Event to check corresponding timer for.
      * @param key Key to the map.
-     * @throws ClassCastException if key doesn't correspond to event map.
-     * @throws NullPointerException if timer has not yet been registered.
+     *
+     * @throws NullPointerException if timer has not yet been registered or event is not tracked.
      */
     fun startTimer(event: ClanEvent, key: Any) {
-        val timer = getTimer(event, key)!!
+        val timer = timerTable[event]!![key]!!
         timer.reset()
         timer.startTimer()
     }
@@ -84,33 +85,12 @@ class SessionManager {
      *
      * @param event Event to check corresponding timer for.
      * @param key Key to the map.
-     * @throws ClassCastException if key doesn't correspond to event map.
+     * @return whether the timer is registered, running, and in bounds.
+     *
+     * @throws NullPointerException if event is not tracked.
      */
     fun isTimerInBounds(event: ClanEvent, key: Any): Boolean {
-        val timer = getTimer(event, key)
+        val timer = timerTable[event]!![key]
         return timer != null && timer.isRunning() && timer.inBounds()
     }
-
-    /*
-     * Internal helpers.
-     */
-
-    // get timer corresponding to some event.
-    private fun getTimer(event: ClanEvent, key: Any) = when(event) {
-        ClanEvent.CREATE -> TODO()
-        ClanEvent.JOIN -> clanInvitePlayerMap[key as Pair<UUID, Clan>]
-        ClanEvent.LEAVE -> TODO()
-        ClanEvent.DISBAND -> clanConfirmDeleteMap[key as Clan]
-    }
-
-    /**
-     * @param map mutable map to add the element to.
-     * @param key Key to add the timer under
-     * @param maxTime Time to put in timer.
-     */
-    private fun <K> registerTimer(map: MutableMap<K, ConfirmTimer>, key: K, maxTime: Long) =
-        if (key !in map) {
-            map[key] = ConfirmTimer(maxTime)
-            true
-        } else false
 }
