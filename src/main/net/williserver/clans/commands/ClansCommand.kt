@@ -171,18 +171,17 @@ class ClansCommand(private val logger: LogHandler,
      * @param args Arguments to command. Should be none -- implicit argument is the clan player is a member of.
      */
     private fun disband(s: CommandSender, args: Array<out String>): Boolean {
-        // API validation
+        // Argument structure validation.
+        // Expect /clans disband or /clans disband confirm
         if (args.size != 1 && args.size != 2) {
             return false
-        } else if (!validPlayer(s)) {
+        }
+        // Argument semantics validation.
+        if (!validPlayer(s)
+            || !assertPlayerInClan(s, clanList, (s as Player).uniqueId)) {
             return true
         }
 
-        // Validate that player has appropriate permissions in some clan.
-        if (!clanList.playerInClan((s as Player).uniqueId)) {
-            sendErrorMessage(s, "You must be in a clan!")
-            return true
-        }
         val clan = clanList.playerClan(s.uniqueId)
         if (!clan.rankOfMember(s.uniqueId).hasPermission(ClanPermission.DISBAND)) {
             sendErrorMessage(s, "You don't have permission to disband this clan!")
@@ -230,13 +229,12 @@ class ClansCommand(private val logger: LogHandler,
      * @return Whether the command was invoked with the correct number of arguments.
      */
     private fun invite(s: CommandSender, args: Array<out String>): Boolean {
-        // API validation: 2 args (subcommand, target)
+        // Argument structure validation: 2 args (subcommand, target)
         if (args.size != 2) {
             return false
-        } else if (!validPlayer(s)) {
-            return true
-        } else if (!clanList.playerInClan((s as Player).uniqueId)) {
-            sendErrorMessage(s, "You must be in a clan!")
+        }
+        // Argument semantics validation.
+        if (!validPlayer(s) || !assertPlayerInClan(s, clanList, (s as Player).uniqueId)) {
             return true
         }
 
@@ -319,13 +317,12 @@ class ClansCommand(private val logger: LogHandler,
      * @return Whether the command was invoked with the correct number of arguments.
      */
     private fun leave(s: CommandSender, args: Array<out String>): Boolean {
-        // API validation: two args (subcommand, optional: confirm)
+        // Argument structure validation: two args (subcommand, optional: confirm)
         if (args.size != 1 && args.size != 2) {
             return false
-        } else if (!validPlayer(s)) {
-            return true
-        } else if (!clanList.playerInClan((s as Player).uniqueId)) {
-            sendErrorMessage(s, "You are not in a clan!")
+        }
+        // Argument semantics validation.
+        if (!validPlayer(s) || !assertPlayerInClan(s, clanList, (s as Player).uniqueId)) {
             return true
         }
 
@@ -353,12 +350,11 @@ class ClansCommand(private val logger: LogHandler,
      * @param args Arguments to command. Should be one -- the name of the clan.
      */
     private fun info(s: CommandSender, args: Array<out String>): Boolean {
-        // Ensure arguments conform with expected API
+        // Argument structure validation.
         if (args.size != 2) {
             return false // Malformed command -- clan info needs a name!
         }
-
-        // Validate that clan present in list.
+        // Argument semantics validation.
         if (args[1] !in clanList) {
             sendErrorMessage(s, "Clan \"${args[1]}\" does not exist!")
             return true
