@@ -100,7 +100,7 @@ class ClansCommand(private val logger: LogHandler,
      * TODO: add pages when too many clans.
      */
     private fun list(s: CommandSender, args: Array<out String>): Boolean {
-        // List should only be invoked with one argument.
+        // Argument structure validation. One arg: subcommand
         if (args.size > 1) {
             return false
         }
@@ -133,23 +133,17 @@ class ClansCommand(private val logger: LogHandler,
             sendErrorMessage(s, "Your clan needs a name!")
             return true
         }
-
         // Argument semantics validation
         if (!validPlayer(s)
             || !assertPlayerNotInClan(s, clanList, (s as Player).uniqueId, "You are already in a clan!")
-            || !assertValidClanName(s, args[1])) {
-            return true
-        }
-        // Check if the clan name is unique.
-        val name = args[1]
-        if (name in clanList) {
-            sendErrorMessage(s, "The name $name is already taken, try a new one!")
+            || !assertValidClanName(s, args[1])
+            || !assertUniqueClanName(s, clanList, args[1])) {
             return true
         }
 
         // Create a new clan with this player as its leader and starting member.
         val leader = s.uniqueId
-        val newClan = Clan(name, leader, arrayListOf(leader))
+        val newClan = Clan(args[1], leader, arrayListOf(leader))
         bus.fireEvent(ClanEvent.CREATE, newClan, leader)
         broadcastPrefixedMessage("Chief ${s.name} has formed the clan \"${newClan.name}\"!", NamedTextColor.DARK_PURPLE)
         return true

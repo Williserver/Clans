@@ -52,7 +52,7 @@ fun assertPlayerNotInClan(s: CommandSender, clans: ClanList, player: UUID, messa
     } else true
 
 /**
- * Check whether a clan name is valid, according to the data model. If not, send command invoker an error message.
+ * Check whether a clan name is syntactically valid, according to the data model. If not, send command invoker an error message.
  *
  * @param s Sender to report errors to.
  * @param name Name of clan to validate.
@@ -63,5 +63,20 @@ fun assertValidClanName(s: CommandSender, name: String) =
     if (!validClanName(name)) {
         sendErrorMessage(s, "You have specified an invalid clan name.")
         sendErrorMessage(s, "Use only alphanumeric characters, underscore, and dash.")
+        false
+    } else true
+
+/**
+ * Check whether a clan name is unique. If another clan already has the name, send an error message.
+ *
+ * @param s Sender to report errors to.
+ * @param clans List of clans to check duplicate names from.
+ * @param name Name to check duplicates for.
+ *
+ * @return Whether the name is unique.
+ */
+fun assertUniqueClanName(s: CommandSender, clans: ClanList, name: String, ) =
+    if (name in clans) {
+        sendErrorMessage(s, "The name \"$name\" is already taken, try a new one!")
         false
     } else true
