@@ -127,25 +127,22 @@ class ClansCommand(private val logger: LogHandler,
     private fun create(s: CommandSender, args: Array<String>): Boolean {
         // Argument structure validation. Two args: subcommand and new clan name.
         if (args.size > 2) {
-            // Returing false here -- this is the only place where the server should send a usage message!
             return false
         } else if (args.size < 2) {
+            // Special case: they forgot to include a name. Send a small reminder rather than a full usage report.
             sendErrorMessage(s, "Your clan needs a name!")
             return true
         }
 
         // Argument semantics validation
         if (!validPlayer(s)
-            || !assertPlayerNotInClan(s, clanList, (s as Player).uniqueId, "You are already in a clan!")) {
+            || !assertPlayerNotInClan(s, clanList, (s as Player).uniqueId, "You are already in a clan!")
+            || !assertValidClanName(s, args[1])) {
             return true
         }
-        // Check if the clan name is valid and unique.
+        // Check if the clan name is unique.
         val name = args[1]
-        if (!validClanName(name)) {
-            sendErrorMessage(s, "You have specified an invalid clan name.")
-            sendErrorMessage(s, "Use only alphanumeric characters, underscore, and dash.")
-            return true
-        } else if (name in clanList) {
+        if (name in clanList) {
             sendErrorMessage(s, "The name $name is already taken, try a new one!")
             return true
         }
@@ -154,7 +151,6 @@ class ClansCommand(private val logger: LogHandler,
         val leader = s.uniqueId
         val newClan = Clan(name, leader, arrayListOf(leader))
         bus.fireEvent(ClanEvent.CREATE, newClan, leader)
-
         broadcastPrefixedMessage("Chief ${s.name} has formed the clan \"${newClan.name}\"!", NamedTextColor.DARK_PURPLE)
         return true
     }

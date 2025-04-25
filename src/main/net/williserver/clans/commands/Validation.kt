@@ -1,6 +1,7 @@
 package net.williserver.clans.commands
 
 import net.williserver.clans.model.ClanList
+import net.williserver.clans.model.validClanName
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import java.util.*
@@ -47,5 +48,20 @@ fun assertPlayerInClan(s: CommandSender, clans: ClanList, player: UUID) =
 fun assertPlayerNotInClan(s: CommandSender, clans: ClanList, player: UUID, message: String) =
     if (clans.playerInClan(player)) {
         sendErrorMessage(s, message)
+        false
+    } else true
+
+/**
+ * Check whether a clan name is valid, according to the data model. If not, send command invoker an error message.
+ *
+ * @param s Sender to report errors to.
+ * @param name Name of clan to validate.
+ *
+ * @return Whether the name is valid.
+ */
+fun assertValidClanName(s: CommandSender, name: String) =
+    if (!validClanName(name)) {
+        sendErrorMessage(s, "You have specified an invalid clan name.")
+        sendErrorMessage(s, "Use only alphanumeric characters, underscore, and dash.")
         false
     } else true
