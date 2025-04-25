@@ -132,8 +132,7 @@ class ClansCommand(private val logger: LogHandler,
         } else if (args.size < 2) {
             sendErrorMessage(s, "Your clan needs a name!")
             return true
-        } else if (s !is Player) {
-            sendErrorMessage(s, "You must be a player to create a clan!")
+        } else if (!validPlayer(s)) {
             return true
         }
 
@@ -149,7 +148,7 @@ class ClansCommand(private val logger: LogHandler,
         }
 
         // Check if the leader is already in a clan.
-        val leader = s.uniqueId
+        val leader = (s as Player).uniqueId
         if (clanList.playerInClan(leader)) {
             sendErrorMessage(s, "You are already in a clan!")
             return true
@@ -175,13 +174,12 @@ class ClansCommand(private val logger: LogHandler,
         // API validation
         if (args.size != 1 && args.size != 2) {
             return false
-        } else if (s !is Player) {
-            sendErrorMessage(s, "You must be a player to disband your clan!")
+        } else if (!validPlayer(s)) {
             return true
         }
 
         // Validate that player has appropriate permissions in some clan.
-        if (!clanList.playerInClan(s.uniqueId)) {
+        if (!clanList.playerInClan((s as Player).uniqueId)) {
             sendErrorMessage(s, "You must be in a clan!")
             return true
         }
@@ -235,10 +233,9 @@ class ClansCommand(private val logger: LogHandler,
         // API validation: 2 args (subcommand, target)
         if (args.size != 2) {
             return false
-        } else if (s !is Player) {
-            sendErrorMessage(s, "You must be a player to invite members to your clan!")
+        } else if (!validPlayer(s)) {
             return true
-        } else if (!clanList.playerInClan(s.uniqueId)) {
+        } else if (!clanList.playerInClan((s as Player).uniqueId)) {
             sendErrorMessage(s, "You must be in a clan!")
             return true
         }
@@ -286,10 +283,9 @@ class ClansCommand(private val logger: LogHandler,
             return false
         }
         // Ensure player and clan are eligible.
-        if (s !is Player) {
-            sendErrorMessage(s, "You must be a player to join a clan!")
+        if (!validPlayer(s)) {
             return true
-        } else if (clanList.playerInClan(s.uniqueId)) {
+        } else if (clanList.playerInClan((s as Player).uniqueId)) {
             sendErrorMessage(s, "You are already in a clan!")
             return true
         } else if (args[1] !in clanList) {
@@ -326,10 +322,9 @@ class ClansCommand(private val logger: LogHandler,
         // API validation: two args (subcommand, optional: confirm)
         if (args.size != 1 && args.size != 2) {
             return false
-        } else if (s !is Player) {
-            sendErrorMessage(s, "You must be a player to leave a clan!")
+        } else if (!validPlayer(s)) {
             return true
-        } else if (!clanList.playerInClan(s.uniqueId)) {
+        } else if (!clanList.playerInClan((s as Player).uniqueId)) {
             sendErrorMessage(s, "You are not in a clan!")
             return true
         }
