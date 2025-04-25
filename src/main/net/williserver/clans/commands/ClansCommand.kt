@@ -259,13 +259,10 @@ class ClansCommand(private val logger: LogHandler,
         }
         // Argument semantics validation.
         if (!validPlayer(s)
+            || !assertClanNameInList(s, clanList, args[1])
             || !assertPlayerNotInClan(s, clanList, (s as Player).uniqueId, "You are already in a clan!")) {
             return true
-        } else if (args[1] !in clanList) {
-            sendErrorMessage(s, "Clan ${args[1]} not found!")
-            return true
         }
-        // TODO: add clan name valid tester.
         // Ensure player has an active invite to the clan.
         val clan = clanList.get(args[1])
         if (!session.isTimerInBounds(ClanEvent.JOIN, Pair(s.uniqueId, clan))) {
@@ -331,8 +328,7 @@ class ClansCommand(private val logger: LogHandler,
             return false // Malformed command -- clan info needs a name!
         }
         // Argument semantics validation.
-        if (args[1] !in clanList) {
-            sendErrorMessage(s, "Clan \"${args[1]}\" does not exist!")
+        if (!assertClanNameInList(s, clanList, args[1])) {
             return true
         }
 

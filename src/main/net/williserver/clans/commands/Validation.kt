@@ -114,3 +114,17 @@ fun assertUniqueClanName(s: CommandSender, clans: ClanList, name: String) =
         sendErrorMessage(s, "The name \"$name\" is already taken, try a new one!")
         false
     } else true
+
+/**
+ * Check whether a clan name is in this list. If not, send an error message.
+ *
+ * @param s Sender to report errors to.
+ * @param name Name to check if is in list.
+ *
+ * @return Whether the clan name is in this list.
+ */
+fun assertClanNameInList(s: CommandSender, list: ClanList, name: String) =
+    if (name !in list) {
+        sendErrorMessage(s, "There is no clan named \"$name\".")
+        false
+    } else true
