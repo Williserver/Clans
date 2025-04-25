@@ -165,17 +165,13 @@ class ClansCommand(private val logger: LogHandler,
         }
         // Argument semantics validation.
         if (!validPlayer(s)
-            || !assertPlayerInClan(s, clanList, (s as Player).uniqueId)) {
-            return true
-        }
-
-        val clan = clanList.playerClan(s.uniqueId)
-        if (!clan.rankOfMember(s.uniqueId).hasPermission(ClanPermission.DISBAND)) {
-            sendErrorMessage(s, "You don't have permission to disband this clan!")
+            || !assertPlayerInClan(s, clanList, (s as Player).uniqueId)
+            || !assertHasPermission(s, clanList.playerClan(s.uniqueId), s.uniqueId, ClanPermission.DISBAND)) {
             return true
         }
 
         // Either initiate a new disband attempt, or confirm one if it's done in time.
+        val clan = clanList.playerClan(s.uniqueId)
         return when(args.size) {
             1 -> {
                 session.registerTimer(ClanEvent.DISBAND, clan, config.confirmDisbandTime.toLong())
@@ -222,18 +218,14 @@ class ClansCommand(private val logger: LogHandler,
         }
         // Argument semantics validation.
         if (!validPlayer(s)
-            || !assertPlayerInClan(s, clanList, (s as Player).uniqueId)) {
+            || !assertPlayerInClan(s, clanList, (s as Player).uniqueId)
+            || !assertHasPermission(s, clanList.playerClan(s.uniqueId), s.uniqueId, ClanPermission.INVITE)) {
             return true
         }
-
-        // Ensure player has correct permissions in their clan.
-        val targetClan = clanList.playerClan(s.uniqueId)
-        if (!targetClan.rankOfMember(s.uniqueId).hasPermission(ClanPermission.INVITE)) {
-            sendErrorMessage(s, "You do not have permission to invite new members to the clan!")
-            return true
-        }
+        // TODO: add player name valid helper.
 
         // Find the UUID of the target player and validate that they are an eligible bachelor.
+        val targetClan = clanList.playerClan(s.uniqueId)
         val targetPlayer = getPlayer(args[1])
         if (targetPlayer == null) {
             sendErrorMessage(s, "Player \"${args[1]}\" not found -- are they online?")
