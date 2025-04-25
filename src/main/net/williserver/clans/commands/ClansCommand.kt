@@ -219,21 +219,17 @@ class ClansCommand(private val logger: LogHandler,
         // Argument semantics validation.
         if (!validPlayer(s)
             || !assertPlayerInClan(s, clanList, (s as Player).uniqueId)
-            || !assertHasPermission(s, clanList.playerClan(s.uniqueId), s.uniqueId, ClanPermission.INVITE)) {
+            || !assertHasPermission(s, clanList.playerClan(s.uniqueId), s.uniqueId, ClanPermission.INVITE)
+            || !assertPlayerNameOnline(s, args[1])
+            || !assertPlayerNotInClan(s, clanList, getPlayer(args[1])!!.uniqueId,
+                "${getPlayer(args[1])!!.name} is already in a clan!")) {
             return true
         }
-        // TODO: add player name valid helper.
 
-        // Find the UUID of the target player and validate that they are an eligible bachelor.
         val targetClan = clanList.playerClan(s.uniqueId)
-        val targetPlayer = getPlayer(args[1])
-        if (targetPlayer == null) {
-            sendErrorMessage(s, "Player \"${args[1]}\" not found -- are they online?")
-            return true
-        } else if (!assertPlayerNotInClan(s, clanList, targetPlayer.uniqueId,
-                "${targetPlayer.name} is already in a clan!")) {
-            return true
-        } else if (session.isTimerInBounds(ClanEvent.JOIN, Pair(s.uniqueId, targetClan))) {
+        val targetPlayer = getPlayer(args[1])!!
+        // Validate that player is not currently waiting on invitation.
+        if (session.isTimerInBounds(ClanEvent.JOIN, Pair(s.uniqueId, targetClan))) {
             sendErrorMessage(s, "${targetPlayer.name} is already waiting on an invitation from you.")
             return true
         }
@@ -241,9 +237,10 @@ class ClansCommand(private val logger: LogHandler,
         sendPrefixedMessage(s, "You have invited ${targetPlayer.name} to your clan!", NamedTextColor.GREEN)
         sendPrefixedMessage(targetPlayer, "${s.name} has invited you to clan ${targetClan.name}!", NamedTextColor.GREEN)
         sendPrefixedMessage(targetPlayer, "You have 30 seconds to accept your invitation.", NamedTextColor.GREEN)
+
         // TODO: configure time for invite.
-        session.registerTimer(ClanEvent.JOIN, Pair(targetPlayer.uniqueId, targetClan), 30)
         // Invitation timer starts immediately after timer registered.
+        session.registerTimer(ClanEvent.JOIN, Pair(targetPlayer.uniqueId, targetClan), 30)
         session.startTimer(ClanEvent.JOIN, Pair(targetPlayer.uniqueId, targetClan))
         return true
     }
@@ -268,6 +265,7 @@ class ClansCommand(private val logger: LogHandler,
             sendErrorMessage(s, "Clan ${args[1]} not found!")
             return true
         }
+        // TODO: add clan name valid tester.
         // Ensure player has an active invite to the clan.
         val clan = clanList.get(args[1])
         if (!session.isTimerInBounds(ClanEvent.JOIN, Pair(s.uniqueId, clan))) {

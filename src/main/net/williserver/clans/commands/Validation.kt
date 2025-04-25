@@ -4,6 +4,7 @@ import net.williserver.clans.model.Clan
 import net.williserver.clans.model.ClanList
 import net.williserver.clans.model.ClanPermission
 import net.williserver.clans.model.validClanName
+import org.bukkit.Bukkit.getPlayer
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import java.util.*
@@ -20,6 +21,20 @@ import java.util.*
 fun validPlayer(s: CommandSender): Boolean =
     if (s !is Player) {
         sendErrorMessage(s, "This command can only be run by players.")
+        false
+    } else true
+
+/**
+ * Check whether a given playername corresponds to an online player. If not, send an error message.
+ *
+ * @param s Sender to report errors to.
+ * @param name Name to check if player online.
+ *
+ * @return Whether some player with the name is online.
+ */
+fun assertPlayerNameOnline(s: CommandSender, name: String) =
+    if (getPlayer(name) == null) {
+        sendErrorMessage(s, "Player \"${name}\" not found -- are they online?")
         false
     } else true
 
@@ -54,6 +69,23 @@ fun assertPlayerNotInClan(s: CommandSender, clans: ClanList, player: UUID, messa
     } else true
 
 /**
+ * Check whether a player has a given permission. If not, send an error message.
+ *
+ * @param s Sender to report errors to.
+ * @param clan Clan to check permissions against.
+ * @param player Player to check permissions for.
+ * @param permission Permission to check if player has.
+ *
+ * @return Whether the player has the specified permission.
+ * @throws IllegalArgumentException if player is not in clan.
+ */
+fun assertHasPermission(s: CommandSender, clan: Clan, player: UUID, permission: ClanPermission) =
+    if (!clan.rankOfMember(player).hasPermission(permission)) {
+        sendErrorMessage(s, "You need clan permission \"$permission\" to use this command.")
+        false
+    } else true
+
+/**
  * Check whether a clan name is syntactically valid, according to the data model. If not, send command invoker an error message.
  *
  * @param s Sender to report errors to.
@@ -80,22 +112,5 @@ fun assertValidClanName(s: CommandSender, name: String) =
 fun assertUniqueClanName(s: CommandSender, clans: ClanList, name: String) =
     if (name in clans) {
         sendErrorMessage(s, "The name \"$name\" is already taken, try a new one!")
-        false
-    } else true
-
-/**
- * Check whether a player has a given permission. If not, send an error message.
- *
- * @param s Sender to report errors to.
- * @param clan Clan to check permissions against.
- * @param player Player to check permissions for.
- * @param permission Permission to check if player has.
- *
- * @return Whether the player has the specified permission.
- * @throws IllegalArgumentException if player is not in clan.
- */
-fun assertHasPermission(s: CommandSender, clan: Clan, player: UUID, permission: ClanPermission) =
-    if (!clan.rankOfMember(player).hasPermission(permission)) {
-        sendErrorMessage(s, "You need clan permission \"$permission\" to use this command.")
         false
     } else true
