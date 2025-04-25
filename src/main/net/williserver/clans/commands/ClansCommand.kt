@@ -159,7 +159,7 @@ class ClansCommand(private val logger: LogHandler,
         val newClan = Clan(name, leader, arrayListOf(leader))
         bus.fireEvent(ClanEvent.CREATE, newClan, leader)
 
-        broadcastPrefixedMessage("Chief ${s.name} has formed the clan \"${newClan.name}\"!", NamedTextColor.GREEN)
+        broadcastPrefixedMessage("Chief ${s.name} has formed the clan \"${newClan.name}\"!", NamedTextColor.DARK_PURPLE)
         return true
     }
 
