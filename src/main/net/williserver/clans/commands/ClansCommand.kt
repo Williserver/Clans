@@ -42,6 +42,7 @@ class ClansCommand(private val logger: LogHandler,
                 "invite" -> invite(sender, args)
                 "join" -> join(sender, args)
                 "help" -> help(sender, args)
+                "leave" -> leave(sender, args)
                 "list" -> list(sender, args)
                 else -> false
             }
@@ -76,6 +77,8 @@ class ClansCommand(private val logger: LogHandler,
         val info = generateCommandHelp("info (name)", "get information about a clan.")
         val invite = generateCommandHelp("invite (user)", "invite a member to your clan.")
         val join = generateCommandHelp("join (clan name)", "join a clan.")
+        val leave = generateCommandHelp("leave", "begin to leave your clan.")
+        val leaveConfirm = generateCommandHelp("leave confirm", "finish leaving your clan.")
         val list = generateCommandHelp("list", "output a list of clans.")
 
         s.sendMessage(header
@@ -86,6 +89,8 @@ class ClansCommand(private val logger: LogHandler,
             .append(info)
             .append(invite)
             .append(join)
+            .append(leave)
+            .append(leaveConfirm)
             .append(list)
         )
         return true
@@ -187,7 +192,9 @@ class ClansCommand(private val logger: LogHandler,
                  */
                 if (args[1].lowercase(Locale.getDefault()) != "confirm") {
                     return false
-                } else if (!session.isTimerRegistered(ClanEvent.DISBAND, clan)) {
+                }
+                // TODO: improve structure
+                if (!session.isTimerRegistered(ClanEvent.DISBAND, clan)) {
                     sendErrorMessage(s, "You have attempted to delete your clan with \"/clans disband confirm\" before starting the deletion timer!")
                     sendErrorMessage(s, "Please start the timer with \"/clans disband\" first, or ignore this message to keep your clan.")
                 } else if (!session.isTimerInBounds(ClanEvent.DISBAND, clan)) {
@@ -271,7 +278,6 @@ class ClansCommand(private val logger: LogHandler,
         }
         // Add player to the clan.
         bus.fireEvent(ClanEvent.JOIN, clan, s.uniqueId)
-        // TODO: setup listener to remove any active invites when you join.
         broadcastPrefixedMessage("${s.name} has joined clan ${clan.name}!", NamedTextColor.DARK_PURPLE)
         sendPrefixedMessage(s, "Welcome to clan ${clan.name}!", NamedTextColor.GREEN)
         return true
@@ -308,10 +314,27 @@ class ClansCommand(private val logger: LogHandler,
                 // TODO: configure time to leave
                 sendPrefixedMessage(s, "Type \"/clans leave confirm\" within 30 seconds to leave.", NamedTextColor.LIGHT_PURPLE)
                 session.registerTimer(ClanEvent.LEAVE, s.uniqueId, 30)
+                session.startTimer(ClanEvent.LEAVE, s.uniqueId)
                 true
             }
             // Leave the user's clan.
             2 -> {
+                // Argument structure validation: second word must be "confirm"
+                if (args[1].lowercase(Locale.getDefault()) != "confirm") {
+                    return false
+                }
+
+                // TODO: modularize
+                if (!session.isTimerRegistered(ClanEvent.LEAVE, s.uniqueId)) {
+                    sendErrorMessage(s, "You have attempted to leave your clan with \"/clans leave confirm\" before starting the leave timer!")
+                    sendErrorMessage(s, "Please start the timer with \"/clans leave\" first, or ignore this message to stay in your clan.")
+                } else if (!session.isTimerInBounds(ClanEvent.LEAVE, s.uniqueId)) {
+                    sendErrorMessage(s, "The timer to leave your clan has expired!")
+                    sendErrorMessage(s, "To leave your clan, enter \"/clans leave\", or ignore this message to stay in your clan.")
+                } else {
+                    bus.fireEvent(ClanEvent.LEAVE, clanList.playerClan(s.uniqueId), s.uniqueId)
+                    sendPrefixedMessage(s, "You have left your clan.", NamedTextColor.LIGHT_PURPLE)
+                }
                 true
             }
             else -> throw IllegalStateException("$pluginMessagePrefix: Internal error: Wrong number of arguments to /clans disband -- this should have been caught earlier!")

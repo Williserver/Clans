@@ -43,6 +43,7 @@ class ClansTabCompleter(private val clanList: ClanList): TabCompleter {
             completions.add("info")
             completions.add("invite")
             completions.add("join")
+            completions.add("leave")
             completions.add("list")
             // Only add completions that correspond with the subcommand they're typing.
             completions.removeAll{ !it.startsWith(args[0].lowercase()) }
