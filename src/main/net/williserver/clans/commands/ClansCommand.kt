@@ -48,7 +48,7 @@ class ClansCommand(private val logger: LogHandler,
                 "list" -> list(sender, args)
                 else -> false
             }
-        } else help(sender, args as List<String>)
+        } else help(sender, args.toList())
 
     /*
      * Subcommands
