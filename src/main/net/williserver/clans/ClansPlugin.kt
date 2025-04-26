@@ -46,6 +46,7 @@ class ClansPlugin : JavaPlugin() {
         bus.registerListener(ClanEvent.CREATE, clanList.constructCreateListener())
         bus.registerListener(ClanEvent.JOIN, clanList.constructJoinListener())
         bus.registerListener(ClanEvent.DISBAND, clanList.constructDisbandListener())
+        bus.registerListener(ClanEvent.LEAVE, clanList.constructLeaveListener())
         // Session listeners affect temporary data, like expiring invites.
         bus.registerListener(ClanEvent.JOIN, session.constructDeregisterInviteListener())
         logger.info("Registered clan lifecycle listeners")

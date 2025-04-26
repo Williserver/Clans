@@ -295,13 +295,19 @@ class ClansCommand(private val logger: LogHandler,
             return false
         }
         // Argument semantics validation.
-        if (!validPlayer(s) || !assertPlayerInClan(s, clanList, (s as Player).uniqueId)) {
+        if (!validPlayer(s)
+            || !assertPlayerInClan(s, clanList, (s as Player).uniqueId)
+            || !assertPlayerNotLeader(s, clanList.playerClan(s.uniqueId), s.uniqueId)) {
             return true
         }
 
         return when(args.size) {
             // Prompt the user to confirm within the confirmation threshold.
             1 -> {
+                sendPrefixedMessage(s, "Really leave your clan?", NamedTextColor.LIGHT_PURPLE)
+                // TODO: configure time to leave
+                sendPrefixedMessage(s, "Type \"/clans leave confirm\" within 30 seconds to leave.", NamedTextColor.LIGHT_PURPLE)
+                session.registerTimer(ClanEvent.LEAVE, s.uniqueId, 30)
                 true
             }
             // Leave the user's clan.

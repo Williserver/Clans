@@ -1,9 +1,6 @@
 package net.williserver.clans.commands
 
-import net.williserver.clans.model.Clan
-import net.williserver.clans.model.ClanList
-import net.williserver.clans.model.ClanPermission
-import net.williserver.clans.model.validClanName
+import net.williserver.clans.model.*
 import org.bukkit.Bukkit.getPlayer
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -126,5 +123,22 @@ fun assertUniqueClanName(s: CommandSender, clans: ClanList, name: String) =
 fun assertClanNameInList(s: CommandSender, list: ClanList, name: String) =
     if (name !in list) {
         sendErrorMessage(s, "There is no clan named \"$name\".")
+        false
+    } else true
+
+/**
+ * Check whether a player is leader of the clan. If they are, send an error message.
+ *
+ * @param s Sender to report errors to.
+ * @param clan Clan player is a member of
+ * @param player Player to check leadership status of.
+ *
+ * @return Whether the player is not leader.
+ * @throws IllegalArgumentException if player is not in clan.
+ */
+fun assertPlayerNotLeader(s: CommandSender, clan: Clan, player: UUID) =
+    if (clan.rankOfMember(player) == ClanRank.LEADER) {
+        sendErrorMessage(s, "You may not execute this command as leader.")
+        sendErrorMessage(s, "Promote another member to leader first.")
         false
     } else true
