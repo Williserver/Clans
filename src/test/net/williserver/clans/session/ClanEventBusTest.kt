@@ -73,4 +73,23 @@ class ClanEventBusTest {
         assertThrows(IllegalArgumentException::class.java) { newClan.leave(newMember) }
         assertThrows(IllegalArgumentException::class.java) { newClan.leave(newLeader) }
     }
+
+    @Test
+    fun testDeregisterInvitation() {
+        val leader = UUID.randomUUID()
+        val clan = Clan("TestClan", leader, mutableListOf(leader))
+
+        // Add an invitation for a new member.
+        val newMember = UUID.randomUUID()
+        val session = SessionManager()
+        session.registerTimer(ClanEvent.JOIN, Pair(newMember, clan), 300)
+        assert(session.isTimerRegistered(ClanEvent.JOIN, Pair(newMember, clan)))
+
+        // When the player joins, the event should be gone.
+        val bus = ClanEventBus()
+        bus.registerListener(ClanEvent.JOIN, session.constructDeregisterInviteListener())
+        bus.fireEvent(ClanEvent.JOIN, clan, newMember)
+
+        assertFalse(session.isTimerRegistered(ClanEvent.JOIN, Pair(newMember, clan)))
+    }
 }

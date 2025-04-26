@@ -42,9 +42,12 @@ class ClansPlugin : JavaPlugin() {
 
         // Register major events in clan lifecycle.
         val bus = ClanEventBus()
+        // Model listeners affect persistent data
         bus.registerListener(ClanEvent.CREATE, clanList.constructCreateListener())
         bus.registerListener(ClanEvent.JOIN, clanList.constructJoinListener())
         bus.registerListener(ClanEvent.DISBAND, clanList.constructDisbandListener())
+        // Session listeners affect temporary data, like expiring invites.
+        bus.registerListener(ClanEvent.JOIN, session.constructDeregisterInviteListener())
         logger.info("Registered clan lifecycle listeners")
 
         // Register commands.

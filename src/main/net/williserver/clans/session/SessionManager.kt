@@ -1,5 +1,8 @@
 package net.williserver.clans.session
 
+import net.williserver.clans.model.Clan
+import java.util.*
+
 /**
  * Manage a single server session's non-persistent data, like confirmation timers.
  *
@@ -93,4 +96,15 @@ class SessionManager {
         val timer = timerTable[event]!![key]
         return timer != null && timer.isRunning() && timer.inBounds()
     }
+
+    /*
+     * Listener factories
+     */
+
+    /**
+     * @return A listener function that, when a player joins the clan, removes the corresponding invite.
+     * This prevents repeatedly leaving and rejoining a clan.
+     */
+    fun constructDeregisterInviteListener(): ClanLifecycleListener =
+        { clan: Clan, agent: UUID -> deregisterTimer(ClanEvent.JOIN, Pair(agent, clan))}
 }
