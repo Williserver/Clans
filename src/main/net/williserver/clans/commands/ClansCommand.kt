@@ -35,7 +35,9 @@ class ClansCommand(private val logger: LogHandler,
 
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean =
         if (args.isNotEmpty()) {
-            when(args[0].lowercase(Locale.getDefault())) {
+            val subcommand = args[0]
+            val args = args.drop(1)
+            when(subcommand.lowercase(Locale.getDefault())) {
                 "create" -> create(sender, args)
                 "disband" -> disband(sender, args)
                 "info" -> info(sender, args)
@@ -46,7 +48,7 @@ class ClansCommand(private val logger: LogHandler,
                 "list" -> list(sender, args)
                 else -> false
             }
-        } else help(sender, args)
+        } else help(sender, args as List<String>)
 
     /*
      * Subcommands
@@ -58,9 +60,9 @@ class ClansCommand(private val logger: LogHandler,
      * @param s Command sender; will recieve help messages.
      * @param args Args for command. Since this is the help command, should only be one arg.
      */
-    private fun help(s: CommandSender, args: Array<out String>): Boolean {
-        // Help may be invoked with zero or one arguments.
-        if (args.size > 1) {
+    private fun help(s: CommandSender, args: List<String>): Boolean {
+        // Help should not be invoked with any args beyond the subcommand
+        if (args.isNotEmpty()) {
             return false
         }
 
@@ -104,9 +106,9 @@ class ClansCommand(private val logger: LogHandler,
      *
      * TODO: add pages when too many clans.
      */
-    private fun list(s: CommandSender, args: Array<out String>): Boolean {
-        // Argument structure validation. One arg: subcommand
-        if (args.size > 1) {
+    private fun list(s: CommandSender, args: List<String>): Boolean {
+        // Argument structure validation. No args
+        if (args.isNotEmpty()) {
             return false
         }
 
@@ -129,11 +131,11 @@ class ClansCommand(private val logger: LogHandler,
      * @param s Command sender; must be a player.
      * @param args Arguments to command, such as name.
      */
-    private fun create(s: CommandSender, args: Array<String>): Boolean {
-        // Argument structure validation. Two args: subcommand and new clan name.
-        if (args.size > 2) {
+    private fun create(s: CommandSender, args: List<String>): Boolean {
+        // Argument structure validation. One arg: new clan name.
+        if (args.size > 1) {
             return false
-        } else if (args.size < 2) {
+        } else if (args.isEmpty()) {
             // Special case: they forgot to include a name. Send a small reminder rather than a full usage report.
             sendErrorMessage(s, "Your clan needs a name!")
             return true
@@ -141,14 +143,14 @@ class ClansCommand(private val logger: LogHandler,
         // Argument semantics validation
         if (!validPlayer(s)
             || !assertPlayerNotInClan(s, clanList, (s as Player).uniqueId, "You are already in a clan!")
-            || !assertValidClanName(s, args[1])
-            || !assertUniqueClanName(s, clanList, args[1])) {
+            || !assertValidClanName(s, args[0])
+            || !assertUniqueClanName(s, clanList, args[0])) {
             return true
         }
 
         // Create a new clan with this player as its leader and starting member.
         val leader = s.uniqueId
-        val newClan = Clan(args[1], leader, arrayListOf(leader))
+        val newClan = Clan(args[0], leader, arrayListOf(leader))
         bus.fireEvent(ClanEvent.CREATE, newClan, leader)
         broadcastPrefixedMessage("Chief ${s.name} has formed the clan \"${newClan.name}\"!", NamedTextColor.DARK_PURPLE)
         return true
@@ -162,10 +164,10 @@ class ClansCommand(private val logger: LogHandler,
      * @param s Command sender; must be a player.
      * @param args Arguments to command. Should be none -- implicit argument is the clan player is a member of.
      */
-    private fun disband(s: CommandSender, args: Array<out String>): Boolean {
+    private fun disband(s: CommandSender, args: List<String>): Boolean {
         // Argument structure validation.
         // Expect /clans disband or /clans disband confirm
-        if (args.size != 1 && args.size != 2) {
+        if (args.size > 1) {
             return false
         }
         // Argument semantics validation.
@@ -178,20 +180,20 @@ class ClansCommand(private val logger: LogHandler,
         // Either initiate a new disband attempt, or confirm one if it's done in time.
         val clan = clanList.playerClan(s.uniqueId)
         return when(args.size) {
-            1 -> {
+            0 -> {
                 session.registerTimer(ClanEvent.DISBAND, clan, config.confirmDisbandTime.toLong())
                 sendPrefixedMessage(s, "You have begun to disband your clan!", NamedTextColor.LIGHT_PURPLE)
                 sendPrefixedMessage(s, "Enter \"/clans disband confirm\" within ${config.confirmDisbandTime} seconds to confirm this choice.", NamedTextColor.LIGHT_PURPLE)
                 session.startTimer(ClanEvent.DISBAND, clan)
                 true
             }
-            2 -> {
+            1 -> {
                 /*
                  * Confirm that the clan should be disbanded after the timer started.
                  * If so, remove the clan from this list.
                  */
                 // Argument structure validation: one arg, confirm
-                if (args[1].lowercase(Locale.getDefault()) != "confirm") {
+                if (args[0].lowercase(Locale.getDefault()) != "confirm") {
                     return false
                 }
                 if (assertTimerInBounds(s, session, ClanEvent.DISBAND, clan, "disband")) {
@@ -211,23 +213,23 @@ class ClansCommand(private val logger: LogHandler,
      * @param args Arguments to command. Should be one: the player invited.
      * @return Whether the command was invoked with the correct number of arguments.
      */
-    private fun invite(s: CommandSender, args: Array<out String>): Boolean {
-        // Argument structure validation: 2 args (subcommand, target)
-        if (args.size != 2) {
+    private fun invite(s: CommandSender, args: List<String>): Boolean {
+        // Argument structure validation: 1 arg: target
+        if (args.size != 1) {
             return false
         }
         // Argument semantics validation.
         if (!validPlayer(s)
             || !assertPlayerInClan(s, clanList, (s as Player).uniqueId)
             || !assertHasPermission(s, clanList.playerClan(s.uniqueId), s.uniqueId, ClanPermission.INVITE)
-            || !assertPlayerNameOnline(s, args[1])
-            || !assertPlayerNotInClan(s, clanList, getPlayer(args[1])!!.uniqueId,
-                "${getPlayer(args[1])!!.name} is already in a clan!")) {
+            || !assertPlayerNameOnline(s, args[0])
+            || !assertPlayerNotInClan(s, clanList, getPlayer(args[0])!!.uniqueId,
+                "${getPlayer(args[0])!!.name} is already in a clan!")) {
             return true
         }
 
         val targetClan = clanList.playerClan(s.uniqueId)
-        val targetPlayer = getPlayer(args[1])!!
+        val targetPlayer = getPlayer(args[0])!!
         // Validate that player is not currently waiting on invitation.
         if (session.isTimerInBounds(ClanEvent.JOIN, Pair(s.uniqueId, targetClan))) {
             sendErrorMessage(s, "${targetPlayer.name} is already waiting on an invitation from you.")
@@ -252,19 +254,19 @@ class ClansCommand(private val logger: LogHandler,
      * @param args Arguments to command. Should be one: the name of the clan to join.
      * @return Whether the command was invoked with the correct number of arguments.
      */
-    private fun join(s: CommandSender, args: Array<out String>): Boolean {
-        // API validation: 2 args (subcommand, target)
-        if (args.size != 2) {
+    private fun join(s: CommandSender, args: List<String>): Boolean {
+        // Argument structure validation: 1 arg: target
+        if (args.size != 1) {
             return false
         }
         // Argument semantics validation.
         if (!validPlayer(s)
-            || !assertClanNameInList(s, clanList, args[1])
+            || !assertClanNameInList(s, clanList, args[0])
             || !assertPlayerNotInClan(s, clanList, (s as Player).uniqueId, "You are already in a clan!")) {
             return true
         }
         // Ensure player has an active invite to the clan.
-        val clan = clanList.get(args[1])
+        val clan = clanList.get(args[0])
         if (!session.isTimerInBounds(ClanEvent.JOIN, Pair(s.uniqueId, clan))) {
             sendErrorMessage(s, "You do not have an active invite to ${clan.name}.")
             return true
@@ -276,8 +278,6 @@ class ClansCommand(private val logger: LogHandler,
         return true
     }
 
-    // TODO: constant for only subcommand # args (1)
-
     /**
      * Make a player leave their clan.
      * First, the user executes /clans leave. This starts the leave timer.
@@ -287,9 +287,9 @@ class ClansCommand(private val logger: LogHandler,
      * @param args Arguments to command. Should be none.
      * @return Whether the command was invoked with the correct number of arguments.
      */
-    private fun leave(s: CommandSender, args: Array<out String>): Boolean {
-        // Argument structure validation: two args (subcommand, optional: confirm)
-        if (args.size != 1 && args.size != 2) {
+    private fun leave(s: CommandSender, args: List<String>): Boolean {
+        // Argument structure validation: one arg: (optional) confirm
+        if (args.size > 1) {
             return false
         }
         // Argument semantics validation.
@@ -301,7 +301,7 @@ class ClansCommand(private val logger: LogHandler,
 
         return when(args.size) {
             // Prompt the user to confirm within the confirmation threshold.
-            1 -> {
+            0 -> {
                 sendPrefixedMessage(s, "Really leave your clan?", NamedTextColor.LIGHT_PURPLE)
                 // TODO: configure time to leave
                 sendPrefixedMessage(s, "Type \"/clans leave confirm\" within 30 seconds to leave.", NamedTextColor.LIGHT_PURPLE)
@@ -310,9 +310,9 @@ class ClansCommand(private val logger: LogHandler,
                 true
             }
             // Leave the user's clan.
-            2 -> {
+            1 -> {
                 // Argument structure validation: second word must be "confirm"
-                if (args[1].lowercase(Locale.getDefault()) != "confirm") {
+                if (args[0].lowercase(Locale.getDefault()) != "confirm") {
                     return false
                 }
                 // Leave clan if the timer was started.
@@ -329,25 +329,25 @@ class ClansCommand(private val logger: LogHandler,
     /**
      * Message the sender with a report about the given clan.
      * Format:
-     *  Clan $clanName:
+     *  Clan $clanName
      *  Leader: $leadername
      *  Members: $members
      *
      * @param s Command sender. Can be any message receiving entity.
      * @param args Arguments to command. Should be one -- the name of the clan.
      */
-    private fun info(s: CommandSender, args: Array<out String>): Boolean {
-        // Argument structure validation.
-        if (args.size != 2) {
+    private fun info(s: CommandSender, args: List<String>): Boolean {
+        // Argument structure validation. One arg: name
+        if (args.size != 1) {
             return false // Malformed command -- clan info needs a name!
         }
         // Argument semantics validation.
-        if (!assertClanNameInList(s, clanList, args[1])) {
+        if (!assertClanNameInList(s, clanList, args[0])) {
             return true
         }
 
         // If clan present, prepare and send message with information.
-        val correspondingClan = clanList.get(args[1])
+        val correspondingClan = clanList.get(args[0])
         val header = Component.text("Clan \"${correspondingClan.name}\":\n", NamedTextColor.GOLD)
         val leaderTitle = Component.text("Leader: ", NamedTextColor.RED)
         val leaderName = Component.text("${getOfflinePlayer(correspondingClan.leader).name}\n", NamedTextColor.GREEN)
