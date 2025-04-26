@@ -7,13 +7,12 @@ import org.bukkit.Bukkit.broadcast
 import org.bukkit.command.CommandSender
 
 /**
- * Broadcast a colored string message.
+ * Broadcast a string message. Color will be purple.
  *
  * @param message Message to format and broadcast.
- * @param color kyori component color to broadcast message in.
  */
-fun broadcastPrefixedMessage(message: String, color: NamedTextColor)
-        = broadcast(prefixedMessage(Component.text(message, color)))
+fun broadcastPrefixedMessage(message: String)
+        = broadcast(prefixedMessage(Component.text(message, NamedTextColor.DARK_PURPLE)))
 
 
 /**

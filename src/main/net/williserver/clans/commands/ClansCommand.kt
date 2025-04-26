@@ -152,7 +152,7 @@ class ClansCommand(private val logger: LogHandler,
         val leader = s.uniqueId
         val newClan = Clan(args[0], leader, arrayListOf(leader))
         bus.fireEvent(ClanEvent.CREATE, newClan, leader)
-        broadcastPrefixedMessage("Chief ${s.name} has formed the clan \"${newClan.name}\"!", NamedTextColor.DARK_PURPLE)
+        broadcastPrefixedMessage("Chief ${s.name} has formed the clan \"${newClan.name}\"!")
         return true
     }
 
@@ -198,7 +198,7 @@ class ClansCommand(private val logger: LogHandler,
                 }
                 if (assertTimerInBounds(s, session, ClanEvent.DISBAND, clan, "disband")) {
                     bus.fireEvent(ClanEvent.DISBAND, clan, s.uniqueId)
-                    broadcastPrefixedMessage("Clan \"${clan.name}\" has disbanded!", NamedTextColor.DARK_PURPLE)
+                    broadcastPrefixedMessage("Clan \"${clan.name}\" has disbanded!")
                 }
                 true
             }
@@ -273,7 +273,7 @@ class ClansCommand(private val logger: LogHandler,
         }
         // Add player to the clan.
         bus.fireEvent(ClanEvent.JOIN, clan, s.uniqueId)
-        broadcastPrefixedMessage("${s.name} has joined clan ${clan.name}!", NamedTextColor.DARK_PURPLE)
+        broadcastPrefixedMessage("${s.name} has joined clan ${clan.name}!")
         sendPrefixedMessage(s, "Welcome to clan ${clan.name}!", NamedTextColor.GREEN)
         return true
     }
