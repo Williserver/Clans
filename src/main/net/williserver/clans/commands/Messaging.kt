@@ -53,6 +53,19 @@ fun sendPrefixedMessage(target: CommandSender, message: Component)
 fun sendPrefixedMessage(target: CommandSender, message: String, color: NamedTextColor)
         = target.sendMessage(prefixedMessage(message, color))
 
+/*
+ * Pre-formatted message senders.
+ */
+
+/**
+ * Send a light-purple colored info message to a target.
+ *
+ * @param target Entity to receive info message.
+ * @param message Message to format and send to target.
+ */
+fun sendInfoMessage(target: CommandSender, message: String)
+    = target.sendMessage(prefixedMessage(Component.text(message, NamedTextColor.LIGHT_PURPLE)))
+
 /**
  * Send a red-colored error message to a target.
  *

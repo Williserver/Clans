@@ -182,8 +182,8 @@ class ClansCommand(private val logger: LogHandler,
         return when(args.size) {
             0 -> {
                 session.registerTimer(ClanEvent.DISBAND, clan, config.confirmDisbandTime.toLong())
-                sendPrefixedMessage(s, "You have begun to disband your clan!", NamedTextColor.LIGHT_PURPLE)
-                sendPrefixedMessage(s, "Enter \"/clans disband confirm\" within ${config.confirmDisbandTime} seconds to confirm this choice.", NamedTextColor.LIGHT_PURPLE)
+                sendInfoMessage(s, "You have begun to disband your clan!")
+                sendInfoMessage(s, "Enter \"/clans disband confirm\" within ${config.confirmDisbandTime} seconds to confirm this choice.")
                 session.startTimer(ClanEvent.DISBAND, clan)
                 true
             }
@@ -302,9 +302,9 @@ class ClansCommand(private val logger: LogHandler,
         return when(args.size) {
             // Prompt the user to confirm within the confirmation threshold.
             0 -> {
-                sendPrefixedMessage(s, "Really leave your clan?", NamedTextColor.LIGHT_PURPLE)
+                sendInfoMessage(s, "Really leave your clan?")
                 // TODO: configure time to leave
-                sendPrefixedMessage(s, "Type \"/clans leave confirm\" within 30 seconds to leave.", NamedTextColor.LIGHT_PURPLE)
+                sendInfoMessage(s, "Type \"/clans leave confirm\" within 30 seconds to leave.")
                 session.registerTimer(ClanEvent.LEAVE, s.uniqueId, 30)
                 session.startTimer(ClanEvent.LEAVE, s.uniqueId)
                 true
@@ -318,7 +318,7 @@ class ClansCommand(private val logger: LogHandler,
                 // Leave clan if the timer was started.
                 if (assertTimerInBounds(s, session, ClanEvent.LEAVE, s.uniqueId, "leave")) {
                     bus.fireEvent(ClanEvent.LEAVE, clanList.playerClan(s.uniqueId), s.uniqueId)
-                    sendPrefixedMessage(s, "You have left your clan.", NamedTextColor.LIGHT_PURPLE)
+                    sendInfoMessage(s, "You have left your clan.")
                 }
                 true
             }
