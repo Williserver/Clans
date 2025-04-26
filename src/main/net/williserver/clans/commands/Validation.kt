@@ -1,6 +1,9 @@
 package net.williserver.clans.commands
 
+import net.kyori.adventure.text.format.NamedTextColor
 import net.williserver.clans.model.*
+import net.williserver.clans.session.ClanEvent
+import net.williserver.clans.session.SessionManager
 import org.bukkit.Bukkit.getPlayer
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -130,7 +133,7 @@ fun assertClanNameInList(s: CommandSender, list: ClanList, name: String) =
  * Check whether a player is leader of the clan. If they are, send an error message.
  *
  * @param s Sender to report errors to.
- * @param clan Clan player is a member of
+ * @param clan Clan player is a member of.
  * @param player Player to check leadership status of.
  *
  * @return Whether the player is not leader.
@@ -140,5 +143,25 @@ fun assertPlayerNotLeader(s: CommandSender, clan: Clan, player: UUID) =
     if (clan.rankOfMember(player) == ClanRank.LEADER) {
         sendErrorMessage(s, "You may not execute this command as leader.")
         sendErrorMessage(s, "Promote another member to leader first.")
+        false
+    } else true
+
+/**
+ * Check whether some timer is in bounds. If not, report the issue to the player.
+ *
+ * @param s Sender to report errors to.
+ * @param session Session to check active timer with.
+ * @param event Event timer is registered under,
+ * @param key Entity timer is registered under.
+ * @param subcommand name of subcommand to issue error for.
+ */
+fun assertTimerInBounds(s: CommandSender, session: SessionManager, event: ClanEvent, key: Any, subcommand: String) =
+    if (!session.isTimerRegistered(event, key)) {
+        sendErrorMessage(s, "You have attempted to execute \"/clans $subcommand confirm\" before starting the timer.")
+        sendErrorMessage(s, "Please start the timer with \"/clans $subcommand\" first, or ignore this message to change nothing.")
+        false
+    } else if (!session.isTimerInBounds(event, key)) {
+        sendErrorMessage(s, "The timer to $subcommand has expired!")
+        sendErrorMessage(s, "Enter \"/clans $subcommand\" to start again, or ignore this message to change nothing.")
         false
     } else true

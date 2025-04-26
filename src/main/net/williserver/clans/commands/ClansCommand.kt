@@ -190,18 +190,11 @@ class ClansCommand(private val logger: LogHandler,
                  * Confirm that the clan should be disbanded after the timer started.
                  * If so, remove the clan from this list.
                  */
+                // Argument structure validation: one arg, confirm
                 if (args[1].lowercase(Locale.getDefault()) != "confirm") {
                     return false
                 }
-                // TODO: improve structure
-                if (!session.isTimerRegistered(ClanEvent.DISBAND, clan)) {
-                    sendErrorMessage(s, "You have attempted to delete your clan with \"/clans disband confirm\" before starting the deletion timer!")
-                    sendErrorMessage(s, "Please start the timer with \"/clans disband\" first, or ignore this message to keep your clan.")
-                } else if (!session.isTimerInBounds(ClanEvent.DISBAND, clan)) {
-                    sendErrorMessage(s, "The timer to disband your clan has expired!")
-                    sendErrorMessage(s, "To delete your clan, enter \"/clans disband\", or ignore this message to keep your clan.")
-                } else {
-                    // Confirm the deletion of the clan, firing all relevant listeners.
+                if (assertTimerInBounds(s, session, ClanEvent.DISBAND, clan, "disband")) {
                     bus.fireEvent(ClanEvent.DISBAND, clan, s.uniqueId)
                     broadcastPrefixedMessage("Clan \"${clan.name}\" has disbanded!", NamedTextColor.DARK_PURPLE)
                 }
@@ -284,7 +277,6 @@ class ClansCommand(private val logger: LogHandler,
     }
 
     // TODO: constant for only subcommand # args (1)
-    // TODO: add API validation helper.
 
     /**
      * Make a player leave their clan.
@@ -323,15 +315,8 @@ class ClansCommand(private val logger: LogHandler,
                 if (args[1].lowercase(Locale.getDefault()) != "confirm") {
                     return false
                 }
-
-                // TODO: modularize
-                if (!session.isTimerRegistered(ClanEvent.LEAVE, s.uniqueId)) {
-                    sendErrorMessage(s, "You have attempted to leave your clan with \"/clans leave confirm\" before starting the leave timer!")
-                    sendErrorMessage(s, "Please start the timer with \"/clans leave\" first, or ignore this message to stay in your clan.")
-                } else if (!session.isTimerInBounds(ClanEvent.LEAVE, s.uniqueId)) {
-                    sendErrorMessage(s, "The timer to leave your clan has expired!")
-                    sendErrorMessage(s, "To leave your clan, enter \"/clans leave\", or ignore this message to stay in your clan.")
-                } else {
+                // Leave clan if the timer was started.
+                if (assertTimerInBounds(s, session, ClanEvent.LEAVE, s.uniqueId, "leave")) {
                     bus.fireEvent(ClanEvent.LEAVE, clanList.playerClan(s.uniqueId), s.uniqueId)
                     sendPrefixedMessage(s, "You have left your clan.", NamedTextColor.LIGHT_PURPLE)
                 }
