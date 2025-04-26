@@ -236,9 +236,9 @@ class ClansCommand(private val logger: LogHandler,
             return true
         }
 
-        sendPrefixedMessage(s, "You have invited ${targetPlayer.name} to your clan!", NamedTextColor.GREEN)
-        sendPrefixedMessage(targetPlayer, "${s.name} has invited you to clan ${targetClan.name}!", NamedTextColor.GREEN)
-        sendPrefixedMessage(targetPlayer, "You have 30 seconds to accept your invitation.", NamedTextColor.GREEN)
+        sendCongratsMessage(s, "You have invited ${targetPlayer.name} to your clan!")
+        sendCongratsMessage(targetPlayer, "${s.name} has invited you to clan ${targetClan.name}!")
+        sendCongratsMessage(targetPlayer, "You have 30 seconds to accept your invitation.")
 
         // TODO: configure time for invite.
         // Invitation timer starts immediately after timer registered.
@@ -274,7 +274,7 @@ class ClansCommand(private val logger: LogHandler,
         // Add player to the clan.
         bus.fireEvent(ClanEvent.JOIN, clan, s.uniqueId)
         broadcastPrefixedMessage("${s.name} has joined clan ${clan.name}!")
-        sendPrefixedMessage(s, "Welcome to clan ${clan.name}!", NamedTextColor.GREEN)
+        sendCongratsMessage(s, "Welcome to clan ${clan.name}!")
         return true
     }
 
