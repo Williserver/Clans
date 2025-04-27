@@ -53,6 +53,7 @@ class ClansTabCompleter(private val clanList: ClanList): TabCompleter {
                 "invite" -> getOnlinePlayers().forEach { completions.add(it.name) }
                 "join" -> clanList.clans().forEach { completions.add(it.name) }
                 "disband" -> completions.add("confirm")
+                "leave" -> completions.add("confirm")
                 else -> {}
             }
             completions.removeAll{ !it.startsWith(args[1]) }
