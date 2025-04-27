@@ -10,8 +10,7 @@ import org.bukkit.Bukkit
  */
 
 /**
- * Construct a listener that creates a new scoreboard team when a new clan is created.
- * @return the listener.
+ * @return a listener that creates a new scoreboard team when a new clan is created.
  */
 fun constructCreateAddTeamListener(): ClanLifecycleListener = { clan, creator ->
     val scoreboard = Bukkit.getScoreboardManager().mainScoreboard
@@ -20,5 +19,14 @@ fun constructCreateAddTeamListener(): ClanLifecycleListener = { clan, creator ->
     }
     scoreboard.registerNewTeam(clan.name)
     scoreboard.getTeam(clan.name)!!.addPlayer(Bukkit.getOfflinePlayer(creator))
+}
+
+/**
+ * @return a listener that removes the scoreboard team when a clan is deleted.
+ */
+fun constructDisbandRemoveTeamListener(): ClanLifecycleListener = { clan, creator ->
+    val team = Bukkit.getScoreboardManager().mainScoreboard.getTeam(clan.name)
+        ?: throw IllegalStateException("Team not registered -- how did we get here?")
+    team.unregister()
 }
 
