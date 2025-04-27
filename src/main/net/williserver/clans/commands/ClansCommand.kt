@@ -181,9 +181,9 @@ class ClansCommand(private val logger: LogHandler,
         val clan = clanList.playerClan(s.uniqueId)
         return when(args.size) {
             0 -> {
-                session.registerTimer(ClanEvent.DISBAND, clan, config.confirmDisbandTime.toLong())
+                session.registerTimer(ClanEvent.DISBAND, clan, config.confirmTime.toLong())
                 sendInfoMessage(s, "You have begun to disband your clan!")
-                sendInfoMessage(s, "Enter \"/clans disband confirm\" within ${config.confirmDisbandTime} seconds to confirm this choice.")
+                sendInfoMessage(s, "Enter \"/clans disband confirm\" within ${config.confirmTime} seconds to confirm this choice.")
                 session.startTimer(ClanEvent.DISBAND, clan)
                 true
             }
@@ -238,11 +238,10 @@ class ClansCommand(private val logger: LogHandler,
 
         sendCongratsMessage(s, "You have invited ${targetPlayer.name} to your clan!")
         sendCongratsMessage(targetPlayer, "${s.name} has invited you to clan ${targetClan.name}!")
-        sendCongratsMessage(targetPlayer, "You have 30 seconds to accept your invitation.")
+        sendCongratsMessage(targetPlayer, "You have ${config.confirmTime} seconds to accept your invitation.")
 
-        // TODO: configure time for invite.
         // Invitation timer starts immediately after timer registered.
-        session.registerTimer(ClanEvent.JOIN, Pair(targetPlayer.uniqueId, targetClan), 30)
+        session.registerTimer(ClanEvent.JOIN, Pair(targetPlayer.uniqueId, targetClan), config.confirmTime.toLong())
         session.startTimer(ClanEvent.JOIN, Pair(targetPlayer.uniqueId, targetClan))
         return true
     }
@@ -303,9 +302,8 @@ class ClansCommand(private val logger: LogHandler,
             // Prompt the user to confirm within the confirmation threshold.
             0 -> {
                 sendInfoMessage(s, "Really leave your clan?")
-                // TODO: configure time to leave
-                sendInfoMessage(s, "Type \"/clans leave confirm\" within 30 seconds to leave.")
-                session.registerTimer(ClanEvent.LEAVE, s.uniqueId, 30)
+                sendInfoMessage(s, "Type \"/clans leave confirm\" within ${config.confirmTime} seconds to leave.")
+                session.registerTimer(ClanEvent.LEAVE, s.uniqueId, config.confirmTime.toLong())
                 session.startTimer(ClanEvent.LEAVE, s.uniqueId)
                 true
             }

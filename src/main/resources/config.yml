@@ -1,5 +1,5 @@
 # Clans config
 
-# Maximum time (in seconds) to confirm you wish to disband your clan after initiating a disband.
+# Maximum time (in seconds) to confirm destructive commands (i.e. disband) after initializing them.
 # Default: 30 seconds
-confirmDisbandTime: 30
+confirmTime: 30
