@@ -1,4 +1,4 @@
-package net.williserver.clans.model
+package net.williserver.clans.model.clan
 
 /**
  * Named permissions for important clan actions.

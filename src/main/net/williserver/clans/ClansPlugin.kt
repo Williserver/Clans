@@ -4,6 +4,7 @@ import net.williserver.clans.commands.ClansCommand
 import net.williserver.clans.commands.ClansTabCompleter
 import net.williserver.clans.model.ClanList
 import net.williserver.clans.model.ClansConfigLoader
+import net.williserver.clans.model.clan.constructCreateAddTeamListener
 import net.williserver.clans.model.readFromFile
 import net.williserver.clans.model.writeToFile
 import net.williserver.clans.session.ClanEvent
@@ -49,6 +50,8 @@ class ClansPlugin : JavaPlugin() {
         bus.registerListener(ClanEvent.LEAVE, clanList.constructLeaveListener())
         // Session listeners affect temporary data, like expiring invites.
         bus.registerListener(ClanEvent.JOIN, session.constructDeregisterInviteListener())
+        // Integration listeners connect clans with other features of the plugin.
+        bus.registerListener(ClanEvent.CREATE, constructCreateAddTeamListener())
         logger.info("Registered clan lifecycle listeners")
 
         // Register commands.

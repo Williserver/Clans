@@ -1,5 +1,8 @@
 package net.williserver.clans.model
 
+import net.williserver.clans.model.clan.Clan
+import net.williserver.clans.model.clan.ClanPermission
+import net.williserver.clans.model.clan.ClanRank
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test

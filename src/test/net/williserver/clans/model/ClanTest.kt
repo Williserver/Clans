@@ -1,10 +1,10 @@
 package net.williserver.clans.model
 
-import org.junit.jupiter.api.Assertions.assertFalse
+import net.williserver.clans.model.clan.Clan
+import net.williserver.clans.model.clan.ClanData
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import java.util.*
-import kotlin.test.assertEquals
 
 /**
  * @author Willmo3
@@ -55,11 +55,11 @@ class ClanTest {
 
     @Test
     fun validClanName() {
-        assert(validClanName("123Test-Clan_"))
-        assert(!validClanName("\"\""))
-        assert(!validClanName("{123}"))
-        assert(!validClanName(""))
-        assert(!validClanName(" "))
+        assert(net.williserver.clans.model.clan.validClanName("123Test-Clan_"))
+        assert(!net.williserver.clans.model.clan.validClanName("\"\""))
+        assert(!net.williserver.clans.model.clan.validClanName("{123}"))
+        assert(!net.williserver.clans.model.clan.validClanName(""))
+        assert(!net.williserver.clans.model.clan.validClanName(" "))
     }
 
 }

@@ -4,6 +4,8 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.williserver.clans.LogHandler
 import net.williserver.clans.model.*
+import net.williserver.clans.model.clan.Clan
+import net.williserver.clans.model.clan.ClanPermission
 import net.williserver.clans.pluginMessagePrefix
 import net.williserver.clans.session.SessionManager
 import net.williserver.clans.session.ClanEvent

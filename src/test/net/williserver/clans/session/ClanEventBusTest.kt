@@ -1,6 +1,6 @@
 package net.williserver.clans.session
 
-import net.williserver.clans.model.Clan
+import net.williserver.clans.model.clan.Clan
 import net.williserver.clans.model.ClanList
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test

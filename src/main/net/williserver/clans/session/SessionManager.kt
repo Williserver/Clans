@@ -1,6 +1,6 @@
 package net.williserver.clans.session
 
-import net.williserver.clans.model.Clan
+import net.williserver.clans.model.clan.Clan
 import java.util.*
 
 /**

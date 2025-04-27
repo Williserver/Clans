@@ -1,7 +1,10 @@
 package net.williserver.clans.commands
 
-import net.kyori.adventure.text.format.NamedTextColor
 import net.williserver.clans.model.*
+import net.williserver.clans.model.clan.Clan
+import net.williserver.clans.model.clan.ClanPermission
+import net.williserver.clans.model.clan.ClanRank
+import net.williserver.clans.model.clan.validClanName
 import net.williserver.clans.session.ClanEvent
 import net.williserver.clans.session.SessionManager
 import org.bukkit.Bukkit.getPlayer

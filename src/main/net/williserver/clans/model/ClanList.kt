@@ -2,6 +2,9 @@ package net.williserver.clans.model
 
 import kotlinx.serialization.json.Json
 import net.williserver.clans.LogHandler
+import net.williserver.clans.model.clan.Clan
+import net.williserver.clans.model.clan.ClanData
+import net.williserver.clans.model.clan.ClanPermission
 import net.williserver.clans.pluginMessagePrefix
 import java.io.File
 import java.io.FileReader

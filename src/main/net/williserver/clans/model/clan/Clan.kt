@@ -1,4 +1,4 @@
-package net.williserver.clans.model
+package net.williserver.clans.model.clan
 import kotlinx.serialization.Serializable
 import net.williserver.clans.pluginMessagePrefix
 import java.util.*
