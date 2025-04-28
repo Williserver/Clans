@@ -277,8 +277,6 @@ class ClansCommand(private val logger: LogHandler,
         }
         // Add player to the clan.
         bus.fireEvent(ClanEvent.JOIN, clan, s.uniqueId)
-        broadcastPrefixedMessage("${s.name} has joined clan ${clan.name}!")
-        sendCongratsMessage(s, "Welcome to clan ${clan.name}!")
         return true
     }
 

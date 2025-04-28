@@ -6,10 +6,7 @@ import net.williserver.clans.commands.chat.ChatCommand
 import net.williserver.clans.commands.chat.ChatTabCompleter
 import net.williserver.clans.model.ClanList
 import net.williserver.clans.model.ClansConfigLoader
-import net.williserver.clans.model.clan.constructCreateAddTeamListener
-import net.williserver.clans.model.clan.constructDisbandRemoveTeamListener
-import net.williserver.clans.model.clan.constructJoinTeamListener
-import net.williserver.clans.model.clan.constructLeaveTeamListener
+import net.williserver.clans.model.clan.*
 import net.williserver.clans.model.readFromFile
 import net.williserver.clans.model.writeToFile
 import net.williserver.clans.session.ClanEvent
@@ -55,6 +52,8 @@ class ClansPlugin : JavaPlugin() {
         bus.registerListener(ClanEvent.LEAVE, clanList.constructLeaveListener())
         // Session listeners affect temporary data, like expiring invites.
         bus.registerListener(ClanEvent.JOIN, session.constructDeregisterInviteListener())
+        // Messaging listeners send informational messages when events occur.
+        bus.registerListener(ClanEvent.JOIN, constructJoinMessageListener())
         // Integration listeners connect clans with other features of the plugin.
         if (config.scoreboardTeamsIntegration) {
             bus.registerListener(ClanEvent.CREATE, constructCreateAddTeamListener())
@@ -67,8 +66,8 @@ class ClansPlugin : JavaPlugin() {
         // Register commands.
         this.getCommand("cc")!!.setExecutor(ChatCommand(logger, clanList))
         this.getCommand("clans")!!.setExecutor(ClansCommand(logger, config, clanList, session, bus))
-        this.getCommand("clans")!!.tabCompleter = ClansTabCompleter(clanList)
         this.getCommand("cc")!!.tabCompleter = ChatTabCompleter()
+        this.getCommand("clans")!!.tabCompleter = ClansTabCompleter(clanList)
         logger.info("Registered commands")
 
         logger.info("Enabled")

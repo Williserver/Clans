@@ -1,6 +1,7 @@
 package net.williserver.clans.model.clan
 import kotlinx.serialization.Serializable
 import net.williserver.clans.pluginMessagePrefix
+import net.williserver.clans.session.ClanLifecycleListener
 import java.util.*
 
 // -- name
@@ -142,6 +143,14 @@ class Clan(val name: String, leader: UUID, private val members: MutableList<UUID
      */
     override fun hashCode(): Int = name.hashCode()
 }
+
+/*
+ * Clan-specific event listeners.
+ */
+
+/*
+ * Misc helpers
+ */
 
 /**
  * Check whether a clan name is valid -- i.e., contains only alphanumeric characters, underscore, and dash.
