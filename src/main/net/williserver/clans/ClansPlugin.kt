@@ -54,6 +54,7 @@ class ClansPlugin : JavaPlugin() {
         bus.registerListener(ClanEvent.JOIN, session.constructDeregisterInviteListener())
         // Messaging listeners send informational messages when events occur.
         bus.registerListener(ClanEvent.JOIN, constructJoinMessageListener())
+        bus.registerListener(ClanEvent.LEAVE, constructLeaveMessageListener())
         // Integration listeners connect clans with other features of the plugin.
         if (config.scoreboardTeamsIntegration) {
             bus.registerListener(ClanEvent.CREATE, constructCreateAddTeamListener())
