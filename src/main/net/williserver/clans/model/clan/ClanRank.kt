@@ -6,7 +6,8 @@ package net.williserver.clans.model.clan
  */
 enum class ClanPermission {
     DISBAND,
-    INVITE
+    INVITE,
+    KICK,
 }
 
 /**
@@ -17,7 +18,7 @@ enum class ClanPermission {
  */
 enum class ClanRank(private val rank: UInt, private val permissions: Array<ClanPermission>): Comparable<ClanRank> {
     MEMBER(0u, arrayOf()),
-    ELDER(1u, arrayOf(ClanPermission.INVITE) + MEMBER.permissions),
+    ELDER(1u, arrayOf(ClanPermission.INVITE, ClanPermission.KICK) + MEMBER.permissions),
     COLEADER(2u, arrayOf<ClanPermission>() + ELDER.permissions),
     LEADER(3u, arrayOf(ClanPermission.DISBAND) + COLEADER.permissions);
 

@@ -325,6 +325,16 @@ class ClansCommand(private val clanList: ClanList,
         }
     }
 
+    private fun kick(s: CommandSender, args: List<String>): Boolean {
+        // Argument structure validation. One argument: player to kick.
+        if (args.size != 1) {
+            return false
+        }
+        // Argument semantics validation.
+        // if (!validPlayer(s))
+        return true
+    }
+
     /**
      * Message the sender with a report about the given clan.
      * Format:

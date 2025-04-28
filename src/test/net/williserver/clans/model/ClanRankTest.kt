@@ -46,4 +46,15 @@ class ClanRankTest {
         assert(clan.rankOfMember(leader).hasPermission(ClanPermission.INVITE))
         assertFalse(clan.rankOfMember(member).hasPermission(ClanPermission.INVITE))
     }
+
+    @Test
+    fun testKickPermission() {
+        val leader = UUID.randomUUID()
+        val member = UUID.randomUUID()
+        val members = arrayListOf(leader, member)
+        val clan = Clan("TestClan", leader, members)
+
+        assert(clan.rankOfMember(leader).hasPermission(ClanPermission.KICK))
+        assertFalse(clan.rankOfMember(member).hasPermission(ClanPermission.KICK))
+    }
 }
