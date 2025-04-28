@@ -74,6 +74,8 @@ class ClansCommand(private val logger: LogHandler,
         fun generateCommandHelp(name: String, text: String)
             = bullet.append(Component.text("$name: ", NamedTextColor.RED).append(Component.text(text, NamedTextColor.GRAY)))
 
+        // Special case: cc is outside of scope of normal clans command
+        val chat = Component.text("\n- /cc: ", NamedTextColor.RED).append(Component.text("Send a message to only your clanmates", NamedTextColor.GRAY))
         val help = generateCommandHelp("help", "pull up this help menu.")
         val create = generateCommandHelp("create (name)", "create a new clan under your visionary leadership.")
         val disband = generateCommandHelp("disband", "begin to disband the clan you own.")
@@ -86,6 +88,7 @@ class ClansCommand(private val logger: LogHandler,
         val list = generateCommandHelp("list", "output a list of clans.")
 
         s.sendMessage(header
+            .append(chat)
             .append(help)
             .append(create)
             .append(disband)

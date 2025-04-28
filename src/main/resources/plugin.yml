@@ -7,3 +7,6 @@ commands:
   clans:
     description: Base command for interfacing with clans plugin.
     usage: "Use /clans help for usage information."
+  cc:
+    description: Send a message to only the members of your clan.
+    usage: "/cc (message)"

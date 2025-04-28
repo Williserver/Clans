@@ -2,6 +2,8 @@ package net.williserver.clans
 
 import net.williserver.clans.commands.ClansCommand
 import net.williserver.clans.commands.ClansTabCompleter
+import net.williserver.clans.commands.chat.ChatCommand
+import net.williserver.clans.commands.chat.ChatTabCompleter
 import net.williserver.clans.model.ClanList
 import net.williserver.clans.model.ClansConfigLoader
 import net.williserver.clans.model.clan.constructCreateAddTeamListener
@@ -61,8 +63,10 @@ class ClansPlugin : JavaPlugin() {
         logger.info("Registered clan lifecycle listeners")
 
         // Register commands.
+        this.getCommand("cc")!!.setExecutor(ChatCommand(logger, clanList))
         this.getCommand("clans")!!.setExecutor(ClansCommand(logger, config, clanList, session, bus))
         this.getCommand("clans")!!.tabCompleter = ClansTabCompleter(clanList)
+        this.getCommand("cc")!!.tabCompleter = ChatTabCompleter()
         logger.info("Registered commands")
 
         logger.info("Enabled")
