@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.williserver.clans.LogHandler
 import net.williserver.clans.commands.assertPlayerInClan
+import net.williserver.clans.commands.sendClanMessage
 import net.williserver.clans.commands.validPlayer
 import net.williserver.clans.model.ClanList
 import org.bukkit.Bukkit
@@ -38,9 +39,8 @@ class ChatCommand(private val logger: LogHandler, private val clans: ClanList): 
         logger.info(baseMessage)
 
         // Send a message to each online player in the clan.
-        val message = Component.text(baseMessage, NamedTextColor.DARK_AQUA)
-        clans.playerClan(s.uniqueId)
-            .members().forEach { Bukkit.getPlayer(it)?.sendMessage(message) }
+        sendClanMessage(clan, Component.text(baseMessage, NamedTextColor.DARK_AQUA))
+
         return true
     }
 }

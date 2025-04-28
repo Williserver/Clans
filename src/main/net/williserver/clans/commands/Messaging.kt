@@ -2,7 +2,9 @@ package net.williserver.clans.commands
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
+import net.williserver.clans.model.clan.Clan
 import net.williserver.clans.pluginMessagePrefix
+import org.bukkit.Bukkit
 import org.bukkit.Bukkit.broadcast
 import org.bukkit.command.CommandSender
 
@@ -44,12 +46,18 @@ fun sendCongratsMessage(target: CommandSender, message: String)
  */
 fun sendErrorMessage(target: CommandSender, message: String)
         = target.sendMessage(prefixedMessage(Component.text(message, NamedTextColor.RED)))
-
-// TODO: clan messaging handlers. Want to send informational messages to only clan members.
-
 /*
  * Manually colored message senders.
  */
+
+/**
+ * Send a pre-formatted message to each member of a clan.
+ * @param clan Clan to send message to
+ * @param message pre-formatted message to send.
+ */
+fun sendClanMessage(clan: Clan, message: Component) =
+    // Send a message to each online player in the clan.
+    clan.members().forEach { Bukkit.getPlayer(it)?.sendMessage(message) }
 
 /**
  * Append a message prefix component onto a message component.
