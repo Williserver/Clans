@@ -66,7 +66,7 @@ class ClansPlugin : JavaPlugin() {
 
         // Register commands.
         this.getCommand("cc")!!.setExecutor(ChatCommand(clanList))
-        this.getCommand("clans")!!.setExecutor(ClansCommand(logger, config, clanList, session, bus))
+        this.getCommand("clans")!!.setExecutor(ClansCommand(clanList, config, session, bus))
         this.getCommand("cc")!!.tabCompleter = ChatTabCompleter()
         this.getCommand("clans")!!.tabCompleter = ClansTabCompleter(clanList)
         logger.info("Registered commands")

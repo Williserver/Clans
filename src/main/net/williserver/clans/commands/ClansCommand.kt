@@ -20,17 +20,15 @@ import java.util.*
 /**
  * Base clans command for viewing and modifying clans.
  *
- * @param logger Logging manager
- * @param config Configuration options for this session.
  * @param clanList clan model for this session.
+ * @param config Configuration options for this session.
  * @param session Session-specific data, like timers.
  * @param bus Event bus with registered listeners for events in clan lifecycle that may be caused by command invocation.
  *
  * @author Willmo3
  */
-class ClansCommand(private val logger: LogHandler,
+class ClansCommand(private val clanList: ClanList,
                    private val config: ClansConfig,
-                   private val clanList: ClanList,
                    private val session: SessionManager,
                    private val bus: ClanEventBus
 ): CommandExecutor {
