@@ -21,6 +21,7 @@ class ClansConfigLoader(private val handler: LogHandler,
 
     // ***** CONFIG FIELDS ***** //
     private val confirmTimeOption = "confirmTime"
+    private val teamsIntegrationOption = "scoreboardTeamsIntegration"
 
     // Loaded fields contained in final tiersConfig.
     // This may be accessed externally.
@@ -35,7 +36,9 @@ class ClansConfigLoader(private val handler: LogHandler,
             handler.err("Confirmation time $loadedConfirmTime is less than minimum time $MINIMUM_CONFIRM_TIME, using $MINIMUM_CONFIRM_TIME")
             MINIMUM_CONFIRM_TIME
         }
-        config = ClansConfig(confirmTime)
+
+        val scoreboardTeamsIntegration = fileConfig.getBoolean(teamsIntegrationOption)
+        config = ClansConfig(confirmTime, scoreboardTeamsIntegration)
     }
 }
 
@@ -48,5 +51,6 @@ class ClansConfigLoader(private val handler: LogHandler,
  */
 data class ClansConfig
 (
-    val confirmTime: UInt
+    val confirmTime: UInt,
+    val scoreboardTeamsIntegration: Boolean
 )

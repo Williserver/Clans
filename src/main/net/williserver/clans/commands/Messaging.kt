@@ -45,7 +45,7 @@ fun sendCongratsMessage(target: CommandSender, message: String)
 fun sendErrorMessage(target: CommandSender, message: String)
         = target.sendMessage(prefixedMessage(Component.text(message, NamedTextColor.RED)))
 
-// TODO: clan messaging handlers.
+// TODO: clan messaging handlers. Want to send informational messages to only clan members.
 
 /*
  * Manually colored message senders.

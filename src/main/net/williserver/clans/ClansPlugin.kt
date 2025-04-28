@@ -56,10 +56,12 @@ class ClansPlugin : JavaPlugin() {
         // Session listeners affect temporary data, like expiring invites.
         bus.registerListener(ClanEvent.JOIN, session.constructDeregisterInviteListener())
         // Integration listeners connect clans with other features of the plugin.
-        bus.registerListener(ClanEvent.CREATE, constructCreateAddTeamListener())
-        bus.registerListener(ClanEvent.DISBAND, constructDisbandRemoveTeamListener())
-        bus.registerListener(ClanEvent.JOIN, constructJoinTeamListener())
-        bus.registerListener(ClanEvent.LEAVE, constructLeaveTeamListener())
+        if (config.scoreboardTeamsIntegration) {
+            bus.registerListener(ClanEvent.CREATE, constructCreateAddTeamListener())
+            bus.registerListener(ClanEvent.DISBAND, constructDisbandRemoveTeamListener())
+            bus.registerListener(ClanEvent.JOIN, constructJoinTeamListener())
+            bus.registerListener(ClanEvent.LEAVE, constructLeaveTeamListener())
+        }
         logger.info("Registered clan lifecycle listeners")
 
         // Register commands.
