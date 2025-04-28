@@ -28,8 +28,7 @@ class ChatCommand(private val logger: LogHandler, private val clans: ClanList): 
         }
         // Argument semantics validation.
         if (!validPlayer(s)
-            || !assertPlayerInClan(s, clans, (s as Player).uniqueId)
-        ) {
+            || !assertPlayerInClan(s, clans, (s as Player).uniqueId)) {
             return true
         }
 
