@@ -65,7 +65,7 @@ class ClansPlugin : JavaPlugin() {
         logger.info("Registered clan lifecycle listeners")
 
         // Register commands.
-        this.getCommand("cc")!!.setExecutor(ChatCommand(logger, clanList))
+        this.getCommand("cc")!!.setExecutor(ChatCommand(clanList))
         this.getCommand("clans")!!.setExecutor(ClansCommand(logger, config, clanList, session, bus))
         this.getCommand("cc")!!.tabCompleter = ChatTabCompleter()
         this.getCommand("clans")!!.tabCompleter = ClansTabCompleter(clanList)

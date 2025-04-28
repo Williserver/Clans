@@ -20,7 +20,7 @@ import org.bukkit.entity.Player
  * @param clans List of clans for this session.
  * @author Willmo3
  */
-class ChatCommand(private val logger: LogHandler, private val clans: ClanList): CommandExecutor {
+class ChatCommand(private val clans: ClanList): CommandExecutor {
     override fun onCommand(s: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         // Argument structure validation.
         // Should be at least one message to send.
@@ -35,12 +35,8 @@ class ChatCommand(private val logger: LogHandler, private val clans: ClanList): 
 
         // Format the message and log it in the server.
         val clan = clans.playerClan(s.uniqueId)
-        var baseMessage = "[${clan.name}] ${s.name}: ${args.joinToString(" ")}"
-        logger.info(baseMessage)
-
         // Send a message to each online player in the clan.
-        sendClanMessage(clan, Component.text(baseMessage, NamedTextColor.DARK_AQUA))
-
+        sendClanMessage(clan, Component.text("[${clan.name}] ${s.name}: ${args.joinToString(" ")}", NamedTextColor.DARK_AQUA))
         return true
     }
 }
