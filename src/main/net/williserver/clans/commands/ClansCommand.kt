@@ -180,8 +180,8 @@ class ClansCommand(private val clanList: ClanList,
         }
         // Argument semantics validation.
         if (!assertValidPlayer(s)
-            || !assertPlayerInAClan(s, clanList, (s as Player).uniqueId)
-            || !assertHasPermission(s, clanList.playerClan(s.uniqueId), s.uniqueId, ClanPermission.DISBAND)) {
+            || !assertSenderInAClan(s, clanList)
+            || !assertSenderHasPermission(s, clanList.playerClan((s as Player).uniqueId), ClanPermission.DISBAND)) {
             return true
         }
 
@@ -228,8 +228,8 @@ class ClansCommand(private val clanList: ClanList,
         }
         // Argument semantics validation.
         if (!assertValidPlayer(s)
-            || !assertPlayerInAClan(s, clanList, (s as Player).uniqueId)
-            || !assertHasPermission(s, clanList.playerClan(s.uniqueId), s.uniqueId, ClanPermission.INVITE)
+            || !assertSenderInAClan(s, clanList)
+            || !assertSenderHasPermission(s, clanList.playerClan((s as Player).uniqueId), ClanPermission.INVITE)
             || !assertPlayerNameOnline(s, args[0])
             || !assertPlayerNotInAClan(s, clanList, getPlayer(args[0])!!.uniqueId,
                 "${getPlayer(args[0])!!.name} is already in a clan!")) {
@@ -299,8 +299,8 @@ class ClansCommand(private val clanList: ClanList,
         }
         // Argument semantics validation.
         if (!assertValidPlayer(s)
-            || !assertPlayerInAClan(s, clanList, (s as Player).uniqueId)
-            || !assertPlayerNotLeader(s, clanList.playerClan(s.uniqueId), s.uniqueId)) {
+            || !assertSenderInAClan(s, clanList)
+            || !assertSenderNotLeader(s, clanList.playerClan((s as Player).uniqueId))) {
             return true
         }
 
@@ -346,15 +346,15 @@ class ClansCommand(private val clanList: ClanList,
         }
         // Argument semantics validation.
         if (!assertValidPlayer(s)
-             || !assertPlayerInAClan(s, clanList, (s as Player).uniqueId)
+             || !assertSenderInAClan(s, clanList)
              || ! assertPlayerNameValid(s, args[0])) {
              return true
         }
-        val clanToKickFrom = clanList.playerClan(s.uniqueId)
+        val clanToKickFrom = clanList.playerClan((s as Player).uniqueId)
         val playerToKick = getOfflinePlayer(args[0])
-        if (!assertHasPermission(s, clanToKickFrom, s.uniqueId, ClanPermission.KICK)
-             || !assertPlayerInThisClan(s, clanToKickFrom, playerToKick.uniqueId)
-             || !assertRankBelow(s, clanToKickFrom, s.uniqueId, playerToKick.uniqueId)) {
+        if (!assertSenderHasPermission(s, clanToKickFrom, ClanPermission.KICK)
+             || !assertPlayerInThisClan(s, clanToKickFrom, playerToKick.uniqueId, "")
+             || !assertSenderOutranks(s, clanToKickFrom, playerToKick.uniqueId)) {
             return true
         }
 

@@ -52,31 +52,30 @@ fun assertPlayerNameOnline(s: CommandSender, name: String) =
  */
 fun assertPlayerNameValid(s: CommandSender, name: String) =
     if (!getOfflinePlayer(name).hasPlayedBefore()) {
-        sendErrorMessage(s, "\"${name}\" is not a valid playername.")
+        sendErrorMessage(s, "\"${name}\" is not a recognized playername.")
         false
     } else true
 
 /**
- * Check whether one player has a higher rank than another. If not, send an error message.
+ * Check whether sender has a higher rank than some player. If not, send an error message.
  *
  * @param s Sender to report errors to
  * @param clan Clan both players should be in.
- * @param shouldOutrank Player who should have the higher rank in the clan.
  * @param shouldUnderrank Player who should have the lower rank in the clan.
  *
  * @return Whether @shouldOutrank has a higher rank than @shouldUnderrank
  * @throws IllegalArgumentException if either player is not in this clan.
  */
-fun assertRankBelow(s: CommandSender, clan: Clan, shouldOutrank: UUID, shouldUnderrank: UUID) =
-    if (shouldUnderrank !in clan || shouldUnderrank !in clan) {
+fun assertSenderOutranks(s: CommandSender, clan: Clan, shouldUnderrank: UUID) =
+    if (s !is Player || s.uniqueId !in clan || shouldUnderrank !in clan) {
         throw IllegalArgumentException("One of the players was not in the clan ${clan.name}.")
-    } else if (clan.rankOfMember(shouldOutrank) <= clan.rankOfMember(shouldUnderrank)) {
-        sendErrorMessage(s, "This player outranks you!")
+    } else if (clan.rankOfMember(s.uniqueId) <= clan.rankOfMember(shouldUnderrank)) {
+        sendErrorMessage(s, "You don't outrank the target player!")
         false
     } else true
 
 /**
- * Check whether a player is in a clan. if not, send an error message.
+ * Check whether the sender is a player in a clan. If not, send an error message.
  *
  * @param s Sender to report errors to.
  * @param clans List of clans for this session.
@@ -84,11 +83,9 @@ fun assertRankBelow(s: CommandSender, clan: Clan, shouldOutrank: UUID, shouldUnd
  *
  * @return whether the player was in one of the clans in list @clans.
  */
-// TODO: look at params here -- can we make these error messages more readable?
-// Maybe send a different message when we're the sender?
-fun assertPlayerInAClan(s: CommandSender, clans: ClanList, player: UUID) =
-    if (!clans.playerInClan(player)) {
-        sendErrorMessage(s, "You must be in a clan to invoke this command.")
+fun assertSenderInAClan(s: CommandSender, clans: ClanList) =
+    if (s !is Player || !clans.playerInClan(s.uniqueId)) {
+        sendErrorMessage(s, "You must be in a clan.")
         false
     } else true
 
@@ -113,29 +110,29 @@ fun assertPlayerNotInAClan(s: CommandSender, clans: ClanList, player: UUID, mess
  * @param s Sender to report errors to.
  * @param clan Clan player should be in.
  * @param player UUID of player to check if in clan.
+ * @param message Message to send if conditions fail.
  *
  * @return whether the player was in the clan.
  */
-fun assertPlayerInThisClan(s: CommandSender, clan: Clan, player: UUID) =
+fun assertPlayerInThisClan(s: CommandSender, clan: Clan, player: UUID, message: String) =
     if (player !in clan) {
-        sendErrorMessage(s, "Target player must be in clan ${clan.name} to invoke this command!")
+        sendErrorMessage(s, message)
         false
     } else true
 
 /**
- * Check whether a player has a given permission. If not, send an error message.
+ * Check whether a player has a given permission in their clan. If not, send an error message.
  *
  * @param s Sender to report errors to.
  * @param clan Clan to check permissions against.
- * @param player Player to check permissions for.
  * @param permission Permission to check if player has.
  *
  * @return Whether the player has the specified permission.
  * @throws IllegalArgumentException if player is not in clan.
  */
-fun assertHasPermission(s: CommandSender, clan: Clan, player: UUID, permission: ClanPermission) =
-    if (!clan.rankOfMember(player).hasPermission(permission)) {
-        sendErrorMessage(s, "You need clan permission \"$permission\" to use this command.")
+fun assertSenderHasPermission(s: CommandSender, clan: Clan, permission: ClanPermission) =
+    if (s is Player && !clan.rankOfMember(s.uniqueId).hasPermission(permission)) {
+        sendErrorMessage(s, "You need clan permission \"$permission\".")
         false
     } else true
 
@@ -188,13 +185,12 @@ fun assertClanNameInList(s: CommandSender, list: ClanList, name: String) =
  *
  * @param s Sender to report errors to.
  * @param clan Clan player is a member of.
- * @param player Player to check leadership status of.
  *
  * @return Whether the player is not leader.
  * @throws IllegalArgumentException if player is not in clan.
  */
-fun assertPlayerNotLeader(s: CommandSender, clan: Clan, player: UUID) =
-    if (clan.rankOfMember(player) == ClanRank.LEADER) {
+fun assertSenderNotLeader(s: CommandSender, clan: Clan) =
+    if (s is Player && clan.rankOfMember(s.uniqueId) == ClanRank.LEADER) {
         sendErrorMessage(s, "You may not execute this command as leader.")
         sendErrorMessage(s, "Promote another member to leader first.")
         false
