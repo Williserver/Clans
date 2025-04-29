@@ -42,6 +42,7 @@ class ClansCommand(private val clanList: ClanList,
                 "info" -> info(sender, args)
                 "invite" -> invite(sender, args)
                 "join" -> join(sender, args)
+                "kick" -> kick(sender, args)
                 "help" -> help(sender, args)
                 "leave" -> leave(sender, args)
                 "list" -> list(sender, args)
@@ -73,6 +74,7 @@ class ClansCommand(private val clanList: ClanList,
 
         // Special case: cc is outside of scope of normal clans command
         val chat = Component.text("\n- /cc: ", NamedTextColor.RED).append(Component.text("Send a message to only your clanmates", NamedTextColor.GRAY))
+        // All other commands are prefixed by /clans
         val help = generateCommandHelp("help", "pull up this help menu.")
         val create = generateCommandHelp("create (name)", "create a new clan under your visionary leadership.")
         val disband = generateCommandHelp("disband", "begin to disband the clan you own.")
@@ -80,6 +82,8 @@ class ClansCommand(private val clanList: ClanList,
         val info = generateCommandHelp("info (name)", "get information about a clan.")
         val invite = generateCommandHelp("invite (user)", "invite a member to your clan.")
         val join = generateCommandHelp("join (clan name)", "join a clan.")
+        val kick = generateCommandHelp("kick (playername)", "begin to kick a player from your clan.")
+        val kickConfirm = generateCommandHelp("kick confirm (playername)", "finish kicking a player from your clan.")
         val leave = generateCommandHelp("leave", "begin to leave your clan.")
         val leaveConfirm = generateCommandHelp("leave confirm", "finish leaving your clan.")
         val list = generateCommandHelp("list", "output a list of clans.")
@@ -93,6 +97,8 @@ class ClansCommand(private val clanList: ClanList,
             .append(info)
             .append(invite)
             .append(join)
+            .append(kick)
+            .append(kickConfirm)
             .append(leave)
             .append(leaveConfirm)
             .append(list)
@@ -206,7 +212,7 @@ class ClansCommand(private val clanList: ClanList,
             }
             else -> throw IllegalStateException("$pluginMessagePrefix: Internal error: Wrong number of arguments to /clans disband -- this should have been caught earlier!")
         }
-    }
+    }Final
 
     /**
      * Invite a player to our clan.
@@ -324,19 +330,35 @@ class ClansCommand(private val clanList: ClanList,
         }
     }
 
+    /**
+     * Kick a player from their clan.
+     * A user executes /clans kick (player) to make a player they outrank leave.
+     * Then that user executes /clans kick (player) confirm to confirm kicking that player.
+     *
+     * @param s Player sending command.
+     * @param args Arguments to command, should be one: name of player to kick.
+     * @return Whether the command was invoked with the correct number of arguments.
+     */
     private fun kick(s: CommandSender, args: List<String>): Boolean {
         // Argument structure validation. One argument: player to kick.
         if (args.size != 1) {
             return false
         }
-//        // Argument semantics validation.
-//         if (!validPlayer(s)
-//             || !assertPlayerInClan(s, clanList, (s as Player).uniqueId)
-//             || !assertHasPermission(s, clanList.playerClan(s.uniqueId), s.uniqueId, ClanPermission.KICK))
-//         TODO: assertInGivenClan(s, clan, target.uniqueId)
-//         TODO: assertRankBelow(s, clan, s.uniqueId, target.uniqueId)
+        // Argument semantics validation.
+        if (!validPlayer(s)
+             || !assertPlayerInAClan(s, clanList, (s as Player).uniqueId)
+             || ! assertPlayerNameValid(s, args[0])) {
+             return true
+        }
+        val clanToKickFrom = clanList.playerClan(s.uniqueId)
+        val playerToKick = getOfflinePlayer(args[0])
+        if (!assertHasPermission(s, clanToKickFrom, s.uniqueId, ClanPermission.KICK)
+             || !assertPlayerInThisClan(s, clanToKickFrom, playerToKick.uniqueId)
+             || !assertRankBelow(s, clanToKickFrom, s.uniqueId, playerToKick.uniqueId)) {
+            return true
+        }
 
-        // Establish confirm timer OR finalize kick by firing kick event.
+        // TODO: Establish confirm timer OR finalize kick by firing kick event.
         return true
     }
 

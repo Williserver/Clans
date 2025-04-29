@@ -1,10 +1,12 @@
 package net.williserver.clans.commands
 
 import net.williserver.clans.model.ClanList
+import org.bukkit.Bukkit.getOfflinePlayer
 import org.bukkit.Bukkit.getOnlinePlayers
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
+import org.bukkit.entity.Player
 
 /**
  * State for clans tab completion.
@@ -43,6 +45,7 @@ class ClansTabCompleter(private val clanList: ClanList): TabCompleter {
             completions.add("info")
             completions.add("invite")
             completions.add("join")
+            completions.add("kick")
             completions.add("leave")
             completions.add("list")
             // Only add completions that correspond with the subcommand they're typing.
@@ -52,6 +55,13 @@ class ClansTabCompleter(private val clanList: ClanList): TabCompleter {
                 "info" -> clanList.clans().forEach { completions.add(it.name) }
                 "invite" -> getOnlinePlayers().forEach { completions.add(it.name) }
                 "join" -> clanList.clans().forEach { completions.add(it.name) }
+                "kick" ->
+                    if (sender is Player && clanList.playerInClan(sender.uniqueId)) {
+                        // Notice: all UUIDs must map to a name, as otherwise they would not have been in a clan.
+                        clanList.playerClan(sender.uniqueId)
+                            .members()
+                            .forEach { playerUUID -> completions.add(getOfflinePlayer(playerUUID).name!!) }
+                    }
                 "disband" -> completions.add("confirm")
                 "leave" -> completions.add("confirm")
                 else -> {}

@@ -7,6 +7,7 @@ import net.williserver.clans.model.clan.ClanRank
 import net.williserver.clans.model.clan.validClanName
 import net.williserver.clans.session.ClanEvent
 import net.williserver.clans.session.SessionManager
+import org.bukkit.Bukkit.getOfflinePlayer
 import org.bukkit.Bukkit.getPlayer
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -42,6 +43,39 @@ fun assertPlayerNameOnline(s: CommandSender, name: String) =
     } else true
 
 /**
+ * Check whether this player has played before. If not, send an error message.
+ *
+ * @param s Sender to report errors to.
+ * @param name Name to check if valid.
+ *
+ * @return Whether the player with the given name has played before.
+ */
+fun assertPlayerNameValid(s: CommandSender, name: String) =
+    if (!getOfflinePlayer(name).hasPlayedBefore()) {
+        sendErrorMessage(s, "\"${name}\" is not a valid playername.")
+        false
+    } else true
+
+/**
+ * Check whether one player has a higher rank than another. If not, send an error message.
+ *
+ * @param s Sender to report errors to
+ * @param clan Clan both players should be in.
+ * @param shouldOutrank Player who should have the higher rank in the clan.
+ * @param shouldUnderrank Player who should have the lower rank in the clan.
+ *
+ * @return Whether @shouldOutrank has a higher rank than @shouldUnderrank
+ * @throws IllegalArgumentException if either player is not in this clan.
+ */
+fun assertRankBelow(s: CommandSender, clan: Clan, shouldOutrank: UUID, shouldUnderrank: UUID) =
+    if (shouldUnderrank !in clan || shouldUnderrank !in clan) {
+        throw IllegalArgumentException("One of the players was not in the clan ${clan.name}.")
+    } else if (clan.rankOfMember(shouldOutrank) <= clan.rankOfMember(shouldUnderrank)) {
+        sendErrorMessage(s, "This player outranks you!")
+        false
+    } else true
+
+/**
  * Check whether a player is in a clan. if not, send an error message.
  *
  * @param s Sender to report errors to.
@@ -50,6 +84,8 @@ fun assertPlayerNameOnline(s: CommandSender, name: String) =
  *
  * @return whether the player was in one of the clans in list @clans.
  */
+// TODO: look at params here -- can we make these error messages more readable?
+// Maybe send a different message when we're the sender?
 fun assertPlayerInAClan(s: CommandSender, clans: ClanList, player: UUID) =
     if (!clans.playerInClan(player)) {
         sendErrorMessage(s, "You must be in a clan to invoke this command.")
@@ -68,6 +104,21 @@ fun assertPlayerInAClan(s: CommandSender, clans: ClanList, player: UUID) =
 fun assertPlayerNotInAClan(s: CommandSender, clans: ClanList, player: UUID, message: String) =
     if (clans.playerInClan(player)) {
         sendErrorMessage(s, message)
+        false
+    } else true
+
+/**
+ * Check whether a player is in the given clan. If not, send an error message.
+ *
+ * @param s Sender to report errors to.
+ * @param clan Clan player should be in.
+ * @param player UUID of player to check if in clan.
+ *
+ * @return whether the player was in the clan.
+ */
+fun assertPlayerInThisClan(s: CommandSender, clan: Clan, player: UUID) =
+    if (player !in clan) {
+        sendErrorMessage(s, "Target player must be in clan ${clan.name} to invoke this command!")
         false
     } else true
 
