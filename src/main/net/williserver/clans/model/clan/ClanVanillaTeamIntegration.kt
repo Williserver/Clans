@@ -12,7 +12,7 @@ import org.bukkit.Bukkit
 /**
  * @return a listener that creates a new scoreboard team when a new clan is created.
  */
-fun constructCreateAddTeamListener(): ClanLifecycleListener = { clan, creator ->
+fun constructCreateAddTeamListener(): ClanLifecycleListener = { clan, creator, _ ->
     val scoreboard = Bukkit.getScoreboardManager().mainScoreboard
     if (scoreboard.getTeam(clan.name) != null) {
         throw IllegalStateException("Team already registered -- how did we get here?")
@@ -24,7 +24,7 @@ fun constructCreateAddTeamListener(): ClanLifecycleListener = { clan, creator ->
 /**
  * @return a listener that removes the scoreboard team when a clan is deleted.
  */
-fun constructDisbandRemoveTeamListener(): ClanLifecycleListener = { clan, agent ->
+fun constructDisbandRemoveTeamListener(): ClanLifecycleListener = { clan, _, _ ->
     val team = Bukkit.getScoreboardManager().mainScoreboard.getTeam(clan.name)
         ?: throw IllegalStateException("Team not registered -- how did we get here?")
     team.unregister()
@@ -33,7 +33,7 @@ fun constructDisbandRemoveTeamListener(): ClanLifecycleListener = { clan, agent 
 /**
  * @return a listener that adds a player to a scoreboard team when they join the clan.
  */
-fun constructJoinTeamListener(): ClanLifecycleListener = { clan, joiner ->
+fun constructJoinTeamListener(): ClanLifecycleListener = { clan, joiner, _ ->
     val team = Bukkit.getScoreboardManager().mainScoreboard.getTeam(clan.name)
         ?: throw IllegalStateException("Clan not registered to a team -- how did we get here?")
     team.addPlayer(Bukkit.getOfflinePlayer(joiner))
@@ -42,7 +42,7 @@ fun constructJoinTeamListener(): ClanLifecycleListener = { clan, joiner ->
 /**
  * @return a listener that removes a player from a scoreboard team when they leave the clan.
  */
-fun constructLeaveTeamListener(): ClanLifecycleListener = { clan, leaver ->
+fun constructLeaveTeamListener(): ClanLifecycleListener = { clan, leaver, _ ->
     val team = Bukkit.getScoreboardManager().mainScoreboard.getTeam(clan.name)
         ?: throw IllegalStateException("Clan not registered to a team -- how did we get here?")
     if (!team.removePlayer(Bukkit.getOfflinePlayer(leaver))) {

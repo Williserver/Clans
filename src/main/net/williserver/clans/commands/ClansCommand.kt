@@ -154,7 +154,7 @@ class ClansCommand(private val clanList: ClanList,
         // Create a new clan with this player as its leader and starting member.
         val leader = s.uniqueId
         val newClan = Clan(args[0], leader, arrayListOf(leader))
-        bus.fireEvent(ClanEvent.CREATE, newClan, leader)
+        bus.fireEvent(ClanEvent.CREATE, newClan, agent=leader, target=leader)
         broadcastPrefixedMessage("Chief ${s.name} has formed the clan \"${newClan.name}\"!")
         return true
     }
@@ -200,7 +200,7 @@ class ClansCommand(private val clanList: ClanList,
                     return false
                 }
                 if (assertTimerInBounds(s, session, ClanEvent.DISBAND, clan, "disband")) {
-                    bus.fireEvent(ClanEvent.DISBAND, clan, s.uniqueId)
+                    bus.fireEvent(ClanEvent.DISBAND, clan, agent=s.uniqueId, target=s.uniqueId)
                     broadcastPrefixedMessage("Clan \"${clan.name}\" has disbanded!")
                 }
                 true
@@ -274,7 +274,7 @@ class ClansCommand(private val clanList: ClanList,
             return true
         }
         // Add player to the clan.
-        bus.fireEvent(ClanEvent.JOIN, clan, s.uniqueId)
+        bus.fireEvent(ClanEvent.JOIN, clan, agent=s.uniqueId, target=s.uniqueId)
         return true
     }
 
@@ -316,7 +316,7 @@ class ClansCommand(private val clanList: ClanList,
                 }
                 // Leave clan if the timer was started.
                 if (assertTimerInBounds(s, session, ClanEvent.LEAVE, s.uniqueId, "leave")) {
-                    bus.fireEvent(ClanEvent.LEAVE, clanList.playerClan(s.uniqueId), s.uniqueId)
+                    bus.fireEvent(ClanEvent.LEAVE, clanList.playerClan(s.uniqueId), agent=s.uniqueId, target=s.uniqueId)
                     sendInfoMessage(s, "You have left your clan.")
                 }
                 true

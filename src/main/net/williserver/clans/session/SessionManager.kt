@@ -106,5 +106,5 @@ class SessionManager {
      * This prevents repeatedly leaving and rejoining a clan.
      */
     fun constructDeregisterInviteListener(): ClanLifecycleListener =
-        { clan: Clan, agent: UUID -> deregisterTimer(ClanEvent.JOIN, Pair(agent, clan))}
+        { clan: Clan, agent: UUID, _: UUID -> deregisterTimer(ClanEvent.JOIN, Pair(agent, clan))}
 }

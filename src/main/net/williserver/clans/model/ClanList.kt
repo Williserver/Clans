@@ -5,6 +5,7 @@ import net.williserver.clans.LogHandler
 import net.williserver.clans.model.clan.Clan
 import net.williserver.clans.model.clan.ClanData
 import net.williserver.clans.pluginMessagePrefix
+import net.williserver.clans.session.ClanLifecycleListener
 import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
@@ -157,7 +158,7 @@ class ClanList(data: List<ClanData>) {
      * Fire when a player joins a clan.
      * @return the listener
      */
-    fun constructJoinListener() = { clan: Clan, agent: UUID ->
+    fun constructJoinListener(): ClanLifecycleListener = { clan, agent, _ ->
         assert(clan in clans)
         clan.join(agent)
     }
@@ -167,7 +168,7 @@ class ClanList(data: List<ClanData>) {
      * Fire when a player leaves a clan.
      * @return The listener.
      */
-    fun constructLeaveListener() = { clan: Clan, agent: UUID ->
+    fun constructLeaveListener(): ClanLifecycleListener = { clan, agent, _ ->
         assert(clan in clans)
         clan.leave(agent)
     }
@@ -177,14 +178,14 @@ class ClanList(data: List<ClanData>) {
      * Fire when a new clan is created.
      * @return the listener
      */
-    fun constructCreateListener() = { clan: Clan, _: UUID -> addClan(clan) }
+    fun constructCreateListener(): ClanLifecycleListener = { clan, _, _ -> addClan(clan) }
 
     /**
      * Construct disband listener to remove from this model.
      * Fire when a clan is disbanded.
      * @return the listener
      */
-    fun constructDisbandListener() = { clan: Clan, agent: UUID ->
+    fun constructDisbandListener(): ClanLifecycleListener = { clan, _, _ ->
         assert(clan in clans)
         removeClan(clan)
     }

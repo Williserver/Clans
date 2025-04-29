@@ -18,7 +18,7 @@ class ClanEventBusTest {
         assertFalse(newClan.name in list)
 
         bus.registerListener(ClanEvent.CREATE, list.constructCreateListener())
-        bus.fireEvent(ClanEvent.CREATE, newClan, newLeader)
+        bus.fireEvent(ClanEvent.CREATE, newClan, newLeader, newLeader)
         assert(newClan.name in list)
     }
 
@@ -32,7 +32,7 @@ class ClanEventBusTest {
         list.addClan(newClan)
 
         bus.registerListener(ClanEvent.DISBAND, list.constructDisbandListener())
-        bus.fireEvent(ClanEvent.DISBAND, newClan, newLeader)
+        bus.fireEvent(ClanEvent.DISBAND, newClan, newLeader, newLeader)
         assert(newClan.name !in list)
     }
 
@@ -47,7 +47,7 @@ class ClanEventBusTest {
 
         bus.registerListener(ClanEvent.JOIN, list.constructJoinListener())
         val newMember = UUID.randomUUID()
-        bus.fireEvent(ClanEvent.JOIN, newClan, newMember)
+        bus.fireEvent(ClanEvent.JOIN, newClan, newMember, newMember)
         assert(newMember in newClan)
     }
 
@@ -66,7 +66,7 @@ class ClanEventBusTest {
 
         // When leave fires, the listener should register the change.
         bus.registerListener(ClanEvent.LEAVE, list.constructLeaveListener())
-        bus.fireEvent(ClanEvent.LEAVE, newClan, newMember)
+        bus.fireEvent(ClanEvent.LEAVE, newClan, newMember, newMember)
         assert(newMember !in newClan)
 
         // Only non-leader members who are in the clan should be able to leave.
@@ -88,7 +88,7 @@ class ClanEventBusTest {
         // When the player joins, the event should be gone.
         val bus = ClanEventBus()
         bus.registerListener(ClanEvent.JOIN, session.constructDeregisterInviteListener())
-        bus.fireEvent(ClanEvent.JOIN, clan, newMember)
+        bus.fireEvent(ClanEvent.JOIN, clan, newMember, newMember)
 
         assertFalse(session.isTimerRegistered(ClanEvent.JOIN, Pair(newMember, clan)))
     }
