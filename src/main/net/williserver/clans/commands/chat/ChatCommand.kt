@@ -2,7 +2,7 @@ package net.williserver.clans.commands.chat
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
-import net.williserver.clans.commands.assertPlayerInAClan
+import net.williserver.clans.commands.assertSenderInAClan
 import net.williserver.clans.commands.sendClanMessage
 import net.williserver.clans.commands.assertValidPlayer
 import net.williserver.clans.model.ClanList
@@ -27,12 +27,12 @@ class ChatCommand(private val clans: ClanList): CommandExecutor {
         }
         // Argument semantics validation.
         if (!assertValidPlayer(s)
-            || !assertPlayerInAClan(s, clans, (s as Player).uniqueId)) {
+            || !assertSenderInAClan(s, clans)) {
             return true
         }
 
         // Format the message and log it in the server.
-        val clan = clans.playerClan(s.uniqueId)
+        val clan = clans.playerClan((s as Player).uniqueId)
         // Send a message to each online player in the clan.
         sendClanMessage(clan, Component.text("[${clan.name}] ${s.name}: ${args.joinToString(" ")}", NamedTextColor.DARK_AQUA))
         return true
