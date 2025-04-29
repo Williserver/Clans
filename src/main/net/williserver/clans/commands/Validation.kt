@@ -79,7 +79,6 @@ fun assertSenderOutranks(s: CommandSender, clan: Clan, shouldUnderrank: UUID) =
  *
  * @param s Sender to report errors to.
  * @param clans List of clans for this session.
- * @param player UUID of player to search for.
  *
  * @return whether the player was in one of the clans in list @clans.
  */
