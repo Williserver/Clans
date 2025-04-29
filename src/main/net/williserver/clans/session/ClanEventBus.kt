@@ -11,6 +11,7 @@ enum class ClanEvent {
     CREATE,
     JOIN,
     LEAVE,
+    KICK,
     DISBAND,
 }
 
@@ -45,7 +46,6 @@ class ClanEventBus {
             listeners[event]!! += listener
             true
         } else false
-
 
     /**
      * Notify all listeners that an event has occured.

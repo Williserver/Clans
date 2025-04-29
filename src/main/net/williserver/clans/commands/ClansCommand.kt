@@ -330,8 +330,14 @@ class ClansCommand(private val clanList: ClanList,
         if (args.size != 1) {
             return false
         }
-        // Argument semantics validation.
-        // if (!validPlayer(s))
+//        // Argument semantics validation.
+//         if (!validPlayer(s)
+//             || !assertPlayerInClan(s, clanList, (s as Player).uniqueId)
+//             || !assertHasPermission(s, clanList.playerClan(s.uniqueId), s.uniqueId, ClanPermission.KICK))
+//         TODO: assertInGivenClan(s, clan, target.uniqueId)
+//         TODO: assertRankBelow(s, clan, s.uniqueId, target.uniqueId)
+
+        // Establish confirm timer OR finalize kick by firing kick event.
         return true
     }
 

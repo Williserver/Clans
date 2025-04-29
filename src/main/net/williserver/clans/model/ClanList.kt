@@ -4,7 +4,6 @@ import kotlinx.serialization.json.Json
 import net.williserver.clans.LogHandler
 import net.williserver.clans.model.clan.Clan
 import net.williserver.clans.model.clan.ClanData
-import net.williserver.clans.model.clan.ClanPermission
 import net.williserver.clans.pluginMessagePrefix
 import java.io.File
 import java.io.FileReader
@@ -112,7 +111,7 @@ class ClanList(data: List<ClanData>) {
      * @param name Name of clan to search for
      * @return Whether a clan with the given name is in this list.
      */
-    operator fun contains(name: String): Boolean = clans.any { it.name == name }
+    operator fun contains(name: String) = clans.any { it.name == name }
 
     /**
      * Get the clan with a given name if it's present in this list.
@@ -120,6 +119,7 @@ class ClanList(data: List<ClanData>) {
      * @param name Name of clan to search for.
      * @return The found clan, or null if not present.
      * @throws NoSuchElementException if a clan with this name is not present.
+     * @throws IllegalArgumentException if multiple clans with this name are present.
      */
     fun get(name: String): Clan {
         if (!contains(name)) {
@@ -158,9 +158,7 @@ class ClanList(data: List<ClanData>) {
      * @return the listener
      */
     fun constructJoinListener() = { clan: Clan, agent: UUID ->
-        if (!contains(clan.name)) {
-            throw IllegalArgumentException("$pluginMessagePrefix: Clan ${clan.name} is not in this list!")
-        }
+        assert(clan in clans)
         clan.join(agent)
     }
 
@@ -170,9 +168,7 @@ class ClanList(data: List<ClanData>) {
      * @return The listener.
      */
     fun constructLeaveListener() = { clan: Clan, agent: UUID ->
-        if (!contains(clan.name)) {
-            throw IllegalArgumentException("$pluginMessagePrefix: Clan ${clan.name} is not in this list!")
-        }
+        assert(clan in clans)
         clan.leave(agent)
     }
 
@@ -189,9 +185,7 @@ class ClanList(data: List<ClanData>) {
      * @return the listener
      */
     fun constructDisbandListener() = { clan: Clan, agent: UUID ->
-        if (!clan.rankOfMember(agent).hasPermission(ClanPermission.DISBAND)) {
-            throw IllegalArgumentException("Disband attempted by member with insufficient permissions!")
-        }
+        assert(clan in clans)
         removeClan(clan)
     }
 
@@ -203,7 +197,7 @@ class ClanList(data: List<ClanData>) {
      * Check whether given clan has members that are also in other clans in this list.
      * In good circumstances, this should never be the case.
      */
-    private fun duplicateMembers(clan: Clan): Boolean =
+    private fun duplicateMembers(clan: Clan) =
         clans.any {
             otherClan -> otherClan != clan && otherClan.members().any { it in clan }
         }
