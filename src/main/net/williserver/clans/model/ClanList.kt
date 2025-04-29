@@ -158,9 +158,9 @@ class ClanList(data: List<ClanData>) {
      * Fire when a player joins a clan.
      * @return the listener
      */
-    fun constructJoinListener(): ClanLifecycleListener = { clan, agent, _ ->
+    fun constructJoinListener(): ClanLifecycleListener = { clan, _, target ->
         assert(clan in clans)
-        clan.join(agent)
+        clan.join(target)
     }
 
     /**
@@ -168,9 +168,9 @@ class ClanList(data: List<ClanData>) {
      * Fire when a player leaves a clan.
      * @return The listener.
      */
-    fun constructLeaveListener(): ClanLifecycleListener = { clan, agent, _ ->
+    fun constructLeaveListener(): ClanLifecycleListener = { clan, _, target ->
         assert(clan in clans)
-        clan.leave(agent)
+        clan.leave(target)
     }
 
     /**
