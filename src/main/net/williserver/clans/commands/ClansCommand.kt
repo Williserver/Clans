@@ -149,7 +149,7 @@ class ClansCommand(private val clanList: ClanList,
             return true
         }
         // Argument semantics validation
-        if (!validPlayer(s)
+        if (!assertValidPlayer(s)
             || !assertPlayerNotInAClan(s, clanList, (s as Player).uniqueId, "You are already in a clan!")
             || !assertValidClanName(s, args[0])
             || !assertUniqueClanName(s, clanList, args[0])) {
@@ -179,7 +179,7 @@ class ClansCommand(private val clanList: ClanList,
             return false
         }
         // Argument semantics validation.
-        if (!validPlayer(s)
+        if (!assertValidPlayer(s)
             || !assertPlayerInAClan(s, clanList, (s as Player).uniqueId)
             || !assertHasPermission(s, clanList.playerClan(s.uniqueId), s.uniqueId, ClanPermission.DISBAND)) {
             return true
@@ -227,7 +227,7 @@ class ClansCommand(private val clanList: ClanList,
             return false
         }
         // Argument semantics validation.
-        if (!validPlayer(s)
+        if (!assertValidPlayer(s)
             || !assertPlayerInAClan(s, clanList, (s as Player).uniqueId)
             || !assertHasPermission(s, clanList.playerClan(s.uniqueId), s.uniqueId, ClanPermission.INVITE)
             || !assertPlayerNameOnline(s, args[0])
@@ -267,7 +267,7 @@ class ClansCommand(private val clanList: ClanList,
             return false
         }
         // Argument semantics validation.
-        if (!validPlayer(s)
+        if (!assertValidPlayer(s)
             || !assertClanNameInList(s, clanList, args[0])
             || !assertPlayerNotInAClan(s, clanList, (s as Player).uniqueId, "You are already in a clan!")) {
             return true
@@ -298,7 +298,7 @@ class ClansCommand(private val clanList: ClanList,
             return false
         }
         // Argument semantics validation.
-        if (!validPlayer(s)
+        if (!assertValidPlayer(s)
             || !assertPlayerInAClan(s, clanList, (s as Player).uniqueId)
             || !assertPlayerNotLeader(s, clanList.playerClan(s.uniqueId), s.uniqueId)) {
             return true
@@ -345,7 +345,7 @@ class ClansCommand(private val clanList: ClanList,
             return false
         }
         // Argument semantics validation.
-        if (!validPlayer(s)
+        if (!assertValidPlayer(s)
              || !assertPlayerInAClan(s, clanList, (s as Player).uniqueId)
              || ! assertPlayerNameValid(s, args[0])) {
              return true

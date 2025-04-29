@@ -22,7 +22,7 @@ import java.util.*
  * @param s Sender to check
  * @return whether the sender is a player -- true indicates correct behavior, false indicates.
  */
-fun validPlayer(s: CommandSender): Boolean =
+fun assertValidPlayer(s: CommandSender): Boolean =
     if (s !is Player) {
         sendErrorMessage(s, "This command can only be run by players.")
         false
