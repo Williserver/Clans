@@ -212,7 +212,7 @@ class ClansCommand(private val clanList: ClanList,
             }
             else -> throw IllegalStateException("$pluginMessagePrefix: Internal error: Wrong number of arguments to /clans disband -- this should have been caught earlier!")
         }
-    }Final
+    }
 
     /**
      * Invite a player to our clan.
