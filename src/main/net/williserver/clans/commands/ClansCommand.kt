@@ -2,7 +2,6 @@ package net.williserver.clans.commands
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
-import net.williserver.clans.LogHandler
 import net.williserver.clans.model.*
 import net.williserver.clans.model.clan.Clan
 import net.williserver.clans.model.clan.ClanPermission
@@ -145,7 +144,7 @@ class ClansCommand(private val clanList: ClanList,
         }
         // Argument semantics validation
         if (!validPlayer(s)
-            || !assertPlayerNotInClan(s, clanList, (s as Player).uniqueId, "You are already in a clan!")
+            || !assertPlayerNotInAClan(s, clanList, (s as Player).uniqueId, "You are already in a clan!")
             || !assertValidClanName(s, args[0])
             || !assertUniqueClanName(s, clanList, args[0])) {
             return true
@@ -175,7 +174,7 @@ class ClansCommand(private val clanList: ClanList,
         }
         // Argument semantics validation.
         if (!validPlayer(s)
-            || !assertPlayerInClan(s, clanList, (s as Player).uniqueId)
+            || !assertPlayerInAClan(s, clanList, (s as Player).uniqueId)
             || !assertHasPermission(s, clanList.playerClan(s.uniqueId), s.uniqueId, ClanPermission.DISBAND)) {
             return true
         }
@@ -223,10 +222,10 @@ class ClansCommand(private val clanList: ClanList,
         }
         // Argument semantics validation.
         if (!validPlayer(s)
-            || !assertPlayerInClan(s, clanList, (s as Player).uniqueId)
+            || !assertPlayerInAClan(s, clanList, (s as Player).uniqueId)
             || !assertHasPermission(s, clanList.playerClan(s.uniqueId), s.uniqueId, ClanPermission.INVITE)
             || !assertPlayerNameOnline(s, args[0])
-            || !assertPlayerNotInClan(s, clanList, getPlayer(args[0])!!.uniqueId,
+            || !assertPlayerNotInAClan(s, clanList, getPlayer(args[0])!!.uniqueId,
                 "${getPlayer(args[0])!!.name} is already in a clan!")) {
             return true
         }
@@ -264,7 +263,7 @@ class ClansCommand(private val clanList: ClanList,
         // Argument semantics validation.
         if (!validPlayer(s)
             || !assertClanNameInList(s, clanList, args[0])
-            || !assertPlayerNotInClan(s, clanList, (s as Player).uniqueId, "You are already in a clan!")) {
+            || !assertPlayerNotInAClan(s, clanList, (s as Player).uniqueId, "You are already in a clan!")) {
             return true
         }
         // Ensure player has an active invite to the clan.
@@ -294,7 +293,7 @@ class ClansCommand(private val clanList: ClanList,
         }
         // Argument semantics validation.
         if (!validPlayer(s)
-            || !assertPlayerInClan(s, clanList, (s as Player).uniqueId)
+            || !assertPlayerInAClan(s, clanList, (s as Player).uniqueId)
             || !assertPlayerNotLeader(s, clanList.playerClan(s.uniqueId), s.uniqueId)) {
             return true
         }

@@ -2,12 +2,10 @@ package net.williserver.clans.commands.chat
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
-import net.williserver.clans.LogHandler
-import net.williserver.clans.commands.assertPlayerInClan
+import net.williserver.clans.commands.assertPlayerInAClan
 import net.williserver.clans.commands.sendClanMessage
 import net.williserver.clans.commands.validPlayer
 import net.williserver.clans.model.ClanList
-import org.bukkit.Bukkit
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
@@ -29,7 +27,7 @@ class ChatCommand(private val clans: ClanList): CommandExecutor {
         }
         // Argument semantics validation.
         if (!validPlayer(s)
-            || !assertPlayerInClan(s, clans, (s as Player).uniqueId)) {
+            || !assertPlayerInAClan(s, clans, (s as Player).uniqueId)) {
             return true
         }
 

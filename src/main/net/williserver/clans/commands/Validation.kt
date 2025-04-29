@@ -50,7 +50,7 @@ fun assertPlayerNameOnline(s: CommandSender, name: String) =
  *
  * @return whether the player was in one of the clans in list @clans.
  */
-fun assertPlayerInClan(s: CommandSender, clans: ClanList, player: UUID) =
+fun assertPlayerInAClan(s: CommandSender, clans: ClanList, player: UUID) =
     if (!clans.playerInClan(player)) {
         sendErrorMessage(s, "You must be in a clan to invoke this command.")
         false
@@ -65,7 +65,7 @@ fun assertPlayerInClan(s: CommandSender, clans: ClanList, player: UUID) =
  *
  * @return whether the player was in one of the clans in list @clans.
  */
-fun assertPlayerNotInClan(s: CommandSender, clans: ClanList, player: UUID, message: String) =
+fun assertPlayerNotInAClan(s: CommandSender, clans: ClanList, player: UUID, message: String) =
     if (clans.playerInClan(player)) {
         sendErrorMessage(s, message)
         false
