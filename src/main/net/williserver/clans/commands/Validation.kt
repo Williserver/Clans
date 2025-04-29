@@ -131,7 +131,7 @@ fun assertPlayerInThisClan(s: CommandSender, clan: Clan, player: UUID, message: 
  */
 fun assertSenderHasPermission(s: CommandSender, clan: Clan, permission: ClanPermission) =
     if (s is Player && !clan.rankOfMember(s.uniqueId).hasPermission(permission)) {
-        sendErrorMessage(s, "You need clan permission \"$permission\".")
+        sendErrorMessage(s, "Your clan rank is not high enough for this command.")
         false
     } else true
 
