@@ -1,6 +1,6 @@
 package net.williserver.clans.commands
 
-import net.williserver.clans.model.ClanList
+import net.williserver.clans.model.ClanSet
 import org.bukkit.Bukkit.getOfflinePlayer
 import org.bukkit.Bukkit.getOnlinePlayers
 import org.bukkit.command.Command
@@ -11,9 +11,9 @@ import org.bukkit.entity.Player
 /**
  * State for clans tab completion.
  *
- * @param clanList list of clans in this session.
+ * @param clanSet list of clans in this session.
  */
-class ClansTabCompleter(private val clanList: ClanList): TabCompleter {
+class ClansTabCompleter(private val clanSet: ClanSet): TabCompleter {
 
     /**
      * Tab completion for clans command.
@@ -52,13 +52,13 @@ class ClansTabCompleter(private val clanList: ClanList): TabCompleter {
             completions.removeAll{ !it.startsWith(args[0].lowercase()) }
         } else if (args.size == 2) {
             when (args[0].lowercase()) {
-                "info" -> clanList.clans().forEach { completions.add(it.name) }
+                "info" -> clanSet.clans().forEach { completions.add(it.name) }
                 "invite" -> getOnlinePlayers().forEach { completions.add(it.name) }
-                "join" -> clanList.clans().forEach { completions.add(it.name) }
+                "join" -> clanSet.clans().forEach { completions.add(it.name) }
                 "kick" ->
-                    if (sender is Player && clanList.playerInClan(sender.uniqueId)) {
+                    if (sender is Player && clanSet.playerInClan(sender.uniqueId)) {
                         // Notice: all UUIDs must map to a name, as otherwise they would not have been in a clan.
-                        clanList.playerClan(sender.uniqueId)
+                        clanSet.playerClan(sender.uniqueId)
                             .members()
                             .forEach { playerUUID -> completions.add(getOfflinePlayer(playerUUID).name!!) }
                     }

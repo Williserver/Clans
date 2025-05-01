@@ -12,7 +12,7 @@ import kotlin.test.assertFalse
 /**
  * @author Willmo3
  */
-class ClanListTest {
+class ClanSetTest {
     private fun generateClanData(): ClanData {
         val leader = UUID.randomUUID().toString()
         val members = setOf(leader)
@@ -21,22 +21,22 @@ class ClanListTest {
 
     @Test
     fun testConstructClanList() {
-        ClanList(setOf(generateClanData()))
+        ClanSet(setOf(generateClanData()))
     }
 
     @Test
     fun testReadWrite() {
         val leader = UUID.randomUUID().toString()
         val clanData = ClanData("TestClan", setOf(leader), setOf(), leader)
-        val clanList = ClanList(setOf(clanData))
+        val clanSet = ClanSet(setOf(clanData))
 
-        writeToFile(LogHandler(null), "testClanList.json", clanList)
-        assertEquals(clanList, readFromFile(LogHandler(null), "testClanList.json"))
+        writeToFile(LogHandler(null), "testClanList.json", clanSet)
+        assertEquals(clanSet, readFromFile(LogHandler(null), "testClanList.json"))
     }
 
     @Test
     fun testNoDuplicateClanNames() {
-        assertThrows(IllegalArgumentException::class.java) { ClanList(setOf(generateClanData(), generateClanData())) }
+        assertThrows(IllegalArgumentException::class.java) { ClanSet(setOf(generateClanData(), generateClanData())) }
     }
 
     @Test
@@ -47,13 +47,13 @@ class ClanListTest {
         val clan1 = Clan("Clan1", leader1, mutableSetOf(leader1, dup), mutableSetOf())
         val clan2 = Clan("Clan2", leader2, mutableSetOf(leader2, dup), mutableSetOf())
 
-        assertThrows(IllegalArgumentException::class.java) { ClanList(setOf(clan1.asDataTuple(), clan2.asDataTuple())) }
+        assertThrows(IllegalArgumentException::class.java) { ClanSet(setOf(clan1.asDataTuple(), clan2.asDataTuple())) }
     }
 
     @Test
     fun testPlayerClan() {
         val clanData = generateClanData()
-        val list = ClanList(setOf(clanData))
+        val list = ClanSet(setOf(clanData))
         assert(list.playerInClan(UUID.fromString(clanData.leader)))
         assertEquals(Clan(clanData), list.playerClan(UUID.fromString(clanData.leader)))
     }
@@ -61,7 +61,7 @@ class ClanListTest {
     @Test
     fun testPlayerNotInClan() {
         val clanData = generateClanData()
-        val list = ClanList(setOf(clanData))
+        val list = ClanSet(setOf(clanData))
         assertFalse(list.playerInClan(UUID.randomUUID()))
         assertThrows(NullPointerException::class.java) { list.playerClan(UUID.randomUUID()) }
     }
@@ -69,7 +69,7 @@ class ClanListTest {
     @Test
     fun testAddClan() {
         val clanData = generateClanData()
-        val list = ClanList(setOf(clanData))
+        val list = ClanSet(setOf(clanData))
 
         // Cannot add duplicate clans.
         val sameLeaderClan = ClanData("NewTestClan", setOf(clanData.leader), setOf(), clanData.leader)
@@ -88,7 +88,7 @@ class ClanListTest {
     fun testRemoveClan() {
         val clanData = generateClanData()
         val clan = Clan(clanData)
-        val list = ClanList(setOf(clanData))
+        val list = ClanSet(setOf(clanData))
 
         assert(clan.name in list)
         list.removeClan(clan)

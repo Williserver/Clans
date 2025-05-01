@@ -4,7 +4,7 @@ import net.williserver.clans.commands.ClansCommand
 import net.williserver.clans.commands.ClansTabCompleter
 import net.williserver.clans.commands.chat.ChatCommand
 import net.williserver.clans.commands.chat.ChatTabCompleter
-import net.williserver.clans.model.ClanList
+import net.williserver.clans.model.ClanSet
 import net.williserver.clans.model.ClansConfigLoader
 import net.williserver.clans.model.clan.*
 import net.williserver.clans.model.readFromFile
@@ -27,7 +27,7 @@ class ClansPlugin : JavaPlugin() {
     // Default data path
     private val path = "$dataFolder${File.separator}clans.json"
     // clanList model.
-    private lateinit var clanList: ClanList
+    private lateinit var clanSet: ClanSet
 
     override fun onEnable() {
         // Note: even with an empty config, this is necessary to generate the data directory.
@@ -36,7 +36,7 @@ class ClansPlugin : JavaPlugin() {
         logger.info("Loaded config")
 
         // Read base clan list.
-        clanList = readFromFile(logger, path)
+        clanSet = readFromFile(logger, path)
         logger.info("Initialized clanList")
 
         // Initiate this session.
@@ -46,12 +46,12 @@ class ClansPlugin : JavaPlugin() {
         // Register major events in clan lifecycle.
         val bus = ClanEventBus()
         // Model listeners affect persistent data
-        bus.registerListener(ClanEvent.CREATE, clanList.constructCreateListener())
-        bus.registerListener(ClanEvent.DISBAND, clanList.constructDisbandListener())
-        bus.registerListener(ClanEvent.JOIN, clanList.constructJoinListener())
-        bus.registerListener(ClanEvent.LEAVE, clanList.constructLeaveListener())
+        bus.registerListener(ClanEvent.CREATE, clanSet.constructCreateListener())
+        bus.registerListener(ClanEvent.DISBAND, clanSet.constructDisbandListener())
+        bus.registerListener(ClanEvent.JOIN, clanSet.constructJoinListener())
+        bus.registerListener(ClanEvent.LEAVE, clanSet.constructLeaveListener())
         // From the model's perspective, the kicked player effectively leaves the clan.
-        bus.registerListener(ClanEvent.KICK, clanList.constructLeaveListener())
+        bus.registerListener(ClanEvent.KICK, clanSet.constructLeaveListener())
         // Session listeners affect temporary data, like expiring invites.
         bus.registerListener(ClanEvent.JOIN, session.constructDeregisterInviteListener())
         // Messaging listeners send informational messages when events occur.
@@ -69,10 +69,10 @@ class ClansPlugin : JavaPlugin() {
         logger.info("Registered clan lifecycle listeners")
 
         // Register commands.
-        this.getCommand("cc")!!.setExecutor(ChatCommand(clanList))
-        this.getCommand("clans")!!.setExecutor(ClansCommand(clanList, config, session, bus))
+        this.getCommand("cc")!!.setExecutor(ChatCommand(clanSet))
+        this.getCommand("clans")!!.setExecutor(ClansCommand(clanSet, config, session, bus))
         this.getCommand("cc")!!.tabCompleter = ChatTabCompleter()
-        this.getCommand("clans")!!.tabCompleter = ClansTabCompleter(clanList)
+        this.getCommand("clans")!!.tabCompleter = ClansTabCompleter(clanSet)
         logger.info("Registered commands")
 
         logger.info("Enabled")
@@ -80,7 +80,7 @@ class ClansPlugin : JavaPlugin() {
 
     override fun onDisable() {
         // Save model settings.
-        writeToFile(logger, path, clanList)
+        writeToFile(logger, path, clanSet)
 
         logger.info("Disabled")
     }

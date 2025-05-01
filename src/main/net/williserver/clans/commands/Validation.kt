@@ -82,7 +82,7 @@ fun assertSenderOutranks(s: CommandSender, clan: Clan, shouldUnderrank: UUID) =
  *
  * @return whether the player was in one of the clans in list @clans.
  */
-fun assertSenderInAClan(s: CommandSender, clans: ClanList) =
+fun assertSenderInAClan(s: CommandSender, clans: ClanSet) =
     if (s !is Player || !clans.playerInClan(s.uniqueId)) {
         sendErrorMessage(s, "You must be in a clan.")
         false
@@ -97,7 +97,7 @@ fun assertSenderInAClan(s: CommandSender, clans: ClanList) =
  *
  * @return whether the player was in one of the clans in list @clans.
  */
-fun assertPlayerNotInAClan(s: CommandSender, clans: ClanList, player: UUID, message: String) =
+fun assertPlayerNotInAClan(s: CommandSender, clans: ClanSet, player: UUID, message: String) =
     if (clans.playerInClan(player)) {
         sendErrorMessage(s, message)
         false
@@ -159,7 +159,7 @@ fun assertValidClanName(s: CommandSender, name: String) =
  *
  * @return Whether the name is unique.
  */
-fun assertUniqueClanName(s: CommandSender, clans: ClanList, name: String) =
+fun assertUniqueClanName(s: CommandSender, clans: ClanSet, name: String) =
     if (name in clans) {
         sendErrorMessage(s, "The name \"$name\" is already taken, try a new one!")
         false
@@ -173,7 +173,7 @@ fun assertUniqueClanName(s: CommandSender, clans: ClanList, name: String) =
  *
  * @return Whether the clan name is in this list.
  */
-fun assertClanNameInList(s: CommandSender, list: ClanList, name: String) =
+fun assertClanNameInList(s: CommandSender, list: ClanSet, name: String) =
     if (name !in list) {
         sendErrorMessage(s, "There is no clan named \"$name\".")
         false

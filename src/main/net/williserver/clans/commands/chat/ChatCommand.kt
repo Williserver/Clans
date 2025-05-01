@@ -5,7 +5,7 @@ import net.kyori.adventure.text.format.NamedTextColor
 import net.williserver.clans.commands.assertSenderInAClan
 import net.williserver.clans.commands.sendClanMessage
 import net.williserver.clans.commands.assertValidPlayer
-import net.williserver.clans.model.ClanList
+import net.williserver.clans.model.ClanSet
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
@@ -18,7 +18,7 @@ import org.bukkit.entity.Player
  * @param clans List of clans for this session.
  * @author Willmo3
  */
-class ChatCommand(private val clans: ClanList): CommandExecutor {
+class ChatCommand(private val clans: ClanSet): CommandExecutor {
     override fun onCommand(s: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         // Argument structure validation.
         // Should be at least one message to send.

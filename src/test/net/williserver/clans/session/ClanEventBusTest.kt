@@ -1,7 +1,7 @@
 package net.williserver.clans.session
 
 import net.williserver.clans.model.clan.Clan
-import net.williserver.clans.model.ClanList
+import net.williserver.clans.model.ClanSet
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import java.util.UUID
@@ -11,7 +11,7 @@ class ClanEventBusTest {
     @Test
     fun testRegisterFireCreateClan() {
         val bus = ClanEventBus()
-        val list = ClanList(setOf())
+        val list = ClanSet(setOf())
 
         val newLeader = UUID.randomUUID()
         val newClan = Clan("TestClan", newLeader, mutableSetOf(newLeader), coLeaders=mutableSetOf())
@@ -25,7 +25,7 @@ class ClanEventBusTest {
     @Test
     fun testRegisterFireDisbandClan() {
         val bus = ClanEventBus()
-        val list = ClanList(setOf())
+        val list = ClanSet(setOf())
 
         val newLeader = UUID.randomUUID()
         val newClan = Clan("TestClan", newLeader, mutableSetOf(newLeader), coLeaders=mutableSetOf())
@@ -39,7 +39,7 @@ class ClanEventBusTest {
     @Test
     fun testRegisterFireJoinClan() {
         val bus = ClanEventBus()
-        val list = ClanList(setOf())
+        val list = ClanSet(setOf())
 
         val newLeader = UUID.randomUUID()
         val newClan = Clan("TestClan", newLeader, mutableSetOf(newLeader), coLeaders=mutableSetOf())
@@ -54,7 +54,7 @@ class ClanEventBusTest {
     @Test
     fun testRegisterFireLeaveClan() {
         val bus = ClanEventBus()
-        val list = ClanList(setOf())
+        val list = ClanSet(setOf())
 
         val newLeader = UUID.randomUUID()
         val newClan = Clan("TestClan", newLeader, mutableSetOf(newLeader), coLeaders=mutableSetOf())

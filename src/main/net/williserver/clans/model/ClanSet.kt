@@ -11,7 +11,6 @@ import java.io.FileReader
 import java.io.FileWriter
 import java.util.*
 import kotlin.NoSuchElementException
-import kotlin.collections.ArrayList
 
 
 /**
@@ -22,7 +21,7 @@ import kotlin.collections.ArrayList
  *
  * @author Willmo3
  */
-class ClanList(data: Set<ClanData>) {
+class ClanSet(data: Set<ClanData>) {
     private val clans: MutableSet<Clan> = HashSet()
 
     // Validate that all clan names are unique
@@ -138,7 +137,7 @@ class ClanList(data: Set<ClanData>) {
      * @param other Object to compare against.
      * @return whether other is a clanList with the same clans.
      */
-    override fun equals(other: Any?): Boolean = other is ClanList && other.clans == clans
+    override fun equals(other: Any?): Boolean = other is ClanSet && other.clans == clans
 
     /*
      * ClanList serialization helpers.
@@ -208,11 +207,11 @@ class ClanList(data: Set<ClanData>) {
  * Write a clanlist in json format to a file at path.
  *
  * @param path Destination for file.
- * @param clanList clanlist object to write.
+ * @param clanSet clanlist object to write.
  */
-fun writeToFile(logger: LogHandler, path: String, clanList: ClanList) {
+fun writeToFile(logger: LogHandler, path: String, clanSet: ClanSet) {
     val writer = FileWriter(path)
-    writer.write(Json.encodeToString(clanList.asDataTuples()))
+    writer.write(Json.encodeToString(clanSet.asDataTuples()))
     logger.info("Saved clan list to $path")
     writer.close()
 }
@@ -223,14 +222,14 @@ fun writeToFile(logger: LogHandler, path: String, clanList: ClanList) {
  * @param path Location of file.
  * @return ClanList read from file.
  */
-fun readFromFile(logger: LogHandler, path: String): ClanList {
+fun readFromFile(logger: LogHandler, path: String): ClanSet {
     if (!File(path).exists()) {
         logger.info("Found no clan list at $path\nReturning new empty list.")
-        return ClanList(setOf())
+        return ClanSet(setOf())
     }
     val reader = FileReader(path)
     val jsonString = reader.readText()
     reader.close()
     logger.info("Loaded clan list from $path")
-    return ClanList(Json.decodeFromString<Set<ClanData>>(jsonString))
+    return ClanSet(Json.decodeFromString<Set<ClanData>>(jsonString))
 }
