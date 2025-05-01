@@ -64,4 +64,11 @@ class ClanTest {
         assert(!net.williserver.clans.model.clan.validClanName(" "))
     }
 
+    @Test
+    fun testConstructClanColeaderNotMember() {
+        val leader = UUID.randomUUID()
+        val coleader = UUID.randomUUID()
+        assertThrows(IllegalArgumentException::class.java) { Clan("TestClan", leader, members=mutableListOf(leader), coLeaders=mutableListOf(coleader)) }
+    }
+
 }

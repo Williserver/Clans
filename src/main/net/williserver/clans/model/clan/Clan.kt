@@ -54,6 +54,8 @@ class Clan(val name: String, leader: UUID, private val members: MutableList<UUID
             throw IllegalArgumentException("$pluginMessagePrefix: Invalid clan name!")
         } else if (leader !in members) {
             throw IllegalArgumentException("$pluginMessagePrefix: Invalid leader UUID (not in clan $name): $leader")
+        } else if (coLeaders.any { it !in members }) {
+            throw IllegalArgumentException("$pluginMessagePrefix: Illegal co-leader detected!")
         }
     }
 
