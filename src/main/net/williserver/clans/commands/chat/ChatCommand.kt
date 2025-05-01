@@ -14,7 +14,6 @@ import org.bukkit.entity.Player
 /**
  * Clan chat command; wrapper around vanilla teams chats, since scoreboard teams underlie clans.
  *
- * @param logger LogHandler to report clan messages to.
  * @param clans List of clans for this session.
  * @author Willmo3
  */
