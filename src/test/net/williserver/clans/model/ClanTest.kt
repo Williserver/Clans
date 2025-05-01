@@ -71,4 +71,10 @@ class ClanTest {
         assertThrows(IllegalArgumentException::class.java) { Clan("TestClan", leader, members=mutableListOf(leader), coLeaders=mutableListOf(coleader)) }
     }
 
+    @Test
+    fun testConstructClanColeaderLeader() {
+        val leader = UUID.randomUUID()
+        assertThrows(IllegalArgumentException::class.java ) { Clan("TestClan", leader, members=mutableListOf(leader), coLeaders=mutableListOf(leader)) }
+    }
+
 }
