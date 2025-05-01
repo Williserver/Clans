@@ -11,7 +11,7 @@ class ClanEventBusTest {
     @Test
     fun testRegisterFireCreateClan() {
         val bus = ClanEventBus()
-        val list = ClanList(listOf())
+        val list = ClanList(setOf())
 
         val newLeader = UUID.randomUUID()
         val newClan = Clan("TestClan", newLeader, mutableSetOf(newLeader), coLeaders=mutableSetOf())
@@ -25,7 +25,7 @@ class ClanEventBusTest {
     @Test
     fun testRegisterFireDisbandClan() {
         val bus = ClanEventBus()
-        val list = ClanList(listOf())
+        val list = ClanList(setOf())
 
         val newLeader = UUID.randomUUID()
         val newClan = Clan("TestClan", newLeader, mutableSetOf(newLeader), coLeaders=mutableSetOf())
@@ -39,7 +39,7 @@ class ClanEventBusTest {
     @Test
     fun testRegisterFireJoinClan() {
         val bus = ClanEventBus()
-        val list = ClanList(listOf())
+        val list = ClanList(setOf())
 
         val newLeader = UUID.randomUUID()
         val newClan = Clan("TestClan", newLeader, mutableSetOf(newLeader), coLeaders=mutableSetOf())
@@ -54,7 +54,7 @@ class ClanEventBusTest {
     @Test
     fun testRegisterFireLeaveClan() {
         val bus = ClanEventBus()
-        val list = ClanList(listOf())
+        val list = ClanList(setOf())
 
         val newLeader = UUID.randomUUID()
         val newClan = Clan("TestClan", newLeader, mutableSetOf(newLeader), coLeaders=mutableSetOf())

@@ -22,8 +22,8 @@ import kotlin.collections.ArrayList
  *
  * @author Willmo3
  */
-class ClanList(data: List<ClanData>) {
-    private val clans: MutableList<Clan> = ArrayList()
+class ClanList(data: Set<ClanData>) {
+    private val clans: MutableSet<Clan> = HashSet()
 
     // Validate that all clan names are unique
     init {
@@ -104,7 +104,7 @@ class ClanList(data: List<ClanData>) {
     /**
      * @return immutable list of the clans.
      */
-    fun clans() = clans.toList()
+    fun clans() = clans.toSet()
 
     /**
      * Determine whether there is a clan in this list with the given name.
@@ -226,11 +226,11 @@ fun writeToFile(logger: LogHandler, path: String, clanList: ClanList) {
 fun readFromFile(logger: LogHandler, path: String): ClanList {
     if (!File(path).exists()) {
         logger.info("Found no clan list at $path\nReturning new empty list.")
-        return ClanList(listOf())
+        return ClanList(setOf())
     }
     val reader = FileReader(path)
     val jsonString = reader.readText()
     reader.close()
     logger.info("Loaded clan list from $path")
-    return ClanList(Json.decodeFromString<List<ClanData>>(jsonString))
+    return ClanList(Json.decodeFromString<Set<ClanData>>(jsonString))
 }
