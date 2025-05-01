@@ -111,6 +111,9 @@ class Clan(val name: String, leader: UUID, private val members: MutableSet<UUID>
             leader -> {
                 ClanRank.LEADER
             }
+            in coLeaders -> {
+                ClanRank.COLEADER
+            }
             in members -> {
                 ClanRank.MEMBER
             }
