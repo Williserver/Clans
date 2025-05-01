@@ -315,7 +315,7 @@ class ClansCommand(private val clanList: ClanList,
             }
             // Leave the user's clan.
             1 -> {
-                // Argument structure validation: second word must be "confirm"
+                // Argument structure validation: word must be "confirm"
                 if (args[0].lowercase(Locale.getDefault()) != "confirm") {
                     return false
                 }
@@ -326,7 +326,7 @@ class ClansCommand(private val clanList: ClanList,
                 }
                 true
             }
-            else -> throw IllegalStateException("$pluginMessagePrefix: Internal error: Wrong number of arguments to /clans disband -- this should have been caught earlier!")
+            else -> throw IllegalStateException("$pluginMessagePrefix: Internal error: Wrong number of arguments to /clans leave -- this should have been caught earlier!")
         }
     }
 
@@ -340,8 +340,8 @@ class ClansCommand(private val clanList: ClanList,
      * @return Whether the command was invoked with the correct number of arguments.
      */
     private fun kick(s: CommandSender, args: List<String>): Boolean {
-        // Argument structure validation. One argument: player to kick.
-        if (args.size != 1) {
+        // Argument structure validation. One required argument: player to kick. One optional argument: confirmation.
+        if (args.isEmpty() || args.size > 2) {
             return false
         }
         // Argument semantics validation.
@@ -358,8 +358,28 @@ class ClansCommand(private val clanList: ClanList,
             return true
         }
 
-        // TODO: Establish confirm timer OR finalize kick by firing kick event.
-        return true
+        return when (args.size) {
+            // Prompt the user to confirm the kick within a certain timespan.
+            1 -> {
+                sendInfoMessage(s, "Really kick ${playerToKick.name} from your clan?")
+                sendInfoMessage(s, "Type \"/clans kick ${playerToKick.name} confirm\" within ${config.confirmTime} seconds.")
+                // Register confirm timer for this user to kick another.
+                session.registerTimer(ClanEvent.KICK, Pair(s.uniqueId, playerToKick.uniqueId), config.confirmTime.toLong())
+                session.startTimer(ClanEvent.KICK, Pair(s.uniqueId, playerToKick.uniqueId))
+                true
+            }
+            2 -> {
+                // Argument structure validation: 2nd argument must be confirm.
+                if (args[1].lowercase(Locale.getDefault()) != "confirm") {
+                    return false
+                }
+                // Kick player from clan if timer started.
+                if (assertTimerInBounds(s, session, ClanEvent.KICK, Pair(s.uniqueId, playerToKick.uniqueId), "kick")) {
+                    bus.fireEvent(ClanEvent.KICK, clanList.playerClan(s.uniqueId), agent=s.uniqueId, target=playerToKick.uniqueId)
+                }
+                true
+            } else -> throw IllegalStateException("$pluginMessagePrefix: Internal error: Wrong number of arguments to /clans kick -- this should have been caught earlier!")
+        }
     }
 
     /**

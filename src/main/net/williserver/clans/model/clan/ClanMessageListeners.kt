@@ -9,19 +9,28 @@ import org.bukkit.Bukkit
 /**
  * @return a listener that sends a message to all clan members when a player joins.
  */
-fun constructJoinMessageListener(): ClanLifecycleListener = { clan, agent, _ ->
+fun constructJoinMessageListener(): ClanLifecycleListener = { clan, _, joiningPlayer ->
     // Getting offline player in case they leave instantly after joining.
     val message = prefix(clan.name)
-        .append(Component.text("${Bukkit.getOfflinePlayer(agent).name} has joined the clan!", NamedTextColor.GREEN))
+        .append(Component.text("${Bukkit.getOfflinePlayer(joiningPlayer).name} has joined the clan!", NamedTextColor.GREEN))
     sendClanMessage(clan, message)
 }
 
 /**
  * @return a listener that sends a message to all clan members when a player leaves the clan.
  */
-fun constructLeaveMessageListener(): ClanLifecycleListener = { clan, agent, _ ->
+fun constructLeaveMessageListener(): ClanLifecycleListener = { clan, _, leavingPlayer ->
     val message = prefix(clan.name)
-        .append(Component.text("${Bukkit.getOfflinePlayer(agent).name} has left the clan.", NamedTextColor.DARK_RED))
+        .append(Component.text("${Bukkit.getOfflinePlayer(leavingPlayer).name} has left the clan.", NamedTextColor.DARK_RED))
+    sendClanMessage(clan, message)
+}
+
+/**
+ * @return a listener that sends a message to all clan members when a player is kicked from the clan.
+ */
+fun constructKickMessageListener(): ClanLifecycleListener = { clan, agent, kickedPlayer ->
+    val message = prefix(clan.name)
+        .append(Component.text("${Bukkit.getOfflinePlayer(kickedPlayer).name} has been kicked from the clan by ${Bukkit.getOfflinePlayer(agent).name}", NamedTextColor.DARK_RED))
     sendClanMessage(clan, message)
 }
 

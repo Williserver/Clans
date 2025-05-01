@@ -19,6 +19,8 @@ class SessionManager {
         ClanEvent.LEAVE to mutableMapOf(),
         // Norm: clan
         ClanEvent.DISBAND to mutableMapOf(),
+        // Norm: Pair<UUID, UUID> (player kicking, player being kicked)
+        ClanEvent.KICK to mutableMapOf(),
     )
 
     /**
