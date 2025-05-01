@@ -66,7 +66,8 @@ class ClansTabCompleter(private val clanList: ClanList): TabCompleter {
                 "leave" -> completions.add("confirm")
                 else -> {}
             }
-            completions.removeAll{ !it.startsWith(args[1].lowercase()) }
+            // Do not include lowercase or playernames will not work!
+            completions.removeAll{ !it.startsWith(args[1]) }
         } else if (args.size == 3) {
             when (args[0].lowercase()) {
                 "kick" -> completions.add("confirm")
