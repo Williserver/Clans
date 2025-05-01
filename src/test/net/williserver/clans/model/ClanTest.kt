@@ -13,7 +13,8 @@ class ClanTest {
     private fun generateValidClan(): Clan {
         val leader = UUID.randomUUID().toString()
         val data = ClanData("TestClan",
-            listOf(leader, UUID.randomUUID().toString()),
+            members=listOf(leader, UUID.randomUUID().toString()),
+            coLeaders=listOf(),
             leader)
         return Clan(data)
     }
@@ -26,7 +27,8 @@ class ClanTest {
     @Test
     fun constructClanLeaderNotMember() {
         val data = ClanData("TestClan",
-            listOf(UUID.randomUUID().toString(), UUID.randomUUID().toString()),
+            members=listOf(UUID.randomUUID().toString(), UUID.randomUUID().toString()),
+            coLeaders=listOf(),
             UUID.randomUUID().toString())
         assertThrows(IllegalArgumentException::class.java) { Clan(data) }
     }

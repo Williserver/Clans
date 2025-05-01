@@ -18,7 +18,7 @@ import java.util.*
  * @param leader UUID for player who leads the clan.
  */
 @Serializable
-data class ClanData(val name: String, val members: List<String>, val leader: String)
+data class ClanData(val name: String, val members: List<String>, val coLeaders: List<String>, val leader: String)
 
 /**
  * Mutable model for clan.
@@ -30,7 +30,7 @@ data class ClanData(val name: String, val members: List<String>, val leader: Str
  * @throws IllegalArgumentException if there are duplicate members between clans or clans with duplicate names.
  * @author Willmo3
  */
-class Clan(val name: String, leader: UUID, private val members: MutableList<UUID>) {
+class Clan(val name: String, leader: UUID, private val members: MutableList<UUID>, private val coLeaders: MutableList<UUID>) {
     // Leader should be publicly visible, but for now, we restrict set to internal.
     var leader = leader
         private set
@@ -42,7 +42,8 @@ class Clan(val name: String, leader: UUID, private val members: MutableList<UUID
     constructor(data: ClanData) : this(
         data.name,
         UUID.fromString(data.leader),
-        ArrayList(data.members.map { UUID.fromString(it) })
+        members=ArrayList(data.members.map { UUID.fromString(it) }),
+        coLeaders=ArrayList(data.coLeaders.map { UUID.fromString(it) })
     )
 
     /*
@@ -129,7 +130,8 @@ class Clan(val name: String, leader: UUID, private val members: MutableList<UUID
      * Convert the object back to a tuple of ClanData. Useful for serialization.
      * @return ClanData tuple form of this data.
      */
-    fun asDataTuple(): ClanData = ClanData(name, members.map { it.toString() }, leader.toString())
+    fun asDataTuple(): ClanData
+        = ClanData(name, members.map { it.toString() }, coLeaders.map {it.toString()}, leader.toString())
 
     /**
      * @param other Object to compare against.

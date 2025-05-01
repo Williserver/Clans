@@ -18,7 +18,7 @@ class ClanRankTest {
         val leader = UUID.randomUUID()
         val member = UUID.randomUUID()
         val members = arrayListOf(leader, member)
-        val clan = Clan("TestClan", leader, members)
+        val clan = Clan("TestClan", leader, members, coLeaders = mutableListOf())
 
         assertEquals(ClanRank.LEADER, clan.rankOfMember(leader))
         assertEquals(ClanRank.MEMBER, clan.rankOfMember(member))
@@ -30,7 +30,7 @@ class ClanRankTest {
         val leader = UUID.randomUUID()
         val member = UUID.randomUUID()
         val members = arrayListOf(leader, member)
-        val clan = Clan("TestClan", leader, members)
+        val clan = Clan("TestClan", leader, members, coLeaders = mutableListOf())
 
         assert(clan.rankOfMember(leader).hasPermission(ClanPermission.DISBAND))
         assertFalse(clan.rankOfMember(member).hasPermission(ClanPermission.DISBAND))
@@ -41,7 +41,7 @@ class ClanRankTest {
         val leader = UUID.randomUUID()
         val member = UUID.randomUUID()
         val members = arrayListOf(leader, member)
-        val clan = Clan("TestClan", leader, members)
+        val clan = Clan("TestClan", leader, members, coLeaders = mutableListOf())
 
         assert(clan.rankOfMember(leader).hasPermission(ClanPermission.INVITE))
         assertFalse(clan.rankOfMember(member).hasPermission(ClanPermission.INVITE))
@@ -52,7 +52,7 @@ class ClanRankTest {
         val leader = UUID.randomUUID()
         val member = UUID.randomUUID()
         val members = arrayListOf(leader, member)
-        val clan = Clan("TestClan", leader, members)
+        val clan = Clan("TestClan", leader, members, coLeaders = mutableListOf())
 
         assert(clan.rankOfMember(leader).hasPermission(ClanPermission.KICK))
         assertFalse(clan.rankOfMember(member).hasPermission(ClanPermission.KICK))
