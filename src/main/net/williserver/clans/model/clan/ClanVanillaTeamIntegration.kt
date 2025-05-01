@@ -33,7 +33,7 @@ fun constructDisbandRemoveTeamListener(): ClanLifecycleListener = { clan, _, _ -
 /**
  * @return a listener that adds a player to a scoreboard team when they join the clan.
  */
-fun constructJoinTeamListener(): ClanLifecycleListener = { clan, joiner, _ ->
+fun constructJoinTeamListener(): ClanLifecycleListener = { clan, _, joiner ->
     val team = Bukkit.getScoreboardManager().mainScoreboard.getTeam(clan.name)
         ?: throw IllegalStateException("Clan not registered to a team -- how did we get here?")
     team.addPlayer(Bukkit.getOfflinePlayer(joiner))
@@ -42,7 +42,7 @@ fun constructJoinTeamListener(): ClanLifecycleListener = { clan, joiner, _ ->
 /**
  * @return a listener that removes a player from a scoreboard team when they leave the clan.
  */
-fun constructLeaveTeamListener(): ClanLifecycleListener = { clan, leaver, _ ->
+fun constructLeaveTeamListener(): ClanLifecycleListener = { clan, _, leaver ->
     val team = Bukkit.getScoreboardManager().mainScoreboard.getTeam(clan.name)
         ?: throw IllegalStateException("Clan not registered to a team -- how did we get here?")
     if (!team.removePlayer(Bukkit.getOfflinePlayer(leaver))) {
