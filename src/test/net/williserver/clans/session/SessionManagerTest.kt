@@ -13,7 +13,7 @@ class SessionManagerTest {
     @Test
     fun testRegisterClanDisbandTimer() {
         val leader = UUID.randomUUID()
-        val clan = Clan("TestClan", leader, mutableListOf(leader), coLeaders=mutableListOf())
+        val clan = Clan("TestClan", leader, mutableSetOf(leader), coLeaders=mutableSetOf())
         val session = SessionManager()
 
         // Duplicate registration is illegal
@@ -26,7 +26,7 @@ class SessionManagerTest {
     @Test
     fun testDisbandTimerInBounds() {
         val leader = UUID.randomUUID()
-        val clan = Clan("TestClan", leader, mutableListOf(leader), coLeaders=mutableListOf())
+        val clan = Clan("TestClan", leader, mutableSetOf(leader), coLeaders=mutableSetOf())
         val session = SessionManager()
 
         // the timer must first be registered!
@@ -43,7 +43,7 @@ class SessionManagerTest {
     @Test
     fun testDisbandTimerNotInBounds() {
         val leader = UUID.randomUUID()
-        val clan = Clan("TestClan", leader, mutableListOf(leader), coLeaders=mutableListOf())
+        val clan = Clan("TestClan", leader, mutableSetOf(leader), coLeaders=mutableSetOf())
         val session = SessionManager()
 
         session.registerTimer(ClanEvent.DISBAND, clan, 0)
@@ -54,7 +54,7 @@ class SessionManagerTest {
     @Test
     fun testAddInvitation() {
         val leader = UUID.randomUUID()
-        val clan = Clan("TestClan", leader, mutableListOf(leader), coLeaders=mutableListOf())
+        val clan = Clan("TestClan", leader, mutableSetOf(leader), coLeaders=mutableSetOf())
         val session = SessionManager()
 
         val rando = UUID.randomUUID()

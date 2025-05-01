@@ -158,7 +158,7 @@ class ClansCommand(private val clanList: ClanList,
 
         // Create a new clan with this player as its leader and starting member.
         val leader = s.uniqueId
-        val newClan = Clan(args[0], leader, members=mutableListOf(leader), coLeaders= mutableListOf())
+        val newClan = Clan(args[0], leader, members= mutableSetOf(leader), coLeaders= mutableSetOf())
         bus.fireEvent(ClanEvent.CREATE, newClan, agent=leader, target=leader)
         broadcastPrefixedMessage("Chief ${s.name} has formed the clan \"${newClan.name}\"!")
         return true
