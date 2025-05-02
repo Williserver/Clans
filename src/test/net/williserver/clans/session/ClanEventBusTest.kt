@@ -10,13 +10,12 @@ import kotlin.test.assertFalse
 class ClanEventBusTest {
     @Test
     fun testRegisterFireCreateClan() {
-        val bus = ClanEventBus()
         val list = ClanSet(setOf())
-
         val newLeader = UUID.randomUUID()
         val newClan = Clan("TestClan", newLeader)
         assertFalse(newClan.name in list)
 
+        val bus = ClanEventBus()
         bus.registerListener(ClanEvent.CREATE, list.constructCreateListener())
         bus.fireEvent(ClanEvent.CREATE, newClan, newLeader, newLeader)
         assert(newClan.name in list)
@@ -24,13 +23,12 @@ class ClanEventBusTest {
 
     @Test
     fun testRegisterFireDisbandClan() {
-        val bus = ClanEventBus()
         val list = ClanSet(setOf())
-
         val newLeader = UUID.randomUUID()
         val newClan = Clan("TestClan", newLeader)
         list.addClan(newClan)
 
+        val bus = ClanEventBus()
         bus.registerListener(ClanEvent.DISBAND, list.constructDisbandListener())
         bus.fireEvent(ClanEvent.DISBAND, newClan, newLeader, newLeader)
         assert(newClan.name !in list)
@@ -38,14 +36,13 @@ class ClanEventBusTest {
 
     @Test
     fun testRegisterFireJoinClan() {
-        val bus = ClanEventBus()
+        val newClan = Clan("TestClan", UUID.randomUUID())
         val list = ClanSet(setOf())
-
-        val newLeader = UUID.randomUUID()
-        val newClan = Clan("TestClan", newLeader)
         list.addClan(newClan)
 
+        val bus = ClanEventBus()
         bus.registerListener(ClanEvent.JOIN, list.constructJoinListener())
+
         val newMember = UUID.randomUUID()
         bus.fireEvent(ClanEvent.JOIN, newClan, newMember, newMember)
         assert(newMember in newClan)
@@ -53,17 +50,16 @@ class ClanEventBusTest {
 
     @Test
     fun testRegisterFireLeaveClan() {
-        val bus = ClanEventBus()
-        val list = ClanSet(setOf())
-
         val newLeader = UUID.randomUUID()
         val newClan = Clan("TestClan", newLeader)
+        val list = ClanSet(setOf())
         list.addClan(newClan)
 
         val newMember = UUID.randomUUID()
         newClan.join(newMember)
         assert(newMember in newClan)
 
+        val bus = ClanEventBus()
         // When leave fires, the listener should register the change.
         bus.registerListener(ClanEvent.LEAVE, list.constructLeaveListener())
         bus.fireEvent(ClanEvent.LEAVE, newClan, newMember, newMember)
@@ -75,9 +71,26 @@ class ClanEventBusTest {
     }
 
     @Test
-    fun testDeregisterInvitation() {
+    fun testRegisterFireKickClan() {
         val leader = UUID.randomUUID()
-        val clan = Clan("TestClan", leader)
+        val member = UUID.randomUUID()
+        val clan = Clan("TestClan", leader, mutableSetOf(leader, member), mutableSetOf(), mutableSetOf())
+        val list = ClanSet(setOf())
+        list.addClan(clan)
+        assert(list.playerInClan(member))
+        assert(member in clan)
+
+        val bus = ClanEventBus()
+        bus.registerListener(ClanEvent.KICK, list.constructLeaveListener())
+        bus.fireEvent(ClanEvent.KICK, clan, leader, member)
+
+        assertFalse(list.playerInClan(member))
+        assert(member !in clan)
+    }
+
+    @Test
+    fun testDeregisterInvitation() {
+        val clan = Clan("TestClan", UUID.randomUUID())
 
         // Add an invitation for a new member.
         val newMember = UUID.randomUUID()
