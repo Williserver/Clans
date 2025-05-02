@@ -1,7 +1,6 @@
 package net.williserver.clans.model.clan
 import kotlinx.serialization.Serializable
 import net.williserver.clans.pluginMessagePrefix
-import net.williserver.clans.session.ClanLifecycleListener
 import java.util.*
 import kotlin.collections.HashSet
 
@@ -15,7 +14,7 @@ import kotlin.collections.HashSet
  * Persistent data for a given clan.
  *
  * @param name Unique name for the clan
- * @param members List of member UUIDs
+ * @param coLeaders set of co-leader UUIDs
  * @param leader UUID for player who leads the clan.
  */
 @Serializable
@@ -26,7 +25,7 @@ data class ClanData(val name: String, val members: Set<String>, val coLeaders: S
  *
  * @param name Name of clan. Must not change, and must be alphanumeric with minus or underscores.
  * @param leader Leader of clan.
- * @param members List of members of clan.
+ * @param members set of members of clan.
  *
  * @throws IllegalArgumentException if there are duplicate members between clans or clans with duplicate names.
  * @author Willmo3
@@ -55,7 +54,7 @@ class Clan(val name: String, leader: UUID, private val members: MutableSet<UUID>
             throw IllegalArgumentException("$pluginMessagePrefix: Invalid clan name!")
         } else if (leader !in members) {
             throw IllegalArgumentException("$pluginMessagePrefix: Invalid leader UUID (not in clan $name): $leader")
-        } else if (coLeaders.any { it !in members || it == leader}) {
+        } else if (coLeaders.any { it !in members || it == leader }) {
             throw IllegalArgumentException("$pluginMessagePrefix: Illegal co-leader detected!")
         }
     }
@@ -95,9 +94,14 @@ class Clan(val name: String, leader: UUID, private val members: MutableSet<UUID>
      */
 
     /**
-     * @return the members as an immutable list.
+     * @return the members as an immutable set.
      */
-    fun members() = members.toList()
+    fun members() = members.toSet()
+
+    /**
+     * @return all co-leaders as an immutable set.
+     */
+    fun coLeaders() = coLeaders.toSet()
 
     /**
      * Get the rank of a clan member. Throw an exception if they're not in the clan.
@@ -150,11 +154,7 @@ class Clan(val name: String, leader: UUID, private val members: MutableSet<UUID>
      * Automatically generated hash function.
      */
     override fun hashCode(): Int = name.hashCode()
-}
-
-/*
- * Clan-specific event listeners.
- */
+}++++++
 
 /*
  * Misc helpers
