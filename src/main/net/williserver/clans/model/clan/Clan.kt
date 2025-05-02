@@ -18,7 +18,7 @@ import kotlin.collections.HashSet
  * @param leader UUID for player who leads the clan.
  */
 @Serializable
-data class ClanData(val name: String, val members: Set<String>, val coLeaders: Set<String>, val leader: String)
+data class ClanData(val name: String, val members: Set<String>, val elders: Set<String>, val coLeaders: Set<String>, val leader: String)
 
 /**
  * Mutable model for clan.
@@ -30,7 +30,11 @@ data class ClanData(val name: String, val members: Set<String>, val coLeaders: S
  * @throws IllegalArgumentException if there are duplicate members between clans or clans with duplicate names.
  * @author Willmo3
  */
-class Clan(val name: String, leader: UUID, private val members: MutableSet<UUID>, private val coLeaders: MutableSet<UUID>) {
+class Clan(val name: String, leader: UUID,
+           private val members: MutableSet<UUID>,
+           private val elders: MutableSet<UUID>,
+           private val coLeaders: MutableSet<UUID>) {
+
     // Leader should be publicly visible, but for now, we restrict set to internal.
     var leader = leader
         private set
@@ -42,8 +46,20 @@ class Clan(val name: String, leader: UUID, private val members: MutableSet<UUID>
     constructor(data: ClanData) : this(
         data.name,
         UUID.fromString(data.leader),
-        members=HashSet(data.members.map { UUID.fromString(it) }),
-        coLeaders=HashSet(data.coLeaders.map { UUID.fromString(it) })
+        members = HashSet(data.members.map     { UUID.fromString(it) }),
+        elders = HashSet(data.elders.map       { UUID.fromString(it) }),
+        coLeaders = HashSet(data.coLeaders.map { UUID.fromString(it) }),
+    )
+
+    /**
+     * Empty new clan constructor. Starts with one member: the leader.
+     */
+    constructor(name: String, leader: UUID) : this(
+        name,
+        leader,
+        members = mutableSetOf(leader),
+        elders = mutableSetOf(),
+        coLeaders = mutableSetOf()
     )
 
     /*
@@ -54,8 +70,12 @@ class Clan(val name: String, leader: UUID, private val members: MutableSet<UUID>
             throw IllegalArgumentException("$pluginMessagePrefix: Invalid clan name!")
         } else if (leader !in members) {
             throw IllegalArgumentException("$pluginMessagePrefix: Invalid leader UUID (not in clan $name): $leader")
-        } else if (coLeaders.any { it !in members || it == leader }) {
+        // Co-leaders should all be marked as members, but none of them should be elders or leaders.
+        } else if (coLeaders.any { it !in members || it in elders || it == leader }) {
             throw IllegalArgumentException("$pluginMessagePrefix: Illegal co-leader detected!")
+        // elders should all be marked as members, but none should be co-leaders or leaders.
+        } else if (elders.any { it !in members || it in coLeaders || it == leader }) {
+            throw IllegalArgumentException("$pluginMessagePrefix: Illegal elder detected!")
         }
     }
 
@@ -99,6 +119,11 @@ class Clan(val name: String, leader: UUID, private val members: MutableSet<UUID>
     fun members() = members.toSet()
 
     /**
+     * @return the elders as an immutable set.
+     */
+    fun elders() = elders.toSet()
+
+    /**
      * @return all co-leaders as an immutable set.
      */
     fun coLeaders() = coLeaders.toSet()
@@ -112,18 +137,10 @@ class Clan(val name: String, leader: UUID, private val members: MutableSet<UUID>
      */
     fun rankOfMember(member: UUID): ClanRank =
         when (member) {
-            leader -> {
-                ClanRank.LEADER
-            }
-            in coLeaders -> {
-                ClanRank.COLEADER
-            }
-            in members -> {
-                ClanRank.MEMBER
-            }
-            else -> {
-                throw IllegalArgumentException("$pluginMessagePrefix: Member $member is not in clan $name.")
-            }
+            leader -> ClanRank.LEADER
+            in coLeaders -> ClanRank.COLEADER
+            in members -> ClanRank.MEMBER
+            else -> throw IllegalArgumentException("$pluginMessagePrefix: Member $member is not in clan $name.")
         }
 
     /**
@@ -140,8 +157,13 @@ class Clan(val name: String, leader: UUID, private val members: MutableSet<UUID>
      * Convert the object back to a tuple of ClanData. Useful for serialization.
      * @return ClanData tuple form of this data.
      */
-    fun asDataTuple(): ClanData
-        = ClanData(name, HashSet(members.map { it.toString() }), HashSet(coLeaders.map {it.toString()}), leader.toString())
+    fun asDataTuple(): ClanData = ClanData(
+        name,
+        HashSet(members.map   { it.toString() }),
+        HashSet(elders.map    { it.toString() }),
+        HashSet(coLeaders.map { it.toString() }),
+        leader.toString()
+    )
 
     /**
      * @param other Object to compare against.
@@ -154,7 +176,7 @@ class Clan(val name: String, leader: UUID, private val members: MutableSet<UUID>
      * Automatically generated hash function.
      */
     override fun hashCode(): Int = name.hashCode()
-}++++++
+}
 
 /*
  * Misc helpers

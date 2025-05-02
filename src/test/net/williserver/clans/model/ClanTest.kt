@@ -14,6 +14,7 @@ class ClanTest {
         val leader = UUID.randomUUID().toString()
         val data = ClanData("TestClan",
             members=setOf(leader, UUID.randomUUID().toString()),
+            elders=setOf(),
             coLeaders=setOf(),
             leader)
         return Clan(data)
@@ -29,7 +30,8 @@ class ClanTest {
         val data = ClanData("TestClan",
             members=setOf(UUID.randomUUID().toString(), UUID.randomUUID().toString()),
             coLeaders=setOf(),
-            UUID.randomUUID().toString())
+            elders=setOf(),
+            leader=UUID.randomUUID().toString())
         assertThrows(IllegalArgumentException::class.java) { Clan(data) }
     }
 
@@ -68,13 +70,13 @@ class ClanTest {
     fun testConstructClanColeaderNotMember() {
         val leader = UUID.randomUUID()
         val coleader = UUID.randomUUID()
-        assertThrows(IllegalArgumentException::class.java) { Clan("TestClan", leader, members=mutableSetOf(leader), coLeaders=mutableSetOf(coleader)) }
+        assertThrows(IllegalArgumentException::class.java) { Clan("TestClan", leader, members=mutableSetOf(leader), elders = mutableSetOf(), coLeaders=mutableSetOf(coleader)) }
     }
 
     @Test
     fun testConstructClanColeaderLeader() {
         val leader = UUID.randomUUID()
-        assertThrows(IllegalArgumentException::class.java ) { Clan("TestClan", leader, members=mutableSetOf(leader), coLeaders=mutableSetOf(leader)) }
+        assertThrows(IllegalArgumentException::class.java ) { Clan("TestClan", leader, members=mutableSetOf(leader), elders = mutableSetOf(), coLeaders=mutableSetOf(leader)) }
     }
 
 }

@@ -14,7 +14,7 @@ class ClanEventBusTest {
         val list = ClanSet(setOf())
 
         val newLeader = UUID.randomUUID()
-        val newClan = Clan("TestClan", newLeader, mutableSetOf(newLeader), coLeaders=mutableSetOf())
+        val newClan = Clan("TestClan", newLeader)
         assertFalse(newClan.name in list)
 
         bus.registerListener(ClanEvent.CREATE, list.constructCreateListener())
@@ -28,7 +28,7 @@ class ClanEventBusTest {
         val list = ClanSet(setOf())
 
         val newLeader = UUID.randomUUID()
-        val newClan = Clan("TestClan", newLeader, mutableSetOf(newLeader), coLeaders=mutableSetOf())
+        val newClan = Clan("TestClan", newLeader)
         list.addClan(newClan)
 
         bus.registerListener(ClanEvent.DISBAND, list.constructDisbandListener())
@@ -42,7 +42,7 @@ class ClanEventBusTest {
         val list = ClanSet(setOf())
 
         val newLeader = UUID.randomUUID()
-        val newClan = Clan("TestClan", newLeader, mutableSetOf(newLeader), coLeaders=mutableSetOf())
+        val newClan = Clan("TestClan", newLeader)
         list.addClan(newClan)
 
         bus.registerListener(ClanEvent.JOIN, list.constructJoinListener())
@@ -57,7 +57,7 @@ class ClanEventBusTest {
         val list = ClanSet(setOf())
 
         val newLeader = UUID.randomUUID()
-        val newClan = Clan("TestClan", newLeader, mutableSetOf(newLeader), coLeaders=mutableSetOf())
+        val newClan = Clan("TestClan", newLeader)
         list.addClan(newClan)
 
         val newMember = UUID.randomUUID()
@@ -77,7 +77,7 @@ class ClanEventBusTest {
     @Test
     fun testDeregisterInvitation() {
         val leader = UUID.randomUUID()
-        val clan = Clan("TestClan", leader, mutableSetOf(leader), coLeaders=mutableSetOf())
+        val clan = Clan("TestClan", leader)
 
         // Add an invitation for a new member.
         val newMember = UUID.randomUUID()
