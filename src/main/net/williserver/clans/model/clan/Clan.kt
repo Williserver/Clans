@@ -31,9 +31,9 @@ data class ClanData(val name: String, val members: Set<String>, val elders: Set<
  * @author Willmo3
  */
 class Clan(val name: String, leader: UUID,
-           private val members: MutableSet<UUID>,
-           private val elders: MutableSet<UUID>,
-           private val coLeaders: MutableSet<UUID>) {
+           private val members: MutableSet<UUID> = mutableSetOf(leader),
+           private val elders: MutableSet<UUID> = mutableSetOf(),
+           private val coLeaders: MutableSet<UUID> = mutableSetOf(),) {
 
     // Leader should be publicly visible, but for now, we restrict set to internal.
     var leader = leader
@@ -49,17 +49,6 @@ class Clan(val name: String, leader: UUID,
         members = HashSet(data.members.map     { UUID.fromString(it) }),
         elders = HashSet(data.elders.map       { UUID.fromString(it) }),
         coLeaders = HashSet(data.coLeaders.map { UUID.fromString(it) }),
-    )
-
-    /**
-     * Empty new clan constructor. Starts with one member: the leader.
-     */
-    constructor(name: String, leader: UUID) : this(
-        name,
-        leader,
-        members = mutableSetOf(leader),
-        elders = mutableSetOf(),
-        coLeaders = mutableSetOf()
     )
 
     /*

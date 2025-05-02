@@ -69,26 +69,24 @@ class ClanTest {
     @Test
     fun testConstructClanColeaderNotMember() {
         val leader = UUID.randomUUID()
-        val coleader = UUID.randomUUID()
-        assertThrows(IllegalArgumentException::class.java) { Clan("TestClan", leader, members=mutableSetOf(leader), elders = mutableSetOf(), coLeaders=mutableSetOf(coleader)) }
+        assertThrows(IllegalArgumentException::class.java) { Clan("TestClan", leader, coLeaders = mutableSetOf(UUID.randomUUID())) }
     }
 
     @Test
     fun testConstructClanColeaderLeader() {
         val leader = UUID.randomUUID()
-        assertThrows(IllegalArgumentException::class.java ) { Clan("TestClan", leader, members=mutableSetOf(leader), elders = mutableSetOf(), coLeaders=mutableSetOf(leader)) }
+        assertThrows(IllegalArgumentException::class.java ) { Clan("TestClan", leader, coLeaders = mutableSetOf(leader)) }
     }
 
     @Test
     fun testConstructClanElderNotMember() {
         val leader = UUID.randomUUID()
-        val elder = UUID.randomUUID()
-        assertThrows(IllegalArgumentException::class.java) { Clan("TestClan", leader, members = mutableSetOf(leader), elders = mutableSetOf(elder), coLeaders=mutableSetOf()) }
+        assertThrows(IllegalArgumentException::class.java) { Clan("TestClan", leader, elders = mutableSetOf(UUID.randomUUID())) }
     }
 
     @Test
     fun testConstructClanElderLeader() {
         val leader = UUID.randomUUID()
-        assertThrows(IllegalArgumentException::class.java) { Clan("TestClan", leader, members = mutableSetOf(leader), elders = mutableSetOf(leader), coLeaders=mutableSetOf()) }
+        assertThrows(IllegalArgumentException::class.java) { Clan("TestClan", leader, elders = mutableSetOf(leader)) }
     }
 }

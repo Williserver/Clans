@@ -18,7 +18,7 @@ class ClanRankTest {
         val leader = UUID.randomUUID()
         val member = UUID.randomUUID()
         val members = mutableSetOf(leader, member)
-        val clan = Clan("TestClan", leader, members, elders = mutableSetOf(), coLeaders = mutableSetOf())
+        val clan = Clan("TestClan", leader, members)
 
         assertEquals(ClanRank.LEADER, clan.rankOfMember(leader))
         assertEquals(ClanRank.MEMBER, clan.rankOfMember(member))
@@ -31,7 +31,7 @@ class ClanRankTest {
         val member = UUID.randomUUID()
         val coleader = UUID.randomUUID()
         val members = mutableSetOf(leader, member, coleader)
-        val clan = Clan("TestClan", leader, members, elders = mutableSetOf(), coLeaders = mutableSetOf(coleader))
+        val clan = Clan("TestClan", leader, members, coLeaders = mutableSetOf(coleader))
 
         assert(clan.rankOfMember(leader).hasPermission(ClanPermission.DISBAND))
         assertFalse(clan.rankOfMember(member).hasPermission(ClanPermission.DISBAND))
@@ -44,7 +44,7 @@ class ClanRankTest {
         val member = UUID.randomUUID()
         val coleader = UUID.randomUUID()
         val members = mutableSetOf(leader, member, coleader)
-        val clan = Clan("TestClan", leader, members, elders = mutableSetOf(), coLeaders = mutableSetOf(coleader))
+        val clan = Clan("TestClan", leader, members, coLeaders = mutableSetOf(coleader))
 
         assert(clan.rankOfMember(leader).hasPermission(ClanPermission.INVITE))
         assert(clan.rankOfMember(coleader).hasPermission(ClanPermission.INVITE))
@@ -57,7 +57,7 @@ class ClanRankTest {
         val member = UUID.randomUUID()
         val coleader = UUID.randomUUID()
         val members = mutableSetOf(leader, member, coleader)
-        val clan = Clan("TestClan", leader, members, elders = mutableSetOf(), coLeaders = mutableSetOf(coleader))
+        val clan = Clan("TestClan", leader, members, coLeaders = mutableSetOf(coleader))
 
         assert(clan.rankOfMember(leader).hasPermission(ClanPermission.KICK))
         assert(clan.rankOfMember(coleader).hasPermission(ClanPermission.KICK))
