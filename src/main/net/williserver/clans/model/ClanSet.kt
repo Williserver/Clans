@@ -4,6 +4,7 @@ import kotlinx.serialization.json.Json
 import net.williserver.clans.LogHandler
 import net.williserver.clans.model.clan.Clan
 import net.williserver.clans.model.clan.ClanData
+import net.williserver.clans.model.clan.ClanPermission
 import net.williserver.clans.pluginMessagePrefix
 import net.williserver.clans.session.ClanLifecycleListener
 import java.io.File
@@ -184,8 +185,10 @@ class ClanSet(data: Set<ClanData>) {
      * Fire when a clan is disbanded.
      * @return the listener
      */
-    fun constructDisbandListener(): ClanLifecycleListener = { clan, _, _ ->
-        assert(clan in clans)
+    fun constructDisbandListener(): ClanLifecycleListener = { clan, agent, _ ->
+        if (agent !in clan || !clan.rankOfMember(agent).hasPermission(ClanPermission.DISBAND)) {
+            throw IllegalArgumentException("This player does not have permission to disband the clan!")
+        }
         removeClan(clan)
     }
 
