@@ -19,5 +19,21 @@ class ListenersTest {
         bus.registerListener(ClanEvent.DISBAND, clanSet.constructDisbandListener())
         // Fire a disband event with a random player initiating
         assertThrows(IllegalArgumentException::class.java) { bus.fireEvent(ClanEvent.DISBAND, clan, UUID.randomUUID(), UUID.randomUUID()) }
+        
+        bus.fireEvent(ClanEvent.DISBAND, clan, clan.leader, clan.leader)
+        assert(clan.name !in clanSet)
+    }
+
+    @Test
+    fun testCreateAgentLeader() {
+        val clan = Clan("TestClan", UUID.randomUUID())
+        val clanSet = ClanSet(setOf())
+
+        val bus = ClanEventBus()
+        bus.registerListener(ClanEvent.CREATE, clanSet.constructCreateListener())
+        assertThrows(IllegalArgumentException::class.java) { bus.fireEvent(ClanEvent.CREATE, clan, UUID.randomUUID(), UUID.randomUUID()) }
+
+        bus.fireEvent(ClanEvent.CREATE, clan, clan.leader, clan.leader)
+        assert(clan.name in clanSet)
     }
 }

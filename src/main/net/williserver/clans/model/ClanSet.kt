@@ -178,7 +178,12 @@ class ClanSet(data: Set<ClanData>) {
      * Fire when a new clan is created.
      * @return the listener
      */
-    fun constructCreateListener(): ClanLifecycleListener = { clan, _, _ -> addClan(clan) }
+    fun constructCreateListener(): ClanLifecycleListener = { clan, agent, _ ->
+        if (agent != clan.leader) {
+            throw IllegalArgumentException("This player is not the leader of the new clan")
+        }
+        addClan(clan)
+    }
 
     /**
      * Construct disband listener to remove from this model.
