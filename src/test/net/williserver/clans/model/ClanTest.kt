@@ -79,4 +79,16 @@ class ClanTest {
         assertThrows(IllegalArgumentException::class.java ) { Clan("TestClan", leader, members=mutableSetOf(leader), elders = mutableSetOf(), coLeaders=mutableSetOf(leader)) }
     }
 
+    @Test
+    fun testConstructClanElderNotMember() {
+        val leader = UUID.randomUUID()
+        val elder = UUID.randomUUID()
+        assertThrows(IllegalArgumentException::class.java) { Clan("TestClan", leader, members = mutableSetOf(leader), elders = mutableSetOf(elder), coLeaders=mutableSetOf()) }
+    }
+
+    @Test
+    fun testConstructClanElderLeader() {
+        val leader = UUID.randomUUID()
+        assertThrows(IllegalArgumentException::class.java) { Clan("TestClan", leader, members = mutableSetOf(leader), elders = mutableSetOf(leader), coLeaders=mutableSetOf()) }
+    }
 }
