@@ -69,6 +69,4 @@ class SessionManagerTest {
         session.startTimer(ClanEvent.JOIN, Pair(rando, clan))
         assert(session.isTimerInBounds(ClanEvent.JOIN, Pair(rando, clan)))
     }
-
-    // TODO: tests for deleting clans.
 }
