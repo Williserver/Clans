@@ -169,7 +169,9 @@ class ClanSet(data: Set<ClanData>) {
      * @return The listener.
      */
     fun constructLeaveListener(): ClanLifecycleListener = { clan, _, target ->
-        assert(clan in clans)
+        if (clan !in clans) {
+            throw IllegalArgumentException("$pluginMessagePrefix: Clan ${clan.name} is not in this list!")
+        }
         clan.leave(target)
     }
 
@@ -180,7 +182,7 @@ class ClanSet(data: Set<ClanData>) {
      */
     fun constructCreateListener(): ClanLifecycleListener = { clan, agent, _ ->
         if (agent != clan.leader) {
-            throw IllegalArgumentException("This player is not the leader of the new clan")
+            throw IllegalArgumentException("$pluginMessagePrefix: This player is not the leader of the new clan.")
         }
         addClan(clan)
     }
@@ -192,7 +194,7 @@ class ClanSet(data: Set<ClanData>) {
      */
     fun constructDisbandListener(): ClanLifecycleListener = { clan, agent, _ ->
         if (agent !in clan || !clan.rankOfMember(agent).hasPermission(ClanPermission.DISBAND)) {
-            throw IllegalArgumentException("This player does not have permission to disband the clan!")
+            throw IllegalArgumentException("$pluginMessagePrefix: This player does not have permission to disband the clan!")
         }
         removeClan(clan)
     }
