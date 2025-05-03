@@ -74,7 +74,7 @@ class ClanEventBusTest {
     fun testRegisterFireKickClan() {
         val leader = UUID.randomUUID()
         val member = UUID.randomUUID()
-        val clan = Clan("TestClan", leader, mutableSetOf(leader, member), mutableSetOf(), mutableSetOf())
+        val clan = Clan("TestClan", leader, members = mutableSetOf(member))
         val list = ClanSet(setOf())
         list.addClan(clan)
         assert(list.playerInClan(member))

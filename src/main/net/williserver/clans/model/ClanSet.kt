@@ -213,7 +213,7 @@ class ClanSet(data: Set<ClanData>) {
      */
     private fun duplicateMembers(clan: Clan) =
         clans.any {
-            otherClan -> otherClan != clan && otherClan.members().any { it in clan }
+            otherClan -> otherClan != clan && otherClan.allClanmates().any { it in clan }
         }
 }
 

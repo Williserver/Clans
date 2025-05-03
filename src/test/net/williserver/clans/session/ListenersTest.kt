@@ -41,9 +41,9 @@ class ListenersTest {
     fun testLeaveUntrackedClan() {
         val leader = UUID.randomUUID()
         val member = UUID.randomUUID()
-        val trackedClan = Clan("TestClan", leader, members= mutableSetOf(leader, member))
+        val trackedClan = Clan("TestClan", leader, members= mutableSetOf(member))
 
-        val untrackedClan = Clan("OtherClan", leader, members = mutableSetOf(leader, member))
+        val untrackedClan = Clan("OtherClan", leader, members = mutableSetOf(member))
         val clanSet = ClanSet(setOf(trackedClan.asDataTuple()))
 
         val bus = ClanEventBus()

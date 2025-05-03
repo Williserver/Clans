@@ -16,7 +16,7 @@ class ClanSetTest {
     @Test
     fun testReadWrite() {
         val leader = UUID.randomUUID().toString()
-        val clanData = ClanData("TestClan", setOf(leader), elders = setOf(), coLeaders = setOf(), leader)
+        val clanData = ClanData("TestClan", members = setOf(), elders = setOf(), coLeaders = setOf(), leader)
         val clanSet = ClanSet(setOf(clanData))
 
         writeToFile(LogHandler(null), "testClanList.json", clanSet)
@@ -35,8 +35,8 @@ class ClanSetTest {
         val dup = UUID.randomUUID()
         val leader1 = UUID.randomUUID()
         val leader2 = UUID.randomUUID()
-        val clan1 = Clan("Clan1", leader1, mutableSetOf(leader1, dup), elders = mutableSetOf(), coLeaders = mutableSetOf())
-        val clan2 = Clan("Clan2", leader2, mutableSetOf(leader2, dup), elders = mutableSetOf(), coLeaders = mutableSetOf())
+        val clan1 = Clan("Clan1", leader1, mutableSetOf(dup), elders = mutableSetOf(), coLeaders = mutableSetOf())
+        val clan2 = Clan("Clan2", leader2, mutableSetOf(dup), elders = mutableSetOf(), coLeaders = mutableSetOf())
 
         assertThrows(IllegalArgumentException::class.java) { ClanSet(setOf(clan1.asDataTuple(), clan2.asDataTuple())) }
     }
@@ -44,7 +44,7 @@ class ClanSetTest {
     @Test
     fun testPlayerClan() {
         val leader = UUID.randomUUID().toString()
-        val clanData = ClanData("TestClan", setOf(leader), setOf(), setOf(), leader)
+        val clanData = ClanData("TestClan", setOf(), setOf(), setOf(), leader)
         val list = ClanSet(setOf(clanData))
         assert(list.playerInClan(UUID.fromString(clanData.leader)))
         assertEquals(Clan(clanData), list.playerClan(UUID.fromString(clanData.leader)))
@@ -53,7 +53,7 @@ class ClanSetTest {
     @Test
     fun testPlayerNotInClan() {
         val leader = UUID.randomUUID().toString()
-        val clanData = ClanData("TestClan", setOf(leader), setOf(), setOf(), leader)
+        val clanData = ClanData("TestClan", setOf(), setOf(), setOf(), leader)
         val list = ClanSet(setOf(clanData))
         assertFalse(list.playerInClan(UUID.randomUUID()))
         assertThrows(NullPointerException::class.java) { list.playerClan(UUID.randomUUID()) }

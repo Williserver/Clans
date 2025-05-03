@@ -31,7 +31,7 @@ data class ClanData(val name: String, val members: Set<String>, val elders: Set<
  * @author Willmo3
  */
 class Clan(val name: String, leader: UUID,
-           private val members: MutableSet<UUID> = mutableSetOf(leader),
+           private val members: MutableSet<UUID> = mutableSetOf(),
            private val elders: MutableSet<UUID> = mutableSetOf(),
            private val coLeaders: MutableSet<UUID> = mutableSetOf(),) {
 
@@ -57,14 +57,8 @@ class Clan(val name: String, leader: UUID,
     init {
         if (!validClanName(name)) {
             throw IllegalArgumentException("$pluginMessagePrefix: Invalid clan name!")
-        } else if (leader !in members) {
-            throw IllegalArgumentException("$pluginMessagePrefix: Invalid leader UUID (not in clan $name): $leader")
-        // Co-leaders should all be marked as members, but none of them should be elders or leaders.
-        } else if (coLeaders.any { it !in members || it in elders || it == leader }) {
-            throw IllegalArgumentException("$pluginMessagePrefix: Illegal co-leader detected!")
-        // elders should all be marked as members, but none should be co-leaders or leaders.
-        } else if (elders.any { it !in members || it in coLeaders || it == leader }) {
-            throw IllegalArgumentException("$pluginMessagePrefix: Illegal elder detected!")
+        } else if (allClanmates().any { !uniqueRank(it)} ) {
+            throw IllegalArgumentException("$pluginMessagePrefix: All clan members must have a unique rank.")
         }
     }
 
@@ -98,11 +92,29 @@ class Clan(val name: String, leader: UUID,
         members -= member
     }
 
-    fun promote(member: UUID) {
-        if (!contains(member)) {
-            throw IllegalArgumentException("$pluginMessagePrefix: Member $member does not exist!")
-        }
-    }
+//    fun promote(promotedMember: UUID) {
+//        if (!contains(promotedMember)) {
+//            throw IllegalArgumentException("$pluginMessagePrefix: Member $promotedMember does not exist!")
+//        }
+//        // Add the member to the corresponding set, or throw an error
+//        when (rankOfMember(promotedMember)) {
+//            ClanRank.LEADER -> {
+//                throw IllegalArgumentException("$pluginMessagePrefix: Cannot promote leader!")
+//            }
+//            ClanRank.COLEADER -> {
+//                throw IllegalArgumentException("$pluginMessagePrefix: Cannot promote co-leader, use anoint!")
+//            }
+//            ClanRank.ELDER -> {
+//                // Members cannot be both elders and co-leaders.
+//                elders -= promotedMember
+//                coLeaders += promotedMember
+//            }
+//            ClanRank.MEMBER -> {
+//                // All players in the clan maintain their member rank.
+//                elders += promotedMember
+//            }
+//        }
+//    }
 
     // TODO: promote
     // -- validate that we have a higher rank than the target
@@ -131,6 +143,11 @@ class Clan(val name: String, leader: UUID,
     fun coLeaders() = coLeaders.toSet()
 
     /**
+     * @return all clanmates as an immutable set.
+     */
+    fun allClanmates() = members() + elders() + coLeaders() + leader
+
+    /**
      * Get the rank of a clan member. Throw an exception if they're not in the clan.
      *
      * @param member UUID of member to get rank for.
@@ -150,7 +167,7 @@ class Clan(val name: String, leader: UUID,
      * Check whether a UUID is already in the clan.
      * @param member UUID of member to check.
      */
-    operator fun contains(member: UUID): Boolean = member in members
+    operator fun contains(member: UUID): Boolean = member in allClanmates()
 
     /*
      * Assorted helpers.
@@ -179,6 +196,19 @@ class Clan(val name: String, leader: UUID,
      * Automatically generated hash function.
      */
     override fun hashCode(): Int = name.hashCode()
+
+    /**
+     * @param player Player to check rank uniqueness.
+     * @return whether the player is only in one rank set.
+     * @throws IllegalArgumentException if the player is not in the clan.
+     */
+    private fun uniqueRank(player: UUID) =
+        when (rankOfMember(player)) {
+            ClanRank.LEADER -> player !in members() && player !in elders() && player !in coLeaders()
+            ClanRank.COLEADER -> player != leader && player !in members() && player !in elders()
+            ClanRank.ELDER -> player != leader && player !in members() && player !in coLeaders()
+            ClanRank.MEMBER -> player != leader && player !in elders() && player !in coLeaders()
+        }
 }
 
 /*

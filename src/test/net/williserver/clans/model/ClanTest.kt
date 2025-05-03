@@ -14,26 +14,11 @@ class ClanTest {
     private fun generateValidClan(): Clan {
         val leader = UUID.randomUUID().toString()
         val data = ClanData("TestClan",
-            members=setOf(leader, UUID.randomUUID().toString()),
+            members=setOf(UUID.randomUUID().toString()),
             elders=setOf(),
             coLeaders=setOf(),
             leader)
         return Clan(data)
-    }
-
-    @Test
-    fun constructValidClan() {
-        generateValidClan()
-    }
-
-    @Test
-    fun constructClanLeaderNotMember() {
-        val data = ClanData("TestClan",
-            members=setOf(UUID.randomUUID().toString(), UUID.randomUUID().toString()),
-            coLeaders=setOf(),
-            elders=setOf(),
-            leader=UUID.randomUUID().toString())
-        assertThrows(IllegalArgumentException::class.java) { Clan(data) }
     }
 
     @Test
@@ -68,21 +53,9 @@ class ClanTest {
     }
 
     @Test
-    fun testConstructClanColeaderNotMember() {
-        val leader = UUID.randomUUID()
-        assertThrows(IllegalArgumentException::class.java) { Clan("TestClan", leader, coLeaders = mutableSetOf(UUID.randomUUID())) }
-    }
-
-    @Test
     fun testConstructClanColeaderLeader() {
         val leader = UUID.randomUUID()
         assertThrows(IllegalArgumentException::class.java ) { Clan("TestClan", leader, coLeaders = mutableSetOf(leader)) }
-    }
-
-    @Test
-    fun testConstructClanElderNotMember() {
-        val leader = UUID.randomUUID()
-        assertThrows(IllegalArgumentException::class.java) { Clan("TestClan", leader, elders = mutableSetOf(UUID.randomUUID())) }
     }
 
     @Test
@@ -99,7 +72,7 @@ class ClanTest {
         val member = UUID.randomUUID()
         val clan = Clan("TestClan",
                         leader,
-                        members = mutableSetOf(leader, elder, coleader, member),
+                        members = mutableSetOf(member),
                         coLeaders = mutableSetOf(coleader),
                         elders = mutableSetOf(elder),
                         )
