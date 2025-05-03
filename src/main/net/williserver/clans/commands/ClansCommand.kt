@@ -320,7 +320,6 @@ class ClansCommand(private val clanSet: ClanSet,
                 // Leave clan if the timer was started.
                 if (assertTimerInBounds(s, session, ClanEvent.LEAVE, s.uniqueId, "leave")) {
                     bus.fireEvent(ClanEvent.LEAVE, clanSet.playerClan(s.uniqueId), agent=s.uniqueId, target=s.uniqueId)
-                    sendInfoMessage(s, "You have left your clan.")
                 }
                 true
             }

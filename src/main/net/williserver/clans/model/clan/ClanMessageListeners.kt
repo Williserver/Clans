@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.williserver.clans.commands.broadcastPrefixedMessage
 import net.williserver.clans.commands.sendClanMessage
+import net.williserver.clans.commands.sendInfoMessage
 import net.williserver.clans.commands.sendPrefixedMessage
 import net.williserver.clans.session.ClanLifecycleListener
 import org.bukkit.Bukkit
@@ -42,6 +43,10 @@ fun constructLeaveMessageListener(): ClanLifecycleListener = { clan, _, leavingP
         .append(Component.text("${Bukkit.getOfflinePlayer(leavingPlayer).name} has left the clan.",
             NamedTextColor.DARK_RED))
     sendClanMessage(clan, message)
+
+    // If the leaving player is still online, send them a message.
+    Bukkit.getPlayer(leavingPlayer)?.
+            let { sendInfoMessage(it, "You have left your clan.") }
 }
 
 /**
@@ -56,7 +61,7 @@ fun constructKickMessageListener(): ClanLifecycleListener = { clan, agent, kicke
 
     // If the kicked player is online, send them a message.
     Bukkit.getPlayer(kickedPlayer)?.
-        let { player -> sendPrefixedMessage(player, Component.text("You were kicked from clan ${clan.name}!",
+        let { sendPrefixedMessage(it, Component.text("You were kicked from clan ${clan.name}!",
             NamedTextColor.DARK_RED)) }
 }
 
