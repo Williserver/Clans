@@ -17,6 +17,13 @@ fun constructCreateMessageListener(): ClanLifecycleListener = { clan, _, creatin
 }
 
 /**
+ * @return a listener that broadcasts a message to the server when a player is creator.
+ */
+fun constructDisbandMessageListener(): ClanLifecycleListener = { clan, _, _ ->
+    broadcastPrefixedMessage("Clan \"${clan.name}\" has disbanded!")
+}
+
+/**
  * @return a listener that sends a message to all clan members when a player joins.
  */
 fun constructJoinMessageListener(): ClanLifecycleListener = { clan, _, joiningPlayer ->

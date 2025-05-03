@@ -205,7 +205,6 @@ class ClansCommand(private val clanSet: ClanSet,
                 }
                 if (assertTimerInBounds(s, session, ClanEvent.DISBAND, clan, "disband")) {
                     bus.fireEvent(ClanEvent.DISBAND, clan, agent=s.uniqueId, target=s.uniqueId)
-                    broadcastPrefixedMessage("Clan \"${clan.name}\" has disbanded!")
                 }
                 true
             }
