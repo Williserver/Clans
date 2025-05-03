@@ -2,6 +2,8 @@ package net.williserver.clans.session
 
 import net.williserver.clans.model.ClanSet
 import net.williserver.clans.model.clan.Clan
+import net.williserver.clans.model.clan.ClanRank
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import java.util.*
@@ -70,5 +72,24 @@ class ListenersTest {
         assert(randoJoining !in clan)
         bus.fireEvent(ClanEvent.JOIN, clan, randoJoining, randoJoining)
         assert(randoJoining in clan)
+    }
+
+    @Test
+    fun testPromote() {
+        val leader = UUID.randomUUID()
+        val promotee = UUID.randomUUID()
+        val clan = Clan("TestClan", leader, members = mutableSetOf(promotee))
+        val clanSet = ClanSet(setOf(clan.asDataTuple()))
+
+        val bus = ClanEventBus()
+        bus.registerListener(ClanEvent.PROMOTE, clanSet.constructPromoteListener())
+
+        assertEquals(ClanRank.MEMBER, clan.rankOfMember(promotee))
+        assertThrows(IllegalArgumentException::class.java) {bus.fireEvent(ClanEvent.PROMOTE, clan, promotee, promotee) }
+        bus.fireEvent(ClanEvent.PROMOTE, clan, leader, promotee)
+        assertEquals(ClanRank.ELDER, clan.rankOfMember(promotee))
+        bus.fireEvent(ClanEvent.PROMOTE, clan, leader, promotee)
+        assertEquals(ClanRank.COLEADER, clan.rankOfMember(promotee))
+        assertThrows(IllegalArgumentException::class.java) {bus.fireEvent(ClanEvent.PROMOTE, clan, leader, promotee) }
     }
 }

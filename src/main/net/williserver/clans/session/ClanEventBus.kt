@@ -13,6 +13,7 @@ enum class ClanEvent {
     LEAVE,
     KICK,
     DISBAND,
+    PROMOTE,
 }
 // TODO: promotion: add event
 

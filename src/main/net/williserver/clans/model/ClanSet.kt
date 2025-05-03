@@ -201,7 +201,21 @@ class ClanSet(data: Set<ClanData>) {
         removeClan(clan)
     }
 
-    // TODO: promotion: add listener to call promotion in corresponding clan.
+    /**
+     * Construct promotion listener to promote a player in a clan in this model.
+     * Fire when a player is promoted.
+     * @return the listener.
+     */
+    fun constructPromoteListener(): ClanLifecycleListener = { clan, promoter, promotee ->
+        if (clan !in clans) {
+            throw IllegalArgumentException("$pluginMessagePrefix: Clan is not tracked in this list.")
+        } else if (promoter !in clan || promotee !in clan) {
+            throw IllegalArgumentException("$pluginMessagePrefix: Player not in clan.")
+        } else if (clan.rankOfMember(promoter) <= clan.rankOfMember(promotee)) {
+            throw IllegalArgumentException("$pluginMessagePrefix: Promoter does not outrank promoted player.")
+        }
+        clan.promote(promotee)
+    }
 
     /*
      * ClanList internal helpers.
