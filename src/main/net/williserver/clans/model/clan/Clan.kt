@@ -72,13 +72,6 @@ class Clan(val name: String, leader: UUID,
      * Clan manipulators.
      */
 
-    // TODO: promote
-    // -- validate that we have a higher rank than the target
-    //    -- Notice that this subsumes us being the target.
-    // -- validate that we are not leader
-    // -- set the target members rank to nextrank
-    //    -- add to next rankset, remove from previous.
-
     /**
      * Add a new player to the clan.
      * @param recruit UUID of player to join.
@@ -104,6 +97,19 @@ class Clan(val name: String, leader: UUID,
         }
         members -= member
     }
+
+    fun promote(member: UUID) {
+        if (!contains(member)) {
+            throw IllegalArgumentException("$pluginMessagePrefix: Member $member does not exist!")
+        }
+    }
+
+    // TODO: promote
+    // -- validate that we have a higher rank than the target
+    //    -- Notice that this subsumes us being the target.
+    // -- validate that we are not leader
+    // -- set the target members rank to nextrank
+    //    -- add to next rankset, remove from previous.
 
     /*
      * Member information getters.
@@ -135,6 +141,7 @@ class Clan(val name: String, leader: UUID,
         when (member) {
             leader -> ClanRank.LEADER
             in coLeaders -> ClanRank.COLEADER
+            in elders -> ClanRank.ELDER
             in members -> ClanRank.MEMBER
             else -> throw IllegalArgumentException("$pluginMessagePrefix: Member $member is not in clan $name.")
         }

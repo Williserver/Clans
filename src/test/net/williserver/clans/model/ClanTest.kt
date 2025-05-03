@@ -2,6 +2,7 @@ package net.williserver.clans.model
 
 import net.williserver.clans.model.clan.Clan
 import net.williserver.clans.model.clan.ClanData
+import net.williserver.clans.model.clan.ClanRank
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import java.util.*
@@ -88,5 +89,23 @@ class ClanTest {
     fun testConstructClanElderLeader() {
         val leader = UUID.randomUUID()
         assertThrows(IllegalArgumentException::class.java) { Clan("TestClan", leader, elders = mutableSetOf(leader)) }
+    }
+
+    @Test
+    fun testRankOfMember() {
+        val leader = UUID.randomUUID()
+        val coleader = UUID.randomUUID()
+        val elder = UUID.randomUUID()
+        val member = UUID.randomUUID()
+        val clan = Clan("TestClan",
+                        leader,
+                        members = mutableSetOf(leader, elder, coleader, member),
+                        coLeaders = mutableSetOf(coleader),
+                        elders = mutableSetOf(elder),
+                        )
+        assert(clan.rankOfMember(leader) == ClanRank.LEADER)
+        assert(clan.rankOfMember(coleader) == ClanRank.COLEADER)
+        assert(clan.rankOfMember(elder) == ClanRank.ELDER)
+        assert(clan.rankOfMember(member) == ClanRank.MEMBER)
     }
 }
