@@ -160,7 +160,6 @@ class ClansCommand(private val clanSet: ClanSet,
         val leader = s.uniqueId
         val newClan = Clan(args[0], leader)
         bus.fireEvent(ClanEvent.CREATE, newClan, agent=leader, target=leader)
-        broadcastPrefixedMessage("Chief ${s.name} has formed the clan \"${newClan.name}\"!")
         return true
     }
 

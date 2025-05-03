@@ -2,10 +2,19 @@ package net.williserver.clans.model.clan
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
+import net.williserver.clans.commands.broadcastPrefixedMessage
 import net.williserver.clans.commands.sendClanMessage
 import net.williserver.clans.commands.sendPrefixedMessage
 import net.williserver.clans.session.ClanLifecycleListener
 import org.bukkit.Bukkit
+
+/**
+ * @return a listener that broadcasts a message to the server when a player is creator.
+ */
+fun constructCreateMessageListener(): ClanLifecycleListener = { clan, _, creatingPlayer ->
+    val name = Bukkit.getOfflinePlayer(creatingPlayer).name!!
+    broadcastPrefixedMessage("Chief $name has formed the clan \"${clan.name}\"!")
+}
 
 /**
  * @return a listener that sends a message to all clan members when a player joins.
