@@ -53,4 +53,22 @@ class ListenersTest {
         bus.fireEvent(ClanEvent.LEAVE, trackedClan, member, member)
         assert(member !in trackedClan)
     }
+
+    @Test
+    fun testJoinUntrackedClan() {
+        val clan = Clan("TestClan", UUID.randomUUID())
+        val clanSet = ClanSet(setOf())
+
+        val bus = ClanEventBus()
+        bus.registerListener(ClanEvent.JOIN, clanSet.constructJoinListener())
+
+        val randoJoining = UUID.randomUUID()
+        assertThrows(IllegalArgumentException::class.java)
+            { bus.fireEvent(ClanEvent.JOIN, clan, randoJoining, randoJoining) }
+
+        clanSet.addClan(clan)
+        assert(randoJoining !in clan)
+        bus.fireEvent(ClanEvent.JOIN, clan, randoJoining, randoJoining)
+        assert(randoJoining in clan)
+    }
 }

@@ -158,9 +158,11 @@ class ClanSet(data: Set<ClanData>) {
      * Fire when a player joins a clan.
      * @return the listener
      */
-    fun constructJoinListener(): ClanLifecycleListener = { clan, _, target ->
-        assert(clan in clans)
-        clan.join(target)
+    fun constructJoinListener(): ClanLifecycleListener = { clan, _, joiner ->
+        if (clan !in clans) {
+            throw IllegalArgumentException("$pluginMessagePrefix: Clan ${clan.name} is not in this list!")
+        }
+        clan.join(joiner)
     }
 
     /**
@@ -168,11 +170,11 @@ class ClanSet(data: Set<ClanData>) {
      * Fire when a player leaves a clan.
      * @return The listener.
      */
-    fun constructLeaveListener(): ClanLifecycleListener = { clan, _, target ->
+    fun constructLeaveListener(): ClanLifecycleListener = { clan, _, leaver ->
         if (clan !in clans) {
             throw IllegalArgumentException("$pluginMessagePrefix: Clan ${clan.name} is not in this list!")
         }
-        clan.leave(target)
+        clan.leave(leaver)
     }
 
     /**
@@ -180,8 +182,8 @@ class ClanSet(data: Set<ClanData>) {
      * Fire when a new clan is created.
      * @return the listener
      */
-    fun constructCreateListener(): ClanLifecycleListener = { clan, agent, _ ->
-        if (agent != clan.leader) {
+    fun constructCreateListener(): ClanLifecycleListener = { clan, _, creator ->
+        if (creator != clan.leader) {
             throw IllegalArgumentException("$pluginMessagePrefix: This player is not the leader of the new clan.")
         }
         addClan(clan)
@@ -192,8 +194,8 @@ class ClanSet(data: Set<ClanData>) {
      * Fire when a clan is disbanded.
      * @return the listener
      */
-    fun constructDisbandListener(): ClanLifecycleListener = { clan, agent, _ ->
-        if (agent !in clan || !clan.rankOfMember(agent).hasPermission(ClanPermission.DISBAND)) {
+    fun constructDisbandListener(): ClanLifecycleListener = { clan, _, disbander ->
+        if (disbander !in clan || !clan.rankOfMember(disbander).hasPermission(ClanPermission.DISBAND)) {
             throw IllegalArgumentException("$pluginMessagePrefix: This player does not have permission to disband the clan!")
         }
         removeClan(clan)
