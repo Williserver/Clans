@@ -15,7 +15,6 @@ enum class ClanEvent {
     DISBAND,
     PROMOTE,
 }
-// TODO: promotion: add event
 
 /**
  * Listener function, registered to a specific event.
