@@ -53,15 +53,32 @@ class ClanTest {
     }
 
     @Test
-    fun testConstructClanColeaderLeader() {
+    fun testConstructClanLeaderDuplicateRank() {
         val leader = UUID.randomUUID()
-        assertThrows(IllegalArgumentException::class.java ) { Clan("TestClan", leader, coLeaders = mutableSetOf(leader)) }
+
+        assertThrows(IllegalArgumentException::class.java) { Clan("TestClan", leader, coLeaders = mutableSetOf(leader)) }
+        assertThrows(IllegalArgumentException::class.java) { Clan("TestClan", leader, elders = mutableSetOf(leader)) }
+        assertThrows(IllegalArgumentException::class.java) { Clan("TestClan", leader, members = mutableSetOf(leader)) }
     }
 
     @Test
-    fun testConstructClanElderLeader() {
+    fun testConstructClanColeaderDuplicateRank() {
         val leader = UUID.randomUUID()
-        assertThrows(IllegalArgumentException::class.java) { Clan("TestClan", leader, elders = mutableSetOf(leader)) }
+        val coLeader = UUID.randomUUID()
+
+        assertThrows(IllegalArgumentException::class.java) { Clan("TestClan", leader, coLeaders = mutableSetOf(leader)) }
+        assertThrows(IllegalArgumentException::class.java) { Clan("TestClan", leader, coLeaders = mutableSetOf(coLeader), elders = mutableSetOf(coLeader)) }
+        assertThrows(IllegalArgumentException::class.java) { Clan("TestClan", leader, coLeaders = mutableSetOf(coLeader), members = mutableSetOf(coLeader)) }
+    }
+
+    @Test
+    fun testConstructClanElderDuplicateRank() {
+        val leader = UUID.randomUUID()
+        val elder = UUID.randomUUID()
+
+        assertThrows(IllegalArgumentException::class.java ) { Clan("TestClan", leader, elders = mutableSetOf(leader)) }
+        assertThrows(IllegalArgumentException::class.java) { Clan("TestClan", leader, coLeaders = mutableSetOf(elder), elders = mutableSetOf(elder)) }
+        assertThrows(IllegalArgumentException::class.java) { Clan("TestClan", leader, elders = mutableSetOf(elder), members = mutableSetOf(elder)) }
     }
 
     @Test
