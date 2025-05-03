@@ -86,7 +86,7 @@ class ClanSet(data: Set<ClanData>) {
      * @param playerToFind UUID for player.
      * @return Whether the player is in a clan in thist list.
      */
-    fun playerInClan(playerToFind: UUID) = clans.any { playerToFind in it }
+    fun playerInClan(playerToFind: UUID) = clans().any { playerToFind in it }
 
     /**
      * Find the clan in this list that has player as a member.
@@ -95,7 +95,7 @@ class ClanSet(data: Set<ClanData>) {
      * @param UUID player to search for.
      * @return The clan UUID is a member of, or null if no such clan exists.
      */
-    fun playerClan(playerToFind: UUID): Clan = clans.find { playerToFind in it }!!
+    fun playerClan(playerToFind: UUID): Clan = clans().find { playerToFind in it }!!
 
     /*
      * ClanList clan helpers.
@@ -112,7 +112,7 @@ class ClanSet(data: Set<ClanData>) {
      * @param name Name of clan to search for
      * @return Whether a clan with the given name is in this list.
      */
-    operator fun contains(name: String) = clans.any { it.name == name }
+    operator fun contains(name: String) = clans().any { it.name == name }
 
     /**
      * Get the clan with a given name if it's present in this list.
@@ -127,7 +127,7 @@ class ClanSet(data: Set<ClanData>) {
             throw NoSuchElementException("$pluginMessagePrefix: $name is not a clan, check with `in` helper before calling get.")
         }
 
-        val nameMatches = clans.filter { it.name == name }
+        val nameMatches = clans().filter { it.name == name }
         if (nameMatches.size > 1) {
             throw IllegalStateException("$pluginMessagePrefix: Two clans with identical name: $name -- very illegal!")
         }
@@ -138,7 +138,7 @@ class ClanSet(data: Set<ClanData>) {
      * @param other Object to compare against.
      * @return whether other is a clanList with the same clans.
      */
-    override fun equals(other: Any?): Boolean = other is ClanSet && other.clans == clans
+    override fun equals(other: Any?): Boolean = other is ClanSet && other.clans() == clans()
 
     /*
      * ClanList serialization helpers.
@@ -159,7 +159,7 @@ class ClanSet(data: Set<ClanData>) {
      * @return the listener
      */
     fun constructJoinListener(): ClanLifecycleListener = { clan, _, joiner ->
-        if (clan !in clans) {
+        if (clan !in clans()) {
             throw IllegalArgumentException("$pluginMessagePrefix: Clan ${clan.name} is not in this list!")
         }
         clan.join(joiner)
@@ -171,7 +171,7 @@ class ClanSet(data: Set<ClanData>) {
      * @return The listener.
      */
     fun constructLeaveListener(): ClanLifecycleListener = { clan, _, leaver ->
-        if (clan !in clans) {
+        if (clan !in clans()) {
             throw IllegalArgumentException("$pluginMessagePrefix: Clan ${clan.name} is not in this list!")
         }
         clan.leave(leaver)
@@ -207,7 +207,7 @@ class ClanSet(data: Set<ClanData>) {
      * @return the listener.
      */
     fun constructPromoteListener(): ClanLifecycleListener = { clan, promoter, promotee ->
-        if (clan !in clans) {
+        if (clan !in clans()) {
             throw IllegalArgumentException("$pluginMessagePrefix: Clan is not tracked in this list.")
         } else if (promoter !in clan || promotee !in clan) {
             throw IllegalArgumentException("$pluginMessagePrefix: Player not in clan.")
@@ -226,7 +226,7 @@ class ClanSet(data: Set<ClanData>) {
      * In good circumstances, this should never be the case.
      */
     private fun duplicateMembers(clan: Clan) =
-        clans.any {
+        clans().any {
             otherClan -> otherClan != clan && otherClan.allClanmates().any { it in clan }
         }
 }
