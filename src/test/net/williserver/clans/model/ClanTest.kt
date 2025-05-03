@@ -98,4 +98,23 @@ class ClanTest {
         assert(clan.rankOfMember(elder) == ClanRank.ELDER)
         assert(clan.rankOfMember(member) == ClanRank.MEMBER)
     }
+
+    @Test
+    fun testPromote() {
+        val leader = UUID.randomUUID()
+        val member = UUID.randomUUID()
+
+        val clan = Clan("TestClan",
+            leader,
+            members = mutableSetOf(member),
+        )
+        assert(clan.rankOfMember(member) == ClanRank.MEMBER)
+        clan.promote(member)
+        assert(clan.rankOfMember(member) == ClanRank.ELDER)
+        clan.promote(member)
+        assert(clan.rankOfMember(member) == ClanRank.COLEADER)
+
+        assertThrows(IllegalArgumentException::class.java) { clan.promote(member) }
+        assertThrows(IllegalArgumentException::class.java) { clan.promote(leader) }
+    }
 }

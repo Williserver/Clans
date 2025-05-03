@@ -92,36 +92,34 @@ class Clan(val name: String, leader: UUID,
         members -= member
     }
 
-//    fun promote(promotedMember: UUID) {
-//        if (!contains(promotedMember)) {
-//            throw IllegalArgumentException("$pluginMessagePrefix: Member $promotedMember does not exist!")
-//        }
-//        // Add the member to the corresponding set, or throw an error
-//        when (rankOfMember(promotedMember)) {
-//            ClanRank.LEADER -> {
-//                throw IllegalArgumentException("$pluginMessagePrefix: Cannot promote leader!")
-//            }
-//            ClanRank.COLEADER -> {
-//                throw IllegalArgumentException("$pluginMessagePrefix: Cannot promote co-leader, use anoint!")
-//            }
-//            ClanRank.ELDER -> {
-//                // Members cannot be both elders and co-leaders.
-//                elders -= promotedMember
-//                coLeaders += promotedMember
-//            }
-//            ClanRank.MEMBER -> {
-//                // All players in the clan maintain their member rank.
-//                elders += promotedMember
-//            }
-//        }
-//    }
-
-    // TODO: promote
-    // -- validate that we have a higher rank than the target
-    //    -- Notice that this subsumes us being the target.
-    // -- validate that we are not leader
-    // -- set the target members rank to nextrank
-    //    -- add to next rankset, remove from previous.
+    /**
+     * Promote a member to the next rank.
+     * @param promotedMember Member to promote to the next rank.
+     * @throws IllegalArgumentException if the rank becomes too high -- co-leaders must be promoted via separate function, since there can only be one leader.
+     */
+    fun promote(promotedMember: UUID) {
+        if (!contains(promotedMember)) {
+            throw IllegalArgumentException("$pluginMessagePrefix: Member $promotedMember does not exist!")
+        }
+        // Add the member to the corresponding set, or throw an error
+        when (rankOfMember(promotedMember)) {
+            ClanRank.LEADER -> {
+                throw IllegalArgumentException("$pluginMessagePrefix: Cannot promote leader!")
+            }
+            ClanRank.COLEADER -> {
+                throw IllegalArgumentException("$pluginMessagePrefix: Cannot promote co-leader, use anoint!")
+            }
+            ClanRank.ELDER -> {
+                // Members cannot be both elders and co-leaders.
+                elders -= promotedMember
+                coLeaders += promotedMember
+            }
+            ClanRank.MEMBER -> {
+                members -= promotedMember
+                elders += promotedMember
+            }
+        }
+    }
 
     /*
      * Member information getters.
