@@ -121,6 +121,11 @@ class Clan(val name: String, leader: UUID,
         }
     }
 
+    // TODO: demote
+    // assert the demoted member is in the list and has not hit the minimum rank.
+    // remove them from the set corresponding to their current rank.
+    // Add them to the set representing the next rank down.
+
     /*
      * Member information getters.
      */

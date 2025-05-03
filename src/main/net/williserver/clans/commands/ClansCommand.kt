@@ -281,6 +281,18 @@ class ClansCommand(private val clanSet: ClanSet,
         return true
     }
 
+    // TODO: promote
+    // -- assert both members are in the same clan.
+    // -- assert the promoter outranks the promotee.
+    // -- assert the promotee's rank is not already too high -- separate command for switching leader.
+    // -- fire the promotion event
+
+    // TODO: demote
+    // -- assert both members are in the same clan.
+    // -- assert the demoter outranks the demotee
+    // -- assert the demoter's rank is not already too low -- if a member, need to use kick command!
+    // -- fire the demotion event.
+
     /**
      * Make a player leave their clan.
      * First, the user executes /clans leave. This starts the leave timer.

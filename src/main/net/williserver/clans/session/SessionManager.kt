@@ -23,6 +23,7 @@ class SessionManager {
         ClanEvent.KICK to mutableMapOf(),
         // Norm: Pair<UUID, UUID> (player promoting, player being promoted)
         ClanEvent.PROMOTE to mutableMapOf(),
+        // TODO: add demote map
     )
 
     /**

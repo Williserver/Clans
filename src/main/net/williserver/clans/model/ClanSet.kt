@@ -217,6 +217,12 @@ class ClanSet(data: Set<ClanData>) {
         clan.promote(promotee)
     }
 
+    // TODO: demote
+    // assert agent clan tracked
+    // assert both members are in the same clan
+    // assert that the demoter has higher rank than the demotee
+    // call clan demote function
+
     /*
      * ClanList internal helpers.
      */

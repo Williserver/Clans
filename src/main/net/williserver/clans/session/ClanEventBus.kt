@@ -16,6 +16,8 @@ enum class ClanEvent {
     PROMOTE,
 }
 
+// TODO: add demote event
+
 /**
  * Listener function, registered to a specific event.
  * Clan and agent parameters are provided -- additional required state should be closed around.

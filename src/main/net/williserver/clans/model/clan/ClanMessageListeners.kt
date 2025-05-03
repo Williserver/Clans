@@ -9,6 +9,9 @@ import net.williserver.clans.commands.sendPrefixedMessage
 import net.williserver.clans.session.ClanLifecycleListener
 import org.bukkit.Bukkit
 
+// TODO: promote, demote messages
+// -- message the clan chat the player's new rank.
+
 /**
  * @return a listener that broadcasts a message to the server when a player is creator.
  */
