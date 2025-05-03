@@ -57,7 +57,7 @@ fun sendErrorMessage(target: CommandSender, message: String)
  */
 fun sendClanMessage(clan: Clan, message: Component) =
     // Send a message to each online player in the clan.
-    clan.members().forEach { Bukkit.getPlayer(it)?.sendMessage(message) }
+    clan.allClanmates().forEach { Bukkit.getPlayer(it)?.sendMessage(message) }
 
 /**
  * Append a message prefix component onto a message component.

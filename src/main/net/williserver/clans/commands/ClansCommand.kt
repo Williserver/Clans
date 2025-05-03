@@ -122,11 +122,11 @@ class ClansCommand(private val clanSet: ClanSet,
 
         val listTitle = Component.text("List:", NamedTextColor.AQUA)
         val sortedClans = clanSet.clans()
-            .sortedBy { it.members().size }
+            .sortedBy { it.allClanmates().size }
             .fold(Component.text())
                 { text, thisClan ->
                     text.append(Component.text("\n- ${thisClan.name}: ", NamedTextColor.GOLD))
-                        .append(Component.text("${thisClan.members().size} members", NamedTextColor.RED))
+                        .append(Component.text("${thisClan.allClanmates().size} clanmates", NamedTextColor.RED))
                 }
 
         sendPrefixedMessage(s, listTitle.append(sortedClans))
@@ -399,17 +399,23 @@ class ClansCommand(private val clanSet: ClanSet,
             return true
         }
 
+        // Convert a collection into a single component
+        fun componentify(title: String, collection: Iterable<UUID>) = collection.fold(
+            Component.text("$title: ", NamedTextColor.RED))
+            { others, uuid ->
+                others.append(Component.text("${getOfflinePlayer(uuid).name}, ", NamedTextColor.GREEN))
+            }
+
         // If clan present, prepare and send message with information.
         val correspondingClan = clanSet.get(args[0])
-        val header = Component.text("Clan \"${correspondingClan.name}\":\n", NamedTextColor.GOLD)
-        val leaderTitle = Component.text("Leader: ", NamedTextColor.RED)
-        val leaderName = Component.text("${getOfflinePlayer(correspondingClan.leader).name}\n", NamedTextColor.GREEN)
-        val memberHeader = Component.text("Members: ", NamedTextColor.RED)
-        val members = correspondingClan.members().fold(Component.text()) { members, uuid ->
-            members.append(Component.text("${getOfflinePlayer(uuid).name}, ", NamedTextColor.GREEN))
-        }
+        val header = Component.text("Clan \"${correspondingClan.name}\":", NamedTextColor.GOLD)
+        val leaderTitle = Component.text("\nLeader: ", NamedTextColor.RED)
+        val leaderName = Component.text("${getOfflinePlayer(correspondingClan.leader).name}", NamedTextColor.GREEN)
+        val coleaders = componentify("\nCo-leaders", correspondingClan.coLeaders())
+        val elders = componentify("\nElders", correspondingClan.elders())
+        val members = componentify("\nMembers", correspondingClan.members())
 
-        sendPrefixedMessage(s, header.append(leaderTitle).append(leaderName).append(memberHeader).append(members))
+        sendPrefixedMessage(s, header.append(leaderTitle).append(leaderName).append(coleaders).append(elders).append(members))
         return true
     }
 }
