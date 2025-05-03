@@ -72,6 +72,13 @@ class Clan(val name: String, leader: UUID,
      * Clan manipulators.
      */
 
+    // TODO: promote
+    // -- validate that we have a higher rank than the target
+    //    -- Notice that this subsumes us being the target.
+    // -- validate that we are not leader
+    // -- set the target members rank to nextrank
+    //    -- add to next rankset, remove from previous.
+
     /**
      * Add a new player to the clan.
      * @param recruit UUID of player to join.

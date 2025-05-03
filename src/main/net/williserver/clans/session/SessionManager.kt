@@ -21,6 +21,7 @@ class SessionManager {
         ClanEvent.DISBAND to mutableMapOf(),
         // Norm: Pair<UUID, UUID> (player kicking, player being kicked)
         ClanEvent.KICK to mutableMapOf(),
+        // TODO: add promote, even if not utilized -- keeps generic.
     )
 
     /**

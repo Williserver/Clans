@@ -201,6 +201,8 @@ class ClanSet(data: Set<ClanData>) {
         removeClan(clan)
     }
 
+    // TODO: promotion: add listener to call promotion in corresponding clan.
+
     /*
      * ClanList internal helpers.
      */
