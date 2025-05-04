@@ -81,11 +81,14 @@ class ClanEventBusTest {
         assert(member in clan)
 
         val bus = ClanEventBus()
-        bus.registerListener(ClanEvent.KICK, list.constructLeaveListener())
+        bus.registerListener(ClanEvent.KICK, list.constructKickListener())
         bus.fireEvent(ClanEvent.KICK, clan, leader, member)
 
         assertFalse(list.isPlayerInClan(member))
         assert(member !in clan)
+
+        clan.join(member)
+        assertThrows(IllegalArgumentException::class.java) { bus.fireEvent(ClanEvent.KICK, clan, member, member) }
     }
 
     @Test

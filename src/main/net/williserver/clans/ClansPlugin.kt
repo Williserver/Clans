@@ -45,17 +45,18 @@ class ClansPlugin : JavaPlugin() {
 
         // Register major events in clan lifecycle.
         val bus = ClanEventBus()
+
         // Model listeners affect persistent data
         bus.registerListener(ClanEvent.CREATE, clanSet.constructCreateListener())
         bus.registerListener(ClanEvent.DISBAND, clanSet.constructDisbandListener())
         bus.registerListener(ClanEvent.JOIN, clanSet.constructJoinListener())
         bus.registerListener(ClanEvent.LEAVE, clanSet.constructLeaveListener())
         bus.registerListener(ClanEvent.PROMOTE, clanSet.constructPromoteListener())
-        // From the model's perspective, the kicked player effectively leaves the clan.
-        // TODO: robust kick listener?
-        bus.registerListener(ClanEvent.KICK, clanSet.constructLeaveListener())
+        bus.registerListener(ClanEvent.KICK, clanSet.constructKickListener())
+
         // Session listeners affect temporary data, like expiring invites.
         bus.registerListener(ClanEvent.JOIN, session.constructDeregisterInviteListener())
+
         // Messaging listeners send informational messages when events occur.
         bus.registerListener(ClanEvent.CREATE, constructCreateMessageListener())
         bus.registerListener(ClanEvent.DISBAND, constructDisbandMessageListener())
@@ -63,6 +64,7 @@ class ClansPlugin : JavaPlugin() {
         bus.registerListener(ClanEvent.LEAVE, constructLeaveMessageListener())
         bus.registerListener(ClanEvent.PROMOTE, constructPromoteMessageListener())
         bus.registerListener(ClanEvent.KICK, constructKickMessageListener())
+
         // Integration listeners connect clans with other features of the plugin.
         if (config.scoreboardTeamsIntegration) {
             bus.registerListener(ClanEvent.CREATE, constructCreateAddTeamListener())
@@ -71,6 +73,7 @@ class ClansPlugin : JavaPlugin() {
             bus.registerListener(ClanEvent.LEAVE, constructLeaveTeamListener())
             bus.registerListener(ClanEvent.KICK, constructLeaveTeamListener())
         }
+
         // TODO: add demote lifecycle listeners.
         logger.info("Registered clan lifecycle listeners")
 

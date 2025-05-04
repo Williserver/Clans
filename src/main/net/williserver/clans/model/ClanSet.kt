@@ -182,6 +182,20 @@ class ClanSet(data: Set<ClanData>) {
     }
 
     /**
+     * Construct kick listener to kick a player from clan in this model.
+     * Fire when one player kicks another from the clan.
+     * @return the listener.
+     */
+    fun constructKickListener(): ClanLifecycleListener = { clan, agent, kickedPlayer ->
+        if (clan !in clans()) {
+            throw IllegalArgumentException("$pluginMessagePrefix: Clan ${clan.name} is not in this list!")
+        } else if (clan.rankOf(kickedPlayer) >= clan.rankOf(agent)) {
+            throw IllegalArgumentException("$pluginMessagePrefix: Kick attempted by player with insufficient rank!")
+        }
+        clan.leave(kickedPlayer)
+    }
+
+    /**
      * Construct create listener to add a clan to this model.
      * Fire when a new clan is created.
      * @return the listener
