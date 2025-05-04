@@ -89,7 +89,13 @@ class Clan(val name: String, leader: UUID,
         } else if (member == leader) {
             throw IllegalArgumentException("$pluginMessagePrefix: Member $member leads this clan!")
         }
-        members -= member
+
+        when (rankOfMember(member)) {
+            ClanRank.MEMBER -> members -= member
+            ClanRank.ELDER -> elders -= member
+            ClanRank.COLEADER -> coLeaders -= member
+            ClanRank.LEADER -> throw IllegalStateException("Should be unreachable -- are there multiple leaders?")
+        }
     }
 
     /**

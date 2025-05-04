@@ -41,6 +41,20 @@ class ClanTest {
         assert(newMember !in clan)
         assertThrows(IllegalArgumentException::class.java) { clan.leave(newMember) }
         assertThrows(IllegalArgumentException::class.java) { clan.leave(clan.leader) }
+
+        // Test different ranks.
+        clan.join(newMember)
+        clan.promote(newMember)
+        assert(newMember in clan)
+        clan.leave(newMember)
+        assert(newMember !in clan)
+
+        clan.join(newMember)
+        clan.promote(newMember)
+        clan.promote(newMember)
+        assert(newMember in clan)
+        clan.leave(newMember)
+        assert(newMember !in clan)
     }
 
     @Test
