@@ -50,7 +50,9 @@ class ClansPlugin : JavaPlugin() {
         bus.registerListener(ClanEvent.DISBAND, clanSet.constructDisbandListener())
         bus.registerListener(ClanEvent.JOIN, clanSet.constructJoinListener())
         bus.registerListener(ClanEvent.LEAVE, clanSet.constructLeaveListener())
+        bus.registerListener(ClanEvent.PROMOTE, clanSet.constructPromoteListener())
         // From the model's perspective, the kicked player effectively leaves the clan.
+        // TODO: robust kick listener?
         bus.registerListener(ClanEvent.KICK, clanSet.constructLeaveListener())
         // Session listeners affect temporary data, like expiring invites.
         bus.registerListener(ClanEvent.JOIN, session.constructDeregisterInviteListener())
@@ -59,6 +61,7 @@ class ClansPlugin : JavaPlugin() {
         bus.registerListener(ClanEvent.DISBAND, constructDisbandMessageListener())
         bus.registerListener(ClanEvent.JOIN, constructJoinMessageListener())
         bus.registerListener(ClanEvent.LEAVE, constructLeaveMessageListener())
+        bus.registerListener(ClanEvent.PROMOTE, constructPromoteMessageListener())
         bus.registerListener(ClanEvent.KICK, constructKickMessageListener())
         // Integration listeners connect clans with other features of the plugin.
         if (config.scoreboardTeamsIntegration) {
@@ -68,7 +71,6 @@ class ClansPlugin : JavaPlugin() {
             bus.registerListener(ClanEvent.LEAVE, constructLeaveTeamListener())
             bus.registerListener(ClanEvent.KICK, constructLeaveTeamListener())
         }
-        // TODO: add promote lifecycle listeners.
         // TODO: add demote lifecycle listeners.
         logger.info("Registered clan lifecycle listeners")
 

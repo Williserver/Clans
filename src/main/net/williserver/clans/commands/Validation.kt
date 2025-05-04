@@ -196,6 +196,20 @@ fun assertSenderNotLeader(s: CommandSender, clan: Clan) =
     } else true
 
 /**
+ * Check whether a given player's rank is equal to some other rank. If so, send an error message.
+ *
+ * @param s Sender to report errors to.
+ * @param clan Clan to get rank from.
+ * @param targetPlayer Player to check rank of.
+ * @param message Error message to send in case of trouble.
+ */
+fun assertRankNotEquals(s: CommandSender, clan: Clan, targetPlayer: UUID, rank: ClanRank, message: String) =
+    if (targetPlayer in clan && clan.rankOfMember(targetPlayer) == rank) {
+        sendErrorMessage(s, message)
+        false
+    } else true
+
+/**
  * Check whether some timer is in bounds. If not, report the issue to the player.
  *
  * @param s Sender to report errors to.

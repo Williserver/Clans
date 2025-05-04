@@ -5,6 +5,7 @@ import net.kyori.adventure.text.format.NamedTextColor
 import net.williserver.clans.model.*
 import net.williserver.clans.model.clan.Clan
 import net.williserver.clans.model.clan.ClanPermission
+import net.williserver.clans.model.clan.ClanRank
 import net.williserver.clans.pluginMessagePrefix
 import net.williserver.clans.session.SessionManager
 import net.williserver.clans.session.ClanEvent
@@ -46,6 +47,7 @@ class ClansCommand(private val clanSet: ClanSet,
                 "help" -> help(sender, args)
                 "leave" -> leave(sender, args)
                 "list" -> list(sender, args)
+                "promote" -> promote(sender, args)
                 else -> false
             }
         } else help(sender, args.toList())
@@ -87,6 +89,7 @@ class ClansCommand(private val clanSet: ClanSet,
         val leave = generateCommandHelp("leave", "begin to leave your clan.")
         val leaveConfirm = generateCommandHelp("leave confirm", "finish leaving your clan.")
         val list = generateCommandHelp("list", "output a list of clans.")
+        val promote = generateCommandHelp("promote (playername)", "Promote a player you outrank in your clan.")
 
         s.sendMessage(header
             .append(chat)
@@ -102,6 +105,7 @@ class ClansCommand(private val clanSet: ClanSet,
             .append(leave)
             .append(leaveConfirm)
             .append(list)
+            .append(promote)
         )
         return true
     }
@@ -281,11 +285,38 @@ class ClansCommand(private val clanSet: ClanSet,
         return true
     }
 
-    // TODO: promote
-    // -- assert both members are in the same clan.
-    // -- assert the promoter outranks the promotee.
-    // -- assert the promotee's rank is not already too high -- separate command for switching leader.
-    // -- fire the promotion event
+    /**
+     * Promote a member of sender's clan.
+     *
+     * @param s Player who invoked the command.
+     * @param args Arguments to command. Should be one: the name of the player to promote.
+     * @return Whether the command was invoked with the correct number of args.
+     */
+    private fun promote(s: CommandSender, args: List<String>): Boolean {
+        // Argument structure validation: 1 arg: target to promote
+        if (args.size != 1) {
+            return false
+        }
+        // Argument semantics validation.
+        if (!assertValidPlayer(s)
+            || !assertSenderInAClan(s, clanSet)
+            || !assertPlayerNameValid(s, args[0])) {
+            return true
+        }
+        val ourClan = clanSet.playerClan((s as Player).uniqueId)
+        val player = getOfflinePlayer(args[0])
+        // This command cannot be invoked as leader, because if so, we would have to implicitly demote ourselves.
+        if (!assertPlayerInThisClan(s, ourClan, player.uniqueId,
+                "Player ${args[0]} is not in our clan!")
+            || !assertRankNotEquals(s, ourClan, player.uniqueId, ClanRank.COLEADER,
+                "${args[0]} has reached rank co-leader -- to make them leader, use \"/clans anoint ${args[0]}\" instead!")
+            || !assertSenderOutranks(s, ourClan, player.uniqueId)) {
+            return true
+        }
+        // If these constraints are met, the player is promoted.
+        bus.fireEvent(ClanEvent.PROMOTE, ourClan, agent=s.uniqueId, target=player.uniqueId)
+        return true
+    }
 
     // TODO: demote
     // -- assert both members are in the same clan.
