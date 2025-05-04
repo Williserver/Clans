@@ -84,12 +84,12 @@ class ListenersTest {
         val bus = ClanEventBus()
         bus.registerListener(ClanEvent.PROMOTE, clanSet.constructPromoteListener())
 
-        assertEquals(ClanRank.MEMBER, clan.rankOfMember(promotee))
+        assertEquals(ClanRank.MEMBER, clan.rankOf(promotee))
         assertThrows(IllegalArgumentException::class.java) {bus.fireEvent(ClanEvent.PROMOTE, clan, promotee, promotee) }
         bus.fireEvent(ClanEvent.PROMOTE, clan, leader, promotee)
-        assertEquals(ClanRank.ELDER, clan.rankOfMember(promotee))
+        assertEquals(ClanRank.ELDER, clan.rankOf(promotee))
         bus.fireEvent(ClanEvent.PROMOTE, clan, leader, promotee)
-        assertEquals(ClanRank.COLEADER, clan.rankOfMember(promotee))
+        assertEquals(ClanRank.COLEADER, clan.rankOf(promotee))
         assertThrows(IllegalArgumentException::class.java) {bus.fireEvent(ClanEvent.PROMOTE, clan, leader, promotee) }
     }
 }

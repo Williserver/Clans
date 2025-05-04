@@ -86,16 +86,16 @@ class ClanSet(data: Set<ClanData>) {
      * @param playerToFind UUID for player.
      * @return Whether the player is in a clan in thist list.
      */
-    fun playerInClan(playerToFind: UUID) = clans().any { playerToFind in it }
+    fun isPlayerInClan(playerToFind: UUID) = clans().any { playerToFind in it }
 
     /**
      * Find the clan in this list that has player as a member.
      *
      * @throws NullPointerException If no player in clan.
-     * @param UUID player to search for.
+     * @param playerToFind player to search for.
      * @return The clan UUID is a member of, or null if no such clan exists.
      */
-    fun playerClan(playerToFind: UUID): Clan = clans().find { playerToFind in it }!!
+    fun clanOf(playerToFind: UUID): Clan = clans().find { playerToFind in it }!!
 
     /*
      * ClanList clan helpers.
@@ -195,7 +195,7 @@ class ClanSet(data: Set<ClanData>) {
      * @return the listener
      */
     fun constructDisbandListener(): ClanLifecycleListener = { clan, _, disbander ->
-        if (disbander !in clan || !clan.rankOfMember(disbander).hasPermission(ClanPermission.DISBAND)) {
+        if (disbander !in clan || !clan.rankOf(disbander).hasPermission(ClanPermission.DISBAND)) {
             throw IllegalArgumentException("$pluginMessagePrefix: This player does not have permission to disband the clan!")
         }
         removeClan(clan)
@@ -211,7 +211,7 @@ class ClanSet(data: Set<ClanData>) {
             throw IllegalArgumentException("$pluginMessagePrefix: Clan is not tracked in this list.")
         } else if (promoter !in clan || promotee !in clan) {
             throw IllegalArgumentException("$pluginMessagePrefix: Player not in clan.")
-        } else if (clan.rankOfMember(promoter) <= clan.rankOfMember(promotee)) {
+        } else if (clan.rankOf(promoter) <= clan.rankOf(promotee)) {
             throw IllegalArgumentException("$pluginMessagePrefix: Promoter does not outrank promoted player.")
         }
         clan.promote(promotee)

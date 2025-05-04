@@ -184,12 +184,12 @@ class ClansCommand(private val clanSet: ClanSet,
         // Argument semantics validation.
         if (!assertValidPlayer(s)
             || !assertSenderInAClan(s, clanSet)
-            || !assertSenderHasPermission(s, clanSet.playerClan((s as Player).uniqueId), ClanPermission.DISBAND)) {
+            || !assertSenderHasPermission(s, clanSet.clanOf((s as Player).uniqueId), ClanPermission.DISBAND)) {
             return true
         }
 
         // Either initiate a new disband attempt, or confirm one if it's done in time.
-        val clan = clanSet.playerClan(s.uniqueId)
+        val clan = clanSet.clanOf(s.uniqueId)
         return when(args.size) {
             0 -> {
                 session.registerTimer(ClanEvent.DISBAND, clan, config.confirmTime.toLong())
@@ -231,14 +231,14 @@ class ClansCommand(private val clanSet: ClanSet,
         // Argument semantics validation.
         if (!assertValidPlayer(s)
             || !assertSenderInAClan(s, clanSet)
-            || !assertSenderHasPermission(s, clanSet.playerClan((s as Player).uniqueId), ClanPermission.INVITE)
+            || !assertSenderHasPermission(s, clanSet.clanOf((s as Player).uniqueId), ClanPermission.INVITE)
             || !assertPlayerNameOnline(s, args[0])
             || !assertPlayerNotInAClan(s, clanSet, getPlayer(args[0])!!.uniqueId,
                 "${getPlayer(args[0])!!.name} is already in a clan!")) {
             return true
         }
 
-        val targetClan = clanSet.playerClan(s.uniqueId)
+        val targetClan = clanSet.clanOf(s.uniqueId)
         val targetPlayer = getPlayer(args[0])!!
         // Validate that player is not currently waiting on invitation.
         if (session.isTimerInBounds(ClanEvent.JOIN, Pair(s.uniqueId, targetClan))) {
@@ -303,7 +303,7 @@ class ClansCommand(private val clanSet: ClanSet,
             || !assertPlayerNameValid(s, args[0])) {
             return true
         }
-        val ourClan = clanSet.playerClan((s as Player).uniqueId)
+        val ourClan = clanSet.clanOf((s as Player).uniqueId)
         val player = getOfflinePlayer(args[0])
         // This command cannot be invoked as leader, because if so, we would have to implicitly demote ourselves.
         if (!assertPlayerInThisClan(s, ourClan, player.uniqueId,
@@ -341,7 +341,7 @@ class ClansCommand(private val clanSet: ClanSet,
         // Argument semantics validation.
         if (!assertValidPlayer(s)
             || !assertSenderInAClan(s, clanSet)
-            || !assertSenderNotLeader(s, clanSet.playerClan((s as Player).uniqueId))) {
+            || !assertSenderNotLeader(s, clanSet.clanOf((s as Player).uniqueId))) {
             return true
         }
 
@@ -362,7 +362,7 @@ class ClansCommand(private val clanSet: ClanSet,
                 }
                 // Leave clan if the timer was started.
                 if (assertTimerInBounds(s, session, ClanEvent.LEAVE, s.uniqueId, "leave")) {
-                    bus.fireEvent(ClanEvent.LEAVE, clanSet.playerClan(s.uniqueId), agent=s.uniqueId, target=s.uniqueId)
+                    bus.fireEvent(ClanEvent.LEAVE, clanSet.clanOf(s.uniqueId), agent=s.uniqueId, target=s.uniqueId)
                 }
                 true
             }
@@ -390,7 +390,7 @@ class ClansCommand(private val clanSet: ClanSet,
              || ! assertPlayerNameValid(s, args[0])) {
              return true
         }
-        val clanToKickFrom = clanSet.playerClan((s as Player).uniqueId)
+        val clanToKickFrom = clanSet.clanOf((s as Player).uniqueId)
         val playerToKick = getOfflinePlayer(args[0])
         if (!assertSenderHasPermission(s, clanToKickFrom, ClanPermission.KICK)
              || !assertPlayerInThisClan(s, clanToKickFrom, playerToKick.uniqueId, "")
@@ -415,7 +415,7 @@ class ClansCommand(private val clanSet: ClanSet,
                 }
                 // Kick player from clan if timer started.
                 if (assertTimerInBounds(s, session, ClanEvent.KICK, Pair(s.uniqueId, playerToKick.uniqueId), "kick")) {
-                    bus.fireEvent(ClanEvent.KICK, clanSet.playerClan(s.uniqueId), agent=s.uniqueId, target=playerToKick.uniqueId)
+                    bus.fireEvent(ClanEvent.KICK, clanSet.clanOf(s.uniqueId), agent=s.uniqueId, target=playerToKick.uniqueId)
                 }
                 true
             } else -> throw IllegalStateException("$pluginMessagePrefix: Internal error: Wrong number of arguments to /clans kick -- this should have been caught earlier!")

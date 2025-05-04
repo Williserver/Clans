@@ -90,7 +90,7 @@ class Clan(val name: String, leader: UUID,
             throw IllegalArgumentException("$pluginMessagePrefix: Member $member leads this clan!")
         }
 
-        when (rankOfMember(member)) {
+        when (rankOf(member)) {
             ClanRank.MEMBER -> members -= member
             ClanRank.ELDER -> elders -= member
             ClanRank.COLEADER -> coLeaders -= member
@@ -108,7 +108,7 @@ class Clan(val name: String, leader: UUID,
             throw IllegalArgumentException("$pluginMessagePrefix: Member $promotedMember does not exist!")
         }
         // Add the member to the corresponding set, or throw an error
-        when (rankOfMember(promotedMember)) {
+        when (rankOf(promotedMember)) {
             ClanRank.LEADER -> {
                 throw IllegalArgumentException("$pluginMessagePrefix: Cannot promote leader!")
             }
@@ -163,7 +163,7 @@ class Clan(val name: String, leader: UUID,
      * @return the rank of member in this clan.
      * @throws IllegalArgumentException If the specified member is not in this clan.
      */
-    fun rankOfMember(member: UUID): ClanRank =
+    fun rankOf(member: UUID): ClanRank =
         when (member) {
             leader -> ClanRank.LEADER
             in coLeaders -> ClanRank.COLEADER
@@ -212,7 +212,7 @@ class Clan(val name: String, leader: UUID,
      * @throws IllegalArgumentException if the player is not in the clan.
      */
     private fun uniqueRank(player: UUID) =
-        when (rankOfMember(player)) {
+        when (rankOf(player)) {
             ClanRank.LEADER -> player !in members() && player !in elders() && player !in coLeaders()
             ClanRank.COLEADER -> player != leader && player !in members() && player !in elders()
             ClanRank.ELDER -> player != leader && player !in members() && player !in coLeaders()

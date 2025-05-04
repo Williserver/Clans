@@ -31,7 +31,7 @@ class ChatCommand(private val clans: ClanSet): CommandExecutor {
         }
 
         // Format the message and log it in the server.
-        val clan = clans.playerClan((s as Player).uniqueId)
+        val clan = clans.clanOf((s as Player).uniqueId)
         // Send a message to each online player in the clan.
         sendClanMessage(clan, Component.text("[${clan.name}] ${s.name}: ${args.joinToString(" ")}", NamedTextColor.DARK_AQUA))
         return true

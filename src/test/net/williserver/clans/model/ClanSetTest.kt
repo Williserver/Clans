@@ -42,12 +42,12 @@ class ClanSetTest {
     }
 
     @Test
-    fun testPlayerClan() {
+    fun testClanOf() {
         val leader = UUID.randomUUID().toString()
         val clanData = ClanData("TestClan", setOf(), setOf(), setOf(), leader)
         val list = ClanSet(setOf(clanData))
-        assert(list.playerInClan(UUID.fromString(clanData.leader)))
-        assertEquals(Clan(clanData), list.playerClan(UUID.fromString(clanData.leader)))
+        assert(list.isPlayerInClan(UUID.fromString(clanData.leader)))
+        assertEquals(Clan(clanData), list.clanOf(UUID.fromString(clanData.leader)))
     }
 
     @Test
@@ -55,8 +55,8 @@ class ClanSetTest {
         val leader = UUID.randomUUID().toString()
         val clanData = ClanData("TestClan", setOf(), setOf(), setOf(), leader)
         val list = ClanSet(setOf(clanData))
-        assertFalse(list.playerInClan(UUID.randomUUID()))
-        assertThrows(NullPointerException::class.java) { list.playerClan(UUID.randomUUID()) }
+        assertFalse(list.isPlayerInClan(UUID.randomUUID()))
+        assertThrows(NullPointerException::class.java) { list.clanOf(UUID.randomUUID()) }
     }
 
     @Test

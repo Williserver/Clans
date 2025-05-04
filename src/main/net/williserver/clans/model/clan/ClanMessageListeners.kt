@@ -74,7 +74,7 @@ fun constructKickMessageListener(): ClanLifecycleListener = { clan, agent, kicke
 fun constructPromoteMessageListener(): ClanLifecycleListener = { clan, promoter, promotedPlayer ->
     val message = prefix(clan.name)
     .append(Component.text(
-        "${Bukkit.getOfflinePlayer(promotedPlayer).name} has been promoted to ${clan.rankOfMember(promotedPlayer)} by ${Bukkit.getOfflinePlayer(promoter).name}."))
+        "${Bukkit.getOfflinePlayer(promotedPlayer).name} has been promoted to ${clan.rankOf(promotedPlayer)} by ${Bukkit.getOfflinePlayer(promoter).name}."))
     sendClanMessage(clan, message)
 }
 

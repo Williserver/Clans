@@ -56,9 +56,9 @@ class ClansTabCompleter(private val clanSet: ClanSet): TabCompleter {
                 "info", "join "-> clanSet.clans().forEach { completions.add(it.name) }
                 "invite" -> getOnlinePlayers().forEach { completions.add(it.name) }
                 "kick", "promote" ->
-                    if (sender is Player && clanSet.playerInClan(sender.uniqueId)) {
+                    if (sender is Player && clanSet.isPlayerInClan(sender.uniqueId)) {
                         // Notice: all UUIDs must map to a name, as otherwise they would not have been in a clan.
-                        clanSet.playerClan(sender.uniqueId)
+                        clanSet.clanOf(sender.uniqueId)
                             .allClanmates()
                             .forEach { playerUUID -> completions.add(getOfflinePlayer(playerUUID).name!!) }
                     }

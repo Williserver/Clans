@@ -19,9 +19,9 @@ class ClanRankTest {
         val member = UUID.randomUUID()
         val clan = Clan("TestClan", leader, members = mutableSetOf(member))
 
-        assertEquals(ClanRank.LEADER, clan.rankOfMember(leader))
-        assertEquals(ClanRank.MEMBER, clan.rankOfMember(member))
-        assertThrows(IllegalArgumentException::class.java) { clan.rankOfMember(UUID.randomUUID()) }
+        assertEquals(ClanRank.LEADER, clan.rankOf(leader))
+        assertEquals(ClanRank.MEMBER, clan.rankOf(member))
+        assertThrows(IllegalArgumentException::class.java) { clan.rankOf(UUID.randomUUID()) }
     }
 
     @Test
@@ -31,9 +31,9 @@ class ClanRankTest {
         val coleader = UUID.randomUUID()
         val clan = Clan("TestClan", leader, members = mutableSetOf(member), coLeaders = mutableSetOf(coleader))
 
-        assert(clan.rankOfMember(leader).hasPermission(ClanPermission.DISBAND))
-        assertFalse(clan.rankOfMember(member).hasPermission(ClanPermission.DISBAND))
-        assertFalse(clan.rankOfMember(coleader).hasPermission(ClanPermission.DISBAND))
+        assert(clan.rankOf(leader).hasPermission(ClanPermission.DISBAND))
+        assertFalse(clan.rankOf(member).hasPermission(ClanPermission.DISBAND))
+        assertFalse(clan.rankOf(coleader).hasPermission(ClanPermission.DISBAND))
     }
 
     @Test
@@ -43,9 +43,9 @@ class ClanRankTest {
         val coleader = UUID.randomUUID()
         val clan = Clan("TestClan", leader, members = mutableSetOf(member), coLeaders = mutableSetOf(coleader))
 
-        assert(clan.rankOfMember(leader).hasPermission(ClanPermission.INVITE))
-        assert(clan.rankOfMember(coleader).hasPermission(ClanPermission.INVITE))
-        assertFalse(clan.rankOfMember(member).hasPermission(ClanPermission.INVITE))
+        assert(clan.rankOf(leader).hasPermission(ClanPermission.INVITE))
+        assert(clan.rankOf(coleader).hasPermission(ClanPermission.INVITE))
+        assertFalse(clan.rankOf(member).hasPermission(ClanPermission.INVITE))
     }
 
     @Test
@@ -55,8 +55,8 @@ class ClanRankTest {
         val coleader = UUID.randomUUID()
         val clan = Clan("TestClan", leader, members = mutableSetOf(member), coLeaders = mutableSetOf(coleader))
 
-        assert(clan.rankOfMember(leader).hasPermission(ClanPermission.KICK))
-        assert(clan.rankOfMember(coleader).hasPermission(ClanPermission.KICK))
-        assertFalse(clan.rankOfMember(member).hasPermission(ClanPermission.KICK))
+        assert(clan.rankOf(leader).hasPermission(ClanPermission.KICK))
+        assert(clan.rankOf(coleader).hasPermission(ClanPermission.KICK))
+        assertFalse(clan.rankOf(member).hasPermission(ClanPermission.KICK))
     }
 }

@@ -77,14 +77,14 @@ class ClanEventBusTest {
         val clan = Clan("TestClan", leader, members = mutableSetOf(member))
         val list = ClanSet(setOf())
         list.addClan(clan)
-        assert(list.playerInClan(member))
+        assert(list.isPlayerInClan(member))
         assert(member in clan)
 
         val bus = ClanEventBus()
         bus.registerListener(ClanEvent.KICK, list.constructLeaveListener())
         bus.fireEvent(ClanEvent.KICK, clan, leader, member)
 
-        assertFalse(list.playerInClan(member))
+        assertFalse(list.isPlayerInClan(member))
         assert(member !in clan)
     }
 

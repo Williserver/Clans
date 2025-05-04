@@ -69,7 +69,7 @@ fun assertPlayerNameValid(s: CommandSender, name: String) =
 fun assertSenderOutranks(s: CommandSender, clan: Clan, shouldUnderrank: UUID) =
     if (s !is Player || s.uniqueId !in clan || shouldUnderrank !in clan) {
         throw IllegalArgumentException("One of the players was not in the clan ${clan.name}.")
-    } else if (clan.rankOfMember(s.uniqueId) <= clan.rankOfMember(shouldUnderrank)) {
+    } else if (clan.rankOf(s.uniqueId) <= clan.rankOf(shouldUnderrank)) {
         sendErrorMessage(s, "You don't outrank the target player!")
         false
     } else true
@@ -83,7 +83,7 @@ fun assertSenderOutranks(s: CommandSender, clan: Clan, shouldUnderrank: UUID) =
  * @return whether the player was in one of the clans in list @clans.
  */
 fun assertSenderInAClan(s: CommandSender, clans: ClanSet) =
-    if (s !is Player || !clans.playerInClan(s.uniqueId)) {
+    if (s !is Player || !clans.isPlayerInClan(s.uniqueId)) {
         sendErrorMessage(s, "You must be in a clan.")
         false
     } else true
@@ -98,7 +98,7 @@ fun assertSenderInAClan(s: CommandSender, clans: ClanSet) =
  * @return whether the player was in one of the clans in list @clans.
  */
 fun assertPlayerNotInAClan(s: CommandSender, clans: ClanSet, player: UUID, message: String) =
-    if (clans.playerInClan(player)) {
+    if (clans.isPlayerInClan(player)) {
         sendErrorMessage(s, message)
         false
     } else true
@@ -130,7 +130,7 @@ fun assertPlayerInThisClan(s: CommandSender, clan: Clan, player: UUID, message: 
  * @throws IllegalArgumentException if player is not in clan.
  */
 fun assertSenderHasPermission(s: CommandSender, clan: Clan, permission: ClanPermission) =
-    if (s is Player && !clan.rankOfMember(s.uniqueId).hasPermission(permission)) {
+    if (s is Player && !clan.rankOf(s.uniqueId).hasPermission(permission)) {
         sendErrorMessage(s, "Your clan rank is not high enough for this command.")
         false
     } else true
@@ -189,7 +189,7 @@ fun assertClanNameInList(s: CommandSender, list: ClanSet, name: String) =
  * @throws IllegalArgumentException if player is not in clan.
  */
 fun assertSenderNotLeader(s: CommandSender, clan: Clan) =
-    if (s is Player && clan.rankOfMember(s.uniqueId) == ClanRank.LEADER) {
+    if (s is Player && clan.rankOf(s.uniqueId) == ClanRank.LEADER) {
         sendErrorMessage(s, "You may not execute this command as leader.")
         sendErrorMessage(s, "Promote another member to leader first.")
         false
@@ -204,7 +204,7 @@ fun assertSenderNotLeader(s: CommandSender, clan: Clan) =
  * @param message Error message to send in case of trouble.
  */
 fun assertRankNotEquals(s: CommandSender, clan: Clan, targetPlayer: UUID, rank: ClanRank, message: String) =
-    if (targetPlayer in clan && clan.rankOfMember(targetPlayer) == rank) {
+    if (targetPlayer in clan && clan.rankOf(targetPlayer) == rank) {
         sendErrorMessage(s, message)
         false
     } else true
