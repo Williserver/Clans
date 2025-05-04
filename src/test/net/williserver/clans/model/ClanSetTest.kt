@@ -66,11 +66,11 @@ class ClanSetTest {
 
         // Cannot add duplicate clans.
         val sameLeaderClan = Clan("NewTestClan", clan.leader)
-        assertThrows(IllegalArgumentException::class.java) { list.addClan(sameLeaderClan) }
+        assertThrows(IllegalArgumentException::class.java) { list += sameLeaderClan }
 
         val newLeader = UUID.randomUUID()
         val sameNameClan = Clan("TestClan", newLeader)
-        assertThrows(IllegalArgumentException::class.java) { list.addClan(sameNameClan) }
+        assertThrows(IllegalArgumentException::class.java) { list += sameNameClan }
 
         val uniqueClan = Clan("ThisShouldWork", newLeader)
         list.addClan(uniqueClan)
@@ -83,8 +83,8 @@ class ClanSetTest {
         val list = ClanSet(setOf(clan.asDataTuple()))
 
         assert(clan.name in list)
-        list.removeClan(clan)
+        list -= clan
         assert(clan.name !in list)
-        assertThrows(NoSuchElementException::class.java) { list.removeClan(clan) }
+        assertThrows(NoSuchElementException::class.java) { list -= clan }
     }
 }

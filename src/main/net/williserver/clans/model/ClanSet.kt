@@ -62,6 +62,8 @@ class ClanSet(data: Set<ClanData>) {
         clans += newClan
     }
 
+    operator fun plusAssign(newClan: Clan) = addClan(newClan)
+
     /**
      * Remove a clan from the ClanList. This effectively deletes it.
      *
@@ -74,6 +76,8 @@ class ClanSet(data: Set<ClanData>) {
         }
         clans -= clanToRemove
     }
+
+    operator fun minusAssign(clanToRemove: Clan) = removeClan(clanToRemove)
 
     /*
      * ClanList player helpers.
