@@ -71,6 +71,8 @@ class ClansPlugin : JavaPlugin() {
             bus.registerListener(ClanEvent.DISBAND, constructDisbandRemoveTeamListener())
             bus.registerListener(ClanEvent.JOIN, constructJoinTeamListener())
             bus.registerListener(ClanEvent.LEAVE, constructLeaveTeamListener())
+            // From the limited perspective of vanilla teams, a kick is just a player leaving.
+            // They lack sufficient context to impose stricter checks and so use the same leave listener.
             bus.registerListener(ClanEvent.KICK, constructLeaveTeamListener())
         }
 
