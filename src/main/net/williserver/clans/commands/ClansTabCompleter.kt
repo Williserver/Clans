@@ -56,7 +56,7 @@ class ClansTabCompleter(private val clanSet: ClanSet): TabCompleter {
         }
         2 -> {
             when (args[0].lowercase()) {
-                "info", "join "-> clanSet.clans().forEach { completions.add(it.name) }
+                "info", "join"-> clanSet.clans().forEach { completions.add(it.name) }
                 "invite" -> getOnlinePlayers().forEach { completions.add(it.name) }
                 "kick", "promote", "demote" ->
                     if (sender is Player && clanSet.isPlayerInClan(sender.uniqueId)) {

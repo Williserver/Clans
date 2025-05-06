@@ -78,7 +78,6 @@ class ClansPlugin : JavaPlugin() {
             bus.registerListener(ClanEvent.KICK, constructLeaveTeamListener())
         }
 
-        // TODO: add demote lifecycle listeners.
         logger.info("Registered clan lifecycle listeners")
 
         // Register commands.
