@@ -127,10 +127,33 @@ class Clan(val name: String, leader: UUID,
         }
     }
 
-    // TODO: demote
-    // assert the demoted member is in the list and has not hit the minimum rank.
-    // remove them from the set corresponding to their current rank.
-    // Add them to the set representing the next rank down.
+    /**
+     * Demote a member to the previous rank.
+     * @param demotedMember Member to demote to previous rank.
+     * @throws IllegalArgumentException if the rank becomes too low, or attempts to demote the leader.
+     */
+    fun demote(demotedMember: UUID) {
+        if (!contains(demotedMember)) {
+            throw IllegalArgumentException("$pluginMessagePrefix: Member $demotedMember does not exist!")
+        }
+        // Remove the member from the corresponding set, or throw an error.
+        when (rankOf(demotedMember)) {
+            ClanRank.LEADER -> {
+                throw IllegalArgumentException("$pluginMessagePrefix: Cannot demote leader!")
+            }
+            ClanRank.COLEADER -> {
+                coLeaders -= demotedMember
+                elders += demotedMember
+            }
+            ClanRank.ELDER -> {
+                elders -= demotedMember
+                members += demotedMember
+            }
+            ClanRank.MEMBER -> {
+                throw IllegalArgumentException("$pluginMessagePrefix: Cannot demote member, use kick!")
+            }
+        }
+    }
 
     /*
      * Member information getters.

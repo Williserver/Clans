@@ -128,7 +128,30 @@ class ClanTest {
         clan.promote(member)
         assert(clan.rankOf(member) == ClanRank.COLEADER)
 
+        // Cannot promote beyond maximum rank
         assertThrows(IllegalArgumentException::class.java) { clan.promote(member) }
         assertThrows(IllegalArgumentException::class.java) { clan.promote(leader) }
+        assertThrows(IllegalArgumentException::class.java) { clan.demote(UUID.randomUUID()) }
+    }
+
+    @Test
+    fun testDemote() {
+        val leader = UUID.randomUUID()
+        val coleader = UUID.randomUUID()
+
+        val clan = Clan("TestClan",
+            leader,
+            coLeaders = mutableSetOf(coleader),
+        )
+        assert(clan.rankOf(coleader) == ClanRank.COLEADER)
+        clan.demote(coleader)
+        assert(clan.rankOf(coleader) == ClanRank.ELDER)
+        clan.demote(coleader)
+        assert(clan.rankOf(coleader) == ClanRank.MEMBER)
+
+        // Cannot demote below maximum rank.
+        assertThrows(IllegalArgumentException::class.java) { clan.demote(coleader) }
+        assertThrows(IllegalArgumentException::class.java) { clan.demote(leader) }
+        assertThrows(IllegalArgumentException::class.java) { clan.demote(UUID.randomUUID()) }
     }
 }
