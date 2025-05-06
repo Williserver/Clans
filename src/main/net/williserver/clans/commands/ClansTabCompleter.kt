@@ -38,9 +38,11 @@ class ClansTabCompleter(private val clanSet: ClanSet): TabCompleter {
         }
 
         // Add all possible suggestions for when the user hasn't finished their first subcommand.
-        if (args.size == 1) {
+        when (args.size) {
+        1 -> {
             completions.add("help")
             completions.add("create")
+            completions.add("demote")
             completions.add("disband")
             completions.add("info")
             completions.add("invite")
@@ -51,11 +53,12 @@ class ClansTabCompleter(private val clanSet: ClanSet): TabCompleter {
             completions.add("promote")
             // Only add completions that correspond with the subcommand they're typing.
             completions.removeAll{ !it.startsWith(args[0].lowercase()) }
-        } else if (args.size == 2) {
+        }
+        2 -> {
             when (args[0].lowercase()) {
                 "info", "join "-> clanSet.clans().forEach { completions.add(it.name) }
                 "invite" -> getOnlinePlayers().forEach { completions.add(it.name) }
-                "kick", "promote" ->
+                "kick", "promote", "demote" ->
                     if (sender is Player && clanSet.isPlayerInClan(sender.uniqueId)) {
                         // Notice: all UUIDs must map to a name, as otherwise they would not have been in a clan.
                         clanSet.clanOf(sender.uniqueId)
@@ -67,12 +70,14 @@ class ClansTabCompleter(private val clanSet: ClanSet): TabCompleter {
             }
             // Do not include lowercase or playernames will not work!
             completions.removeAll{ !it.startsWith(args[1]) }
-        } else if (args.size == 3) {
+        }
+        3 -> {
             // The third argument to kick will only ever be "confirm"
             when (args[0].lowercase()) {
                 "kick" -> completions.add("confirm")
             }
             completions.removeAll{ !it.startsWith(args[2].lowercase()) }
+        }
         }
 
         return completions

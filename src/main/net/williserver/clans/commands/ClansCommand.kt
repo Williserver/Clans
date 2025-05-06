@@ -39,6 +39,7 @@ class ClansCommand(private val clanSet: ClanSet,
             val args = args.drop(1)
             when(subcommand.lowercase(Locale.getDefault())) {
                 "create" -> create(sender, args)
+                "demote" -> demote(sender, args)
                 "disband" -> disband(sender, args)
                 "info" -> info(sender, args)
                 "invite" -> invite(sender, args)
@@ -79,6 +80,7 @@ class ClansCommand(private val clanSet: ClanSet,
         // All other commands are prefixed by /clans
         val help = generateCommandHelp("help", "pull up this help menu.")
         val create = generateCommandHelp("create (name)", "create a new clan under your visionary leadership.")
+        val demote = generateCommandHelp("demote (playername)", "demote a player in your clan.")
         val disband = generateCommandHelp("disband", "begin to disband the clan you own.")
         val disbandConfirm = generateCommandHelp("disband confirm", "finish disbanding the clan you own.")
         val info = generateCommandHelp("info (name)", "get information about a clan.")
@@ -89,12 +91,13 @@ class ClansCommand(private val clanSet: ClanSet,
         val leave = generateCommandHelp("leave", "begin to leave your clan.")
         val leaveConfirm = generateCommandHelp("leave confirm", "finish leaving your clan.")
         val list = generateCommandHelp("list", "output a list of clans.")
-        val promote = generateCommandHelp("promote (playername)", "Promote a player you outrank in your clan.")
+        val promote = generateCommandHelp("promote (playername)", "Promote a player in your clan.")
 
         s.sendMessage(header
             .append(chat)
             .append(help)
             .append(create)
+            .append(demote)
             .append(disband)
             .append(disbandConfirm)
             .append(info)
@@ -292,29 +295,46 @@ class ClansCommand(private val clanSet: ClanSet,
      * @param args Arguments to command. Should be one: the name of the player to promote.
      * @return Whether the command was invoked with the correct number of args.
      */
-    private fun promote(s: CommandSender, args: List<String>): Boolean {
-        // Argument structure validation: 1 arg: target to promote
+    private fun promote(s: CommandSender, args: List<String>): Boolean =
+        changeRank(s, args, ClanEvent.PROMOTE, ClanRank.COLEADER, "Target player has reached rank co-leader -- to make them leader, use \"/clans anoint (playername)\" instead!")
+
+    /**
+     * Demote a member of sender's clan.
+     *
+     * @param s Player who invoked the command.
+     * @param args Arguments to command. Should be one: the name of the player to demote.
+     * @return Whether the command was invoked with the correct number of args.
+     */
+    private fun demote(s: CommandSender, args: List<String>): Boolean =
+        changeRank(s, args, ClanEvent.DEMOTE, ClanRank.MEMBER, "Target player has reached rank member -- to remove them from the clan, use \"/clans kick (playername)\".")
+        // Argument structure validation. 1 arg: target to demote.
+
+    /**
+     * Internal implementation for promote, demote. Should not be called outside those contexts.
+     */
+    private fun changeRank(s: CommandSender, args: List<String>, event: ClanEvent, boundaryRank: ClanRank, boundaryMessage: String): Boolean {
+        assert(event == ClanEvent.DEMOTE || event == ClanEvent.PROMOTE)
+        // Argument structure validation. 1 arg: target to change rank of.
         if (args.size != 1) {
             return false
         }
-        // Argument semantics validation.
+        // argument semantics validation.
         if (!assertValidPlayer(s)
             || !assertSenderInAClan(s, clanSet)
             || !assertPlayerNameValid(s, args[0])) {
             return true
         }
+
         val ourClan = clanSet.clanOf((s as Player).uniqueId)
-        val player = getOfflinePlayer(args[0])
-        // This command cannot be invoked as leader, because if so, we would have to implicitly demote ourselves.
-        if (!assertPlayerInThisClan(s, ourClan, player.uniqueId,
+        val target = getOfflinePlayer(args[0])
+        if (!assertPlayerInThisClan(s, ourClan, target.uniqueId,
                 "Player ${args[0]} is not in our clan!")
-            || !assertRankNotEquals(s, ourClan, player.uniqueId, ClanRank.COLEADER,
-                "${args[0]} has reached rank co-leader -- to make them leader, use \"/clans anoint ${args[0]}\" instead!")
-            || !assertSenderOutranks(s, ourClan, player.uniqueId)) {
+            || !assertRankNotEquals(s, ourClan, target.uniqueId, boundaryRank, boundaryMessage)
+            || !assertSenderOutranks(s, ourClan, target.uniqueId)) {
             return true
         }
-        // If these constraints are met, the player is promoted.
-        bus.fireEvent(ClanEvent.PROMOTE, ourClan, agent=s.uniqueId, target=player.uniqueId)
+        // Fire either promotion or demotion event.
+        bus.fireEvent(event, ourClan, agent=s.uniqueId, target=target.uniqueId)
         return true
     }
 

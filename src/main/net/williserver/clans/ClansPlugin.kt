@@ -48,6 +48,7 @@ class ClansPlugin : JavaPlugin() {
 
         // Model listeners affect persistent data
         bus.registerListener(ClanEvent.CREATE, clanSet.constructCreateListener())
+        bus.registerListener(ClanEvent.DEMOTE, clanSet.constructDemoteListener())
         bus.registerListener(ClanEvent.DISBAND, clanSet.constructDisbandListener())
         bus.registerListener(ClanEvent.JOIN, clanSet.constructJoinListener())
         bus.registerListener(ClanEvent.LEAVE, clanSet.constructLeaveListener())
