@@ -5,6 +5,7 @@ import net.williserver.clans.LogHandler
 import net.williserver.clans.model.clan.Clan
 import net.williserver.clans.model.clan.ClanData
 import net.williserver.clans.model.clan.ClanPermission
+import net.williserver.clans.model.clan.ClanRank
 import net.williserver.clans.pluginMessagePrefix
 import net.williserver.clans.session.ClanLifecycleListener
 import java.io.File
@@ -235,11 +236,23 @@ class ClanSet(data: Set<ClanData>) {
         clan.promote(promotee)
     }
 
-    // TODO: demote
-    // assert agent clan tracked
-    // assert both members are in the same clan
-    // assert that the demoter has higher rank than the demotee
-    // call clan demote function
+    /**
+     * Construct demotion listener to demote a player in a clan in this model.
+     * Fire when a player is demoted.
+     * @return the listener.
+     */
+    fun constructDemoteListener(): ClanLifecycleListener = { clan, demoter, demotee ->
+        if (clan !in clans()) {
+            throw IllegalArgumentException("$pluginMessagePrefix: Clan is not tracked in this list.")
+        } else if (demoter !in clan || demotee !in clan) {
+            throw IllegalArgumentException("$pluginMessagePrefix: Player not in clan.")
+        } else if (clan.rankOf(demoter) <= clan.rankOf(demotee)) {
+            throw IllegalArgumentException("$pluginMessagePrefix: Demoter does not outrank demoted player.")
+        } else if (clan.rankOf(demotee) == ClanRank.MEMBER) {
+            throw IllegalArgumentException("$pluginMessagePrefix: Cannot demote below member, use kick instead.")
+        }
+        clan.demote(demotee)
+    }
 
     /*
      * ClanList internal helpers.

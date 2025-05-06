@@ -78,18 +78,43 @@ class ListenersTest {
     fun testPromote() {
         val leader = UUID.randomUUID()
         val promotee = UUID.randomUUID()
-        val clan = Clan("TestClan", leader, members = mutableSetOf(promotee))
+        val otherColeader = UUID.randomUUID()
+        val clan = Clan("TestClan", leader, members = mutableSetOf(promotee), coLeaders = mutableSetOf(otherColeader))
         val clanSet = ClanSet(setOf(clan.asDataTuple()))
 
         val bus = ClanEventBus()
         bus.registerListener(ClanEvent.PROMOTE, clanSet.constructPromoteListener())
 
         assertEquals(ClanRank.MEMBER, clan.rankOf(promotee))
+        // Cannot promote yourself
         assertThrows(IllegalArgumentException::class.java) {bus.fireEvent(ClanEvent.PROMOTE, clan, promotee, promotee) }
-        bus.fireEvent(ClanEvent.PROMOTE, clan, leader, promotee)
+        bus.fireEvent(ClanEvent.PROMOTE, clan, otherColeader, promotee)
         assertEquals(ClanRank.ELDER, clan.rankOf(promotee))
-        bus.fireEvent(ClanEvent.PROMOTE, clan, leader, promotee)
+        bus.fireEvent(ClanEvent.PROMOTE, clan, otherColeader, promotee)
         assertEquals(ClanRank.COLEADER, clan.rankOf(promotee))
+        // Cannot promote beyond coleader -- even if we outrank
         assertThrows(IllegalArgumentException::class.java) {bus.fireEvent(ClanEvent.PROMOTE, clan, leader, promotee) }
+    }
+
+    @Test
+    fun testDemote() {
+        val leader = UUID.randomUUID()
+        val demotee = UUID.randomUUID()
+        val otherColeader = UUID.randomUUID()
+        val clan = Clan("TestClan", leader, coLeaders = mutableSetOf(demotee, otherColeader))
+        val clanSet = ClanSet(setOf(clan.asDataTuple()))
+
+        val bus = ClanEventBus()
+        bus.registerListener(ClanEvent.DEMOTE, clanSet.constructDemoteListener())
+
+        assertEquals(ClanRank.COLEADER, clan.rankOf(demotee))
+        // You cannot demote yourself!
+        assertThrows(IllegalArgumentException::class.java) { bus.fireEvent(ClanEvent.DEMOTE, clan, demotee, demotee) }
+        bus.fireEvent(ClanEvent.DEMOTE, clan, leader, demotee)
+        assertEquals(ClanRank.ELDER, clan.rankOf(demotee))
+        bus.fireEvent(ClanEvent.DEMOTE, clan, otherColeader, demotee)
+        assertEquals(ClanRank.MEMBER, clan.rankOf(demotee))
+        // Cannot demote below member -- use kick instead
+        assertThrows(IllegalArgumentException::class.java) { bus.fireEvent(ClanEvent.DEMOTE, clan, otherColeader, demotee) }
     }
 }
