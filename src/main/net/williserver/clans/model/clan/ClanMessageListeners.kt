@@ -79,6 +79,15 @@ fun constructPromoteMessageListener(): ClanLifecycleListener = { clan, promoter,
 }
 
 /**
+ * @return a listener that sends a message to all clan members when a player is demoted.
+ */
+fun constructDemoteMessageListener(): ClanLifecycleListener = { clan, demoter, demotedPlayer ->
+    val message = prefix(clan.name)
+        .append(Component.text("${Bukkit.getOfflinePlayer(demotedPlayer).name} has been demoted to ${clan.rankOf(demotedPlayer).name} by ${Bukkit.getOfflinePlayer(demoter).name}."))
+    sendClanMessage(clan, message)
+}
+
+/**
  * @param name Clan name to format
  * @return a formatted prefix component for a clan name.
  */

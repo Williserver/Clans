@@ -60,6 +60,7 @@ class ClansPlugin : JavaPlugin() {
 
         // Messaging listeners send informational messages when events occur.
         bus.registerListener(ClanEvent.CREATE, constructCreateMessageListener())
+        bus.registerListener(ClanEvent.DEMOTE, constructDemoteMessageListener())
         bus.registerListener(ClanEvent.DISBAND, constructDisbandMessageListener())
         bus.registerListener(ClanEvent.JOIN, constructJoinMessageListener())
         bus.registerListener(ClanEvent.LEAVE, constructLeaveMessageListener())
