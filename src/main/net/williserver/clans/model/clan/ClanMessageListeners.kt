@@ -9,9 +9,6 @@ import net.williserver.clans.commands.sendPrefixedMessage
 import net.williserver.clans.session.ClanLifecycleListener
 import org.bukkit.Bukkit
 
-// TODO: promote, demote messages
-// -- message the clan chat the player's new rank.
-
 /**
  * @return a listener that broadcasts a message to the server when a player is creator.
  */
@@ -58,7 +55,7 @@ fun constructLeaveMessageListener(): ClanLifecycleListener = { clan, _, leavingP
 fun constructKickMessageListener(): ClanLifecycleListener = { clan, agent, kickedPlayer ->
     val message = prefix(clan.name)
         .append(Component.text(
-            "${Bukkit.getOfflinePlayer(kickedPlayer).name} has been kicked from the clan by ${Bukkit.getOfflinePlayer(agent).name}",
+            "${Bukkit.getOfflinePlayer(kickedPlayer).name} has been kicked from the clan by ${Bukkit.getOfflinePlayer(agent).name}.",
             NamedTextColor.DARK_RED))
     sendClanMessage(clan, message)
 
@@ -74,7 +71,8 @@ fun constructKickMessageListener(): ClanLifecycleListener = { clan, agent, kicke
 fun constructPromoteMessageListener(): ClanLifecycleListener = { clan, promoter, promotedPlayer ->
     val message = prefix(clan.name)
     .append(Component.text(
-        "${Bukkit.getOfflinePlayer(promotedPlayer).name} has been promoted to ${clan.rankOf(promotedPlayer)} by ${Bukkit.getOfflinePlayer(promoter).name}."))
+        "${Bukkit.getOfflinePlayer(promotedPlayer).name} has been promoted to ${clan.rankOf(promotedPlayer)} by ${Bukkit.getOfflinePlayer(promoter).name}.",
+        NamedTextColor.GREEN))
     sendClanMessage(clan, message)
 }
 
@@ -83,7 +81,9 @@ fun constructPromoteMessageListener(): ClanLifecycleListener = { clan, promoter,
  */
 fun constructDemoteMessageListener(): ClanLifecycleListener = { clan, demoter, demotedPlayer ->
     val message = prefix(clan.name)
-        .append(Component.text("${Bukkit.getOfflinePlayer(demotedPlayer).name} has been demoted to ${clan.rankOf(demotedPlayer).name} by ${Bukkit.getOfflinePlayer(demoter).name}."))
+        .append(Component.text(
+        "${Bukkit.getOfflinePlayer(demotedPlayer).name} has been demoted to ${clan.rankOf(demotedPlayer)} by ${Bukkit.getOfflinePlayer(demoter).name}.",
+            NamedTextColor.DARK_RED))
     sendClanMessage(clan, message)
 }
 
