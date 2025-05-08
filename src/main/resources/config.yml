@@ -7,5 +7,7 @@ confirmTime: 30
 # Whether to integrate with Minecraft scoreboard teams.
 # This will result in clan members being placed in scoreboard teams corresponding to their clans.
 # Using this, you can color players as they join the game.
-# Default: false
-scoreboardTeamsIntegration: False
+# Default: true
+
+# NOTE: CHANGING THIS OPTION AFTER THE SERVER IS LAUNCHED MAY HAVE UNDESIRED AFFECTS!
+scoreboardTeamsIntegration: True

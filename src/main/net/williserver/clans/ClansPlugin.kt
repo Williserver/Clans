@@ -74,13 +74,14 @@ class ClansPlugin : JavaPlugin() {
 
         // Integration listeners connect clans with other features of the plugin.
         if (config.scoreboardTeamsIntegration) {
-            bus.registerListener(CREATE, INTEGRATION, constructCreateAddTeamListener())
-            bus.registerListener(DISBAND, INTEGRATION, constructDisbandRemoveTeamListener())
-            bus.registerListener(JOIN, INTEGRATION, constructJoinTeamListener())
-            bus.registerListener(LEAVE, INTEGRATION, constructLeaveTeamListener())
+            val teamIntegrator = ScoreboardTeamIntegrator(logger)
+            bus.registerListener(CREATE, INTEGRATION, teamIntegrator.constructCreateAddTeamListener())
+            bus.registerListener(DISBAND, INTEGRATION, teamIntegrator.constructDisbandRemoveTeamListener())
+            bus.registerListener(JOIN, INTEGRATION, teamIntegrator.constructJoinTeamListener())
+            bus.registerListener(LEAVE, INTEGRATION, teamIntegrator.constructLeaveTeamListener())
             // From the limited perspective of vanilla teams, a kick is just a player leaving.
             // They lack sufficient context to impose stricter checks and so use the same leave listener.
-            bus.registerListener(KICK, INTEGRATION, constructLeaveTeamListener())
+            bus.registerListener(KICK, INTEGRATION, teamIntegrator.constructLeaveTeamListener())
         }
         // initiate luckperms integration, if plugin present.
         if (server.pluginManager.isPluginEnabled("LuckPerms")) {
