@@ -4,10 +4,7 @@ import net.williserver.clans.commands.ClansCommand
 import net.williserver.clans.commands.ClansTabCompleter
 import net.williserver.clans.commands.chat.ChatCommand
 import net.williserver.clans.commands.chat.ChatTabCompleter
-import net.williserver.clans.integration.constructCreateAddTeamListener
-import net.williserver.clans.integration.constructDisbandRemoveTeamListener
-import net.williserver.clans.integration.constructJoinTeamListener
-import net.williserver.clans.integration.constructLeaveTeamListener
+import net.williserver.clans.integration.*
 import net.williserver.clans.model.ClanSet
 import net.williserver.clans.model.ClansConfigLoader
 import net.williserver.clans.model.clan.*
@@ -35,6 +32,9 @@ class ClansPlugin : JavaPlugin() {
     private lateinit var clanSet: ClanSet
 
     override fun onEnable() {
+        // TODO: luckperms integration manager.
+        // probably want class -- persistent state: luckperms obj.
+
         // Note: even with an empty config, this is necessary to generate the data directory.
         saveDefaultConfig()
         val config = ClansConfigLoader(logger, config).config
@@ -81,6 +81,10 @@ class ClansPlugin : JavaPlugin() {
             // From the limited perspective of vanilla teams, a kick is just a player leaving.
             // They lack sufficient context to impose stricter checks and so use the same leave listener.
             bus.registerListener(KICK, INTEGRATION, constructLeaveTeamListener())
+        }
+        // initiate luckperms integration, if plugin present.
+        if (server.pluginManager.isPluginEnabled("LuckPerms")) {
+            LuckPermsIntegrator(logger).initiateGroups()
         }
 
         logger.info("Registered clan lifecycle listeners")
