@@ -245,7 +245,7 @@ class ClansCommand(private val clanSet: ClanSet,
 
         sendCongratsMessage(s, "You have invited ${targetPlayer.name} to your clan!")
         sendCongratsMessage(targetPlayer, "${s.name} has invited you to clan ${targetClan.name}!")
-        sendCongratsMessage(targetPlayer, "You have ${config.confirmTime} seconds to accept your invitation.")
+        sendCongratsMessage(targetPlayer, "You have ${config.confirmTime} seconds to accept your invitation using \"/clans join ${targetClan.name}\".")
 
         // Invitation timer starts immediately after timer registered.
         session.registerTimer(ClanEvent.JOIN, Pair(targetPlayer.uniqueId, targetClan), config.confirmTime.toLong())
@@ -301,7 +301,6 @@ class ClansCommand(private val clanSet: ClanSet,
      */
     private fun demote(s: CommandSender, args: List<String>): Boolean =
         changeRank(s, args, ClanEvent.DEMOTE, ClanRank.MEMBER, "Target player has reached rank member -- to remove them from the clan, use \"/clans kick (playername)\".")
-        // Argument structure validation. 1 arg: target to demote.
 
     /**
      * Internal implementation for promote, demote. Should not be called outside those contexts.
@@ -331,12 +330,6 @@ class ClansCommand(private val clanSet: ClanSet,
         bus.fireEvent(event, ourClan, agent=s.uniqueId, target=target.uniqueId)
         return true
     }
-
-    // TODO: demote
-    // -- assert both members are in the same clan.
-    // -- assert the demoter outranks the demotee
-    // -- assert the demoter's rank is not already too low -- if a member, need to use kick command!
-    // -- fire the demotion event.
 
     /**
      * Make a player leave their clan.
