@@ -9,8 +9,9 @@ import net.williserver.clans.model.ClansConfigLoader
 import net.williserver.clans.model.clan.*
 import net.williserver.clans.model.readFromFile
 import net.williserver.clans.model.writeToFile
-import net.williserver.clans.session.ClanEvent
+import net.williserver.clans.session.ClanEvent.*
 import net.williserver.clans.session.ClanEventBus
+import net.williserver.clans.session.ClanListenerType.*
 import net.williserver.clans.session.SessionManager
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
@@ -47,35 +48,35 @@ class ClansPlugin : JavaPlugin() {
         val bus = ClanEventBus()
 
         // Model listeners affect persistent data
-        bus.registerListener(ClanEvent.CREATE, clanSet.constructCreateListener())
-        bus.registerListener(ClanEvent.DEMOTE, clanSet.constructDemoteListener())
-        bus.registerListener(ClanEvent.DISBAND, clanSet.constructDisbandListener())
-        bus.registerListener(ClanEvent.JOIN, clanSet.constructJoinListener())
-        bus.registerListener(ClanEvent.LEAVE, clanSet.constructLeaveListener())
-        bus.registerListener(ClanEvent.PROMOTE, clanSet.constructPromoteListener())
-        bus.registerListener(ClanEvent.KICK, clanSet.constructKickListener())
+        bus.registerListener(CREATE, MODEL, clanSet.constructCreateListener())
+        bus.registerListener(DEMOTE, MODEL, clanSet.constructDemoteListener())
+        bus.registerListener(DISBAND, MODEL, clanSet.constructDisbandListener())
+        bus.registerListener(JOIN, MODEL, clanSet.constructJoinListener())
+        bus.registerListener(LEAVE, MODEL, clanSet.constructLeaveListener())
+        bus.registerListener(PROMOTE, MODEL, clanSet.constructPromoteListener())
+        bus.registerListener(KICK, MODEL, clanSet.constructKickListener())
 
         // Session listeners affect temporary data, like expiring invites.
-        bus.registerListener(ClanEvent.JOIN, session.constructDeregisterInviteListener())
+        bus.registerListener(JOIN, SESSION, session.constructDeregisterInviteListener())
 
         // Messaging listeners send informational messages when events occur.
-        bus.registerListener(ClanEvent.CREATE, constructCreateMessageListener())
-        bus.registerListener(ClanEvent.DEMOTE, constructDemoteMessageListener())
-        bus.registerListener(ClanEvent.DISBAND, constructDisbandMessageListener())
-        bus.registerListener(ClanEvent.JOIN, constructJoinMessageListener())
-        bus.registerListener(ClanEvent.LEAVE, constructLeaveMessageListener())
-        bus.registerListener(ClanEvent.PROMOTE, constructPromoteMessageListener())
-        bus.registerListener(ClanEvent.KICK, constructKickMessageListener())
+        bus.registerListener(CREATE, COSMETIC, constructCreateMessageListener())
+        bus.registerListener(DEMOTE, COSMETIC, constructDemoteMessageListener())
+        bus.registerListener(DISBAND, COSMETIC, constructDisbandMessageListener())
+        bus.registerListener(JOIN, COSMETIC, constructJoinMessageListener())
+        bus.registerListener(LEAVE, COSMETIC, constructLeaveMessageListener())
+        bus.registerListener(PROMOTE, COSMETIC, constructPromoteMessageListener())
+        bus.registerListener(KICK, COSMETIC, constructKickMessageListener())
 
         // Integration listeners connect clans with other features of the plugin.
         if (config.scoreboardTeamsIntegration) {
-            bus.registerListener(ClanEvent.CREATE, constructCreateAddTeamListener())
-            bus.registerListener(ClanEvent.DISBAND, constructDisbandRemoveTeamListener())
-            bus.registerListener(ClanEvent.JOIN, constructJoinTeamListener())
-            bus.registerListener(ClanEvent.LEAVE, constructLeaveTeamListener())
+            bus.registerListener(CREATE, INTEGRATION, constructCreateAddTeamListener())
+            bus.registerListener(DISBAND, INTEGRATION, constructDisbandRemoveTeamListener())
+            bus.registerListener(JOIN, INTEGRATION, constructJoinTeamListener())
+            bus.registerListener(LEAVE, INTEGRATION, constructLeaveTeamListener())
             // From the limited perspective of vanilla teams, a kick is just a player leaving.
             // They lack sufficient context to impose stricter checks and so use the same leave listener.
-            bus.registerListener(ClanEvent.KICK, constructLeaveTeamListener())
+            bus.registerListener(KICK, INTEGRATION, constructLeaveTeamListener())
         }
 
         logger.info("Registered clan lifecycle listeners")

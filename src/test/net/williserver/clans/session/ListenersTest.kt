@@ -18,7 +18,7 @@ class ListenersTest {
         val clanSet = ClanSet(setOf(clan.asDataTuple()))
 
         val bus = ClanEventBus()
-        bus.registerListener(ClanEvent.DISBAND, clanSet.constructDisbandListener())
+        bus.registerListener(ClanEvent.DISBAND, ClanListenerType.MODEL, clanSet.constructDisbandListener())
         // Fire a disband event with a random player initiating
         assertThrows(IllegalArgumentException::class.java) { bus.fireEvent(ClanEvent.DISBAND, clan, UUID.randomUUID(), UUID.randomUUID()) }
 
@@ -32,7 +32,7 @@ class ListenersTest {
         val clanSet = ClanSet(setOf())
 
         val bus = ClanEventBus()
-        bus.registerListener(ClanEvent.CREATE, clanSet.constructCreateListener())
+        bus.registerListener(ClanEvent.CREATE, ClanListenerType.MODEL, clanSet.constructCreateListener())
         assertThrows(IllegalArgumentException::class.java) { bus.fireEvent(ClanEvent.CREATE, clan, UUID.randomUUID(), UUID.randomUUID()) }
 
         bus.fireEvent(ClanEvent.CREATE, clan, clan.leader, clan.leader)
@@ -49,7 +49,7 @@ class ListenersTest {
         val clanSet = ClanSet(setOf(trackedClan.asDataTuple()))
 
         val bus = ClanEventBus()
-        bus.registerListener(ClanEvent.LEAVE, clanSet.constructLeaveListener())
+        bus.registerListener(ClanEvent.LEAVE, ClanListenerType.MODEL, clanSet.constructLeaveListener())
         assertThrows(IllegalArgumentException::class.java) {bus.fireEvent(ClanEvent.LEAVE, untrackedClan, member, member)}
 
         bus.fireEvent(ClanEvent.LEAVE, trackedClan, member, member)
@@ -62,7 +62,7 @@ class ListenersTest {
         val clanSet = ClanSet(setOf())
 
         val bus = ClanEventBus()
-        bus.registerListener(ClanEvent.JOIN, clanSet.constructJoinListener())
+        bus.registerListener(ClanEvent.JOIN, ClanListenerType.MODEL, clanSet.constructJoinListener())
 
         val randoJoining = UUID.randomUUID()
         assertThrows(IllegalArgumentException::class.java)
@@ -83,7 +83,7 @@ class ListenersTest {
         val clanSet = ClanSet(setOf(clan.asDataTuple()))
 
         val bus = ClanEventBus()
-        bus.registerListener(ClanEvent.PROMOTE, clanSet.constructPromoteListener())
+        bus.registerListener(ClanEvent.PROMOTE, ClanListenerType.MODEL, clanSet.constructPromoteListener())
 
         assertEquals(ClanRank.MEMBER, clan.rankOf(promotee))
         // Cannot promote yourself
@@ -105,7 +105,7 @@ class ListenersTest {
         val clanSet = ClanSet(setOf(clan.asDataTuple()))
 
         val bus = ClanEventBus()
-        bus.registerListener(ClanEvent.DEMOTE, clanSet.constructDemoteListener())
+        bus.registerListener(ClanEvent.DEMOTE, ClanListenerType.MODEL, clanSet.constructDemoteListener())
 
         assertEquals(ClanRank.COLEADER, clan.rankOf(demotee))
         // You cannot demote yourself!

@@ -2,6 +2,7 @@ package net.williserver.clans.session
 
 import net.williserver.clans.model.clan.Clan
 import net.williserver.clans.model.ClanSet
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import java.util.UUID
@@ -16,7 +17,7 @@ class ClanEventBusTest {
         assertFalse(newClan.name in list)
 
         val bus = ClanEventBus()
-        bus.registerListener(ClanEvent.CREATE, list.constructCreateListener())
+        bus.registerListener(ClanEvent.CREATE, ClanListenerType.MODEL, list.constructCreateListener())
         bus.fireEvent(ClanEvent.CREATE, newClan, newLeader, newLeader)
         assert(newClan.name in list)
     }
@@ -29,7 +30,7 @@ class ClanEventBusTest {
         list.addClan(newClan)
 
         val bus = ClanEventBus()
-        bus.registerListener(ClanEvent.DISBAND, list.constructDisbandListener())
+        bus.registerListener(ClanEvent.DISBAND, ClanListenerType.MODEL, list.constructDisbandListener())
         bus.fireEvent(ClanEvent.DISBAND, newClan, newLeader, newLeader)
         assert(newClan.name !in list)
     }
@@ -41,7 +42,7 @@ class ClanEventBusTest {
         list.addClan(newClan)
 
         val bus = ClanEventBus()
-        bus.registerListener(ClanEvent.JOIN, list.constructJoinListener())
+        bus.registerListener(ClanEvent.JOIN, ClanListenerType.MODEL, list.constructJoinListener())
 
         val newMember = UUID.randomUUID()
         bus.fireEvent(ClanEvent.JOIN, newClan, newMember, newMember)
@@ -61,7 +62,7 @@ class ClanEventBusTest {
 
         val bus = ClanEventBus()
         // When leave fires, the listener should register the change.
-        bus.registerListener(ClanEvent.LEAVE, list.constructLeaveListener())
+        bus.registerListener(ClanEvent.LEAVE, ClanListenerType.MODEL, list.constructLeaveListener())
         bus.fireEvent(ClanEvent.LEAVE, newClan, newMember, newMember)
         assert(newMember !in newClan)
 
@@ -81,7 +82,7 @@ class ClanEventBusTest {
         assert(member in clan)
 
         val bus = ClanEventBus()
-        bus.registerListener(ClanEvent.KICK, list.constructKickListener())
+        bus.registerListener(ClanEvent.KICK, ClanListenerType.MODEL, list.constructKickListener())
         bus.fireEvent(ClanEvent.KICK, clan, leader, member)
 
         assertFalse(list.isPlayerInClan(member))
@@ -103,9 +104,35 @@ class ClanEventBusTest {
 
         // When the player joins, the event should be gone.
         val bus = ClanEventBus()
-        bus.registerListener(ClanEvent.JOIN, session.constructDeregisterInviteListener())
+        bus.registerListener(ClanEvent.JOIN, ClanListenerType.SESSION, session.constructDeregisterInviteListener())
         bus.fireEvent(ClanEvent.JOIN, clan, newMember, newMember)
 
         assertFalse(session.isTimerRegistered(ClanEvent.JOIN, Pair(newMember, clan)))
+    }
+
+    @Test
+    fun testOrderingCorrect() {
+        // Using non-associative operations, ensure the ordering is correct.
+        var sum = 1
+        val bus = ClanEventBus()
+
+        bus.registerListener(ClanEvent.CREATE, ClanListenerType.MODEL) { _, _, _ ->
+            sum *= 2
+        }
+        bus.registerListener(ClanEvent.CREATE, ClanListenerType.INTEGRATION) { _, _, _ ->
+            sum /= 2
+        }
+        bus.registerListener(ClanEvent.CREATE, ClanListenerType.SESSION) { _, _, _ ->
+            sum += 1
+        }
+        bus.registerListener(ClanEvent.CREATE, ClanListenerType.COSMETIC) { _, _, _ ->
+            sum *= 3
+        }
+
+        // Fire repeatedly to avoid potential set ordering traversal weirdness.
+        for (i in 1..100) {
+            bus.fireEvent(ClanEvent.CREATE, Clan("TestClan", UUID.randomUUID()), UUID.randomUUID(), UUID.randomUUID())
+        }
+        assertEquals(101462409, sum)
     }
 }
