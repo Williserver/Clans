@@ -51,8 +51,9 @@ typealias ClanLifecycleListener = (clan: Clan, agent: UUID, target: UUID) -> Uni
  */
 class ClanEventBus {
     /**
-     * Listeners that affect the underlying model.
-     * Listeners are registered under the event they affect and
+     * Listeners that affect the underlying model. They are registered under:
+     * - the event they target (ClanEventType)
+     * - the type of side effect they impose (ClanListenerType)
      */
     private val listeners = hashMapOf<Pair<ClanEvent, ClanListenerType>, MutableSet<ClanLifecycleListener>>()
     init {
