@@ -9,8 +9,8 @@ import java.util.*
  * @author Willmo3
  */
 class SessionManager {
-    /*
-     * Map of events to registrations of each value.
+    /**
+     * Map of events to registered timers of each value.
      */
     private val timerTable = mapOf<ClanEvent, MutableMap<Any, ConfirmTimer>>(
         // Norm: Pair<UUID, Clan>
@@ -22,8 +22,11 @@ class SessionManager {
         // Norm: Pair<UUID, UUID> (player kicking, player being kicked)
         ClanEvent.KICK to mutableMapOf(),
         // Norm: Pair<UUID, UUID> (player promoting, player being promoted)
+        // Currently unused
         ClanEvent.PROMOTE to mutableMapOf(),
-        // TODO: add demote map
+        // Norm: Pair<UUID, UUID> (player demoting, player being demoted)
+        // Currently unused
+        ClanEvent.DEMOTE to mutableMapOf(),
     )
 
     /**
