@@ -1,4 +1,4 @@
-package net.williserver.clans.model.clan
+package net.williserver.clans.integration
 
 import net.williserver.clans.session.ClanLifecycleListener
 import org.bukkit.Bukkit

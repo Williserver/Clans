@@ -4,6 +4,10 @@ import net.williserver.clans.commands.ClansCommand
 import net.williserver.clans.commands.ClansTabCompleter
 import net.williserver.clans.commands.chat.ChatCommand
 import net.williserver.clans.commands.chat.ChatTabCompleter
+import net.williserver.clans.integration.constructCreateAddTeamListener
+import net.williserver.clans.integration.constructDisbandRemoveTeamListener
+import net.williserver.clans.integration.constructJoinTeamListener
+import net.williserver.clans.integration.constructLeaveTeamListener
 import net.williserver.clans.model.ClanSet
 import net.williserver.clans.model.ClansConfigLoader
 import net.williserver.clans.model.clan.*
