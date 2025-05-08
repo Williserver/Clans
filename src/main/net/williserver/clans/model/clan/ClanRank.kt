@@ -26,30 +26,4 @@ enum class ClanRank(private val rank: UInt, private val permissions: Array<ClanP
      * @return Whether this ClanRank has the specified permission in its permission slist.
      */
     fun hasPermission(permission: ClanPermission) = permission in permissions
-
-    /**
-     * Return the next rank (i.e. that this would be promoted to)
-     * Otherwise, if this is leader, simply return that.
-     *
-     * @return Promoted rank.
-     */
-    fun nextRank(): ClanRank =
-        if (this < LEADER) {
-            entries[ordinal + 1]
-        } else {
-            entries[ordinal]
-        }
-
-    /**
-     * Return the previous rank (i.e. that this would be demoted to).
-     * If this is member, do nothing -- would simply kick.
-     *
-     * @return Demoted rank.
-     */
-    fun previousRank(): ClanRank =
-        if (this > MEMBER) {
-            entries[ordinal - 1]
-        } else {
-            entries[ordinal]
-        }
 }
