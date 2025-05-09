@@ -32,21 +32,17 @@ class ClansPlugin : JavaPlugin() {
     private lateinit var clanSet: ClanSet
 
     override fun onEnable() {
-        // TODO: luckperms integration manager.
-        // probably want class -- persistent state: luckperms obj.
-
-        // Note: even with an empty config, this is necessary to generate the data directory.
-        saveDefaultConfig()
+        saveDefaultConfig() // If file deleted, restore defaults
         val config = ClansConfigLoader(logger, config).config
-        logger.info("Loaded config")
+        logger.info("Loaded config.")
 
         // Read base clan list.
         clanSet = readFromFile(logger, path)
-        logger.info("Initialized clanList")
+        logger.info("Initialized clanList.")
 
         // Initiate this session.
         val session = SessionManager()
-        logger.info("Initialized session")
+        logger.info("Initialized session.")
 
         // Register major events in clan lifecycle.
         val bus = ClanEventBus()
@@ -59,9 +55,11 @@ class ClansPlugin : JavaPlugin() {
         bus.registerListener(LEAVE, MODEL, clanSet.constructLeaveListener())
         bus.registerListener(PROMOTE, MODEL, clanSet.constructPromoteListener())
         bus.registerListener(KICK, MODEL, clanSet.constructKickListener())
+        logger.info("Registered clans data model listeners.")
 
         // Session listeners affect temporary data, like expiring invites.
         bus.registerListener(JOIN, SESSION, session.constructDeregisterInviteListener())
+        logger.info("Registered clans session listeners.")
 
         // Messaging listeners send informational messages when events occur.
         bus.registerListener(CREATE, COSMETIC, constructCreateMessageListener())
@@ -71,9 +69,11 @@ class ClansPlugin : JavaPlugin() {
         bus.registerListener(LEAVE, COSMETIC, constructLeaveMessageListener())
         bus.registerListener(PROMOTE, COSMETIC, constructPromoteMessageListener())
         bus.registerListener(KICK, COSMETIC, constructKickMessageListener())
+        logger.info("Registered clans cosmetic listeners.")
 
         // Integration listeners connect clans with other features of the plugin.
         if (config.scoreboardTeamsIntegration) {
+            logger.info("Scoreboard teams integration enabled, registering teams listeners.")
             val teamIntegrator = ScoreboardTeamIntegrator(logger)
             bus.registerListener(CREATE, INTEGRATION, teamIntegrator.constructCreateAddTeamListener())
             bus.registerListener(DISBAND, INTEGRATION, teamIntegrator.constructDisbandRemoveTeamListener())
@@ -82,28 +82,36 @@ class ClansPlugin : JavaPlugin() {
             // From the limited perspective of vanilla teams, a kick is just a player leaving.
             // They lack sufficient context to impose stricter checks and so use the same leave listener.
             bus.registerListener(KICK, INTEGRATION, teamIntegrator.constructLeaveTeamListener())
-        }
-        // initiate luckperms integration, if plugin present.
-        if (server.pluginManager.isPluginEnabled("LuckPerms")) {
-            LuckPermsIntegrator(logger).initiateTrack()
+        } else {
+            logger.info("Scoreboard teams integration disabled, not registering teams listeners.")
         }
 
-        logger.info("Registered clan lifecycle listeners")
+        // initiate luckperms integration, if plugin present.
+        if (config.luckpermsIntegration && server.pluginManager.isPluginEnabled("LuckPerms")) {
+            logger.info("LuckPerms integration enabled, registering LP listeners.")
+            logger.info("Using trackname: ${config.luckPermsTrackName}.")
+            LuckPermsIntegrator(logger, config.luckPermsTrackName).initiateTrack()
+        } else {
+            logger.info("LuckPerms integration disabled, not registering LP listeners.")
+        }
+        logger.info("Registered integration listeners.")
+
+        logger.info("Finished registering clan lifecycle listeners.")
 
         // Register commands.
         this.getCommand("cc")!!.setExecutor(ChatCommand(clanSet))
         this.getCommand("clans")!!.setExecutor(ClansCommand(clanSet, config, session, bus))
         this.getCommand("cc")!!.tabCompleter = ChatTabCompleter()
         this.getCommand("clans")!!.tabCompleter = ClansTabCompleter(clanSet)
-        logger.info("Registered commands")
+        logger.info("Registered commands.")
 
-        logger.info("Enabled")
+        logger.info("Enabled.")
     }
 
     override fun onDisable() {
         // Save model settings.
         writeToFile(logger, path, clanSet)
 
-        logger.info("Disabled")
+        logger.info("Disabled.")
     }
 }

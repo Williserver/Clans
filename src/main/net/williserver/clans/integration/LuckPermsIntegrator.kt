@@ -12,7 +12,7 @@ import java.util.*
  *
  * @author Willmo3
  */
-class LuckPermsIntegrator(private val logger: LogHandler) {
+class LuckPermsIntegrator(private val logger: LogHandler, private val trackName: String) {
     private val luckperms = Bukkit.getServer().servicesManager.load(LuckPerms::class.java)!!
     companion object {
         const val LOG_PREFIX = "[LuckPerms Integration]"
@@ -22,7 +22,7 @@ class LuckPermsIntegrator(private val logger: LogHandler) {
      * Initiate the luckperms group.
      */
     fun initiateTrack() {
-        luckperms.trackManager.createAndLoadTrack("clans")
+        luckperms.trackManager.createAndLoadTrack(trackName)
         logger.info("$LOG_PREFIX: Loading clans track.")
     }
 

@@ -3,11 +3,6 @@ package net.williserver.clans.model
 import net.williserver.clans.LogHandler
 import org.bukkit.configuration.file.FileConfiguration
 
-/*
- * Minimum time bound between initiating and confirming a destructive action.
- */
-const val MINIMUM_CONFIRM_TIME = 8u
-
 /**
  * Responsible for parsing config options and restoring defaults, if need be.
  * Interfaces into a read-only data class.
@@ -19,17 +14,31 @@ const val MINIMUM_CONFIRM_TIME = 8u
 class ClansConfigLoader(private val handler: LogHandler,
                         private val fileConfig: FileConfiguration) {
 
-    // ***** CONFIG FIELDS ***** //
-    private val confirmTimeOption = "confirmTime"
-    private val teamsIntegrationOption = "scoreboardTeamsIntegration"
+    companion object {
+        /**
+         * Minimum time bound between initiating and confirming a destructive action.
+         */
+        const val MINIMUM_CONFIRM_TIME = 8u
+
+        /**
+         * Default name for LuckPerms clan rank track.
+         */
+        private const val DEFAULT_TRACK_NAME = "clans"
+
+        // ***** NAMES FOR CONFIG FIELDS ***** //
+        private const val CONFIRM_TIME_OPTION = "confirmTime"
+        private const val TEAMS_INTEGRATION_OPTION = "scoreboardTeamsIntegration"
+        private const val LUCKPERMS_INTEGRATION_OPTION = "luckPermsIntegration"
+        private const val LUCKPERMS_TRACKNAME_OPTION = "luckPermsTrackName"
+    }
 
     // Loaded fields contained in final tiersConfig.
     // This may be accessed externally.
     val config: ClansConfig
 
     init {
-        // Load config file.
-        val loadedConfirmTime = fileConfig.getInt(confirmTimeOption)
+        // Load confirmation time.
+        val loadedConfirmTime = fileConfig.getInt(CONFIRM_TIME_OPTION)
         val confirmTime = if (loadedConfirmTime > 0 && loadedConfirmTime.toUInt() > MINIMUM_CONFIRM_TIME) {
             loadedConfirmTime.toUInt()
         } else {
@@ -37,8 +46,14 @@ class ClansConfigLoader(private val handler: LogHandler,
             MINIMUM_CONFIRM_TIME
         }
 
-        val scoreboardTeamsIntegration = fileConfig.getBoolean(teamsIntegrationOption)
-        config = ClansConfig(confirmTime, scoreboardTeamsIntegration)
+        // Load integration options.
+        val scoreboardTeamsIntegration = fileConfig.getBoolean(TEAMS_INTEGRATION_OPTION)
+        val luckPermsIntegration = fileConfig.getBoolean(LUCKPERMS_INTEGRATION_OPTION)
+        val luckPermsTrackName = fileConfig.getString(LUCKPERMS_TRACKNAME_OPTION)
+            ?: run { handler.err("Invalid LuckPerms track name provided, using $DEFAULT_TRACK_NAME"); DEFAULT_TRACK_NAME }
+
+        // Finalize config.
+        config = ClansConfig(confirmTime, scoreboardTeamsIntegration, luckPermsIntegration, luckPermsTrackName)
     }
 }
 
@@ -52,5 +67,7 @@ class ClansConfigLoader(private val handler: LogHandler,
 data class ClansConfig
 (
     val confirmTime: UInt,
-    val scoreboardTeamsIntegration: Boolean
+    val scoreboardTeamsIntegration: Boolean,
+    val luckpermsIntegration: Boolean,
+    val luckPermsTrackName: String,
 )

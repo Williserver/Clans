@@ -9,5 +9,17 @@ confirmTime: 30
 # Using this, you can color players as they join the game.
 # Default: true
 
-# NOTE: CHANGING THIS OPTION AFTER THE SERVER IS LAUNCHED MAY HAVE UNDESIRED AFFECTS!
+# NOTE: CHANGING THIS OPTION AFTER THE SERVER IS LAUNCHED MAY HAVE UNDESIRED EFFECTS!
 scoreboardTeamsIntegration: True
+
+# Whether to integrate with LuckPerms, adding tracks and groups. NOTE: requires LuckPerms to be present in server.
+# Default: False
+
+# NOTE: CHANGING THIS OPTION AFTER THE SERVER IS LAUNCHED MAY HAVE UNDESIRED EFFECTS!
+luckPermsIntegration: False
+
+# If using LuckPerms integration, the track under which to put clan groups.
+# Default: "clans"
+
+# NOTE: CHANGING THIS OPTION AFTER THE SERVER IS LAU NCHED MAY HAVE UNDESIRED EFFECTS!
+luckPermsTrackName: "clans"
