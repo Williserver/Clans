@@ -3,6 +3,7 @@ package net.williserver.clans.model
 import net.williserver.clans.model.clan.Clan
 import net.williserver.clans.model.clan.ClanData
 import net.williserver.clans.model.clan.ClanRank
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import java.util.*
@@ -14,6 +15,7 @@ class ClanTest {
     private fun generateValidClan(): Clan {
         val leader = UUID.randomUUID().toString()
         val data = ClanData("TestClan",
+            "TST",
             members=setOf(UUID.randomUUID().toString()),
             elders=setOf(),
             coLeaders=setOf(),
@@ -153,5 +155,27 @@ class ClanTest {
         assertThrows(IllegalArgumentException::class.java) { clan.demote(coleader) }
         assertThrows(IllegalArgumentException::class.java) { clan.demote(leader) }
         assertThrows(IllegalArgumentException::class.java) { clan.demote(UUID.randomUUID()) }
+    }
+
+    @Test
+    fun testDefaultPrefix() {
+        val tc = Clan("Tc",
+            UUID.randomUUID())
+        assertEquals("TC", tc.prefix)
+
+        val none = Clan("test",
+            UUID.randomUUID())
+        assertEquals("TES", none.prefix)
+
+        val specified = Clan("Test",
+                            UUID.randomUUID(),
+                            "TST")
+        assertEquals("TST", specified.prefix)
+
+        assertThrows(IllegalArgumentException::class.java) {
+            Clan("prefix-too-long",
+                UUID.randomUUID(),
+                "TEST")
+        }
     }
 }

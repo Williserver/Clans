@@ -3,7 +3,6 @@ package net.williserver.clans.integration
 import net.williserver.clans.LogHandler
 import net.williserver.clans.session.ClanLifecycleListener
 import org.bukkit.Bukkit
-import org.bukkit.scoreboard.Team
 
 /**
  * Manages integration with Vanilla scoreboard teams, creating and disbanding groups when needed.

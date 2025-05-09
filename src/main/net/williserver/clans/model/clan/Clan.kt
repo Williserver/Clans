@@ -3,40 +3,51 @@ import kotlinx.serialization.Serializable
 import net.williserver.clans.pluginMessagePrefix
 import java.util.*
 import kotlin.collections.HashSet
-
-// -- name
-// -- members
-// -- coleaders
-// -- leader
-// -- elders
+import kotlin.math.min
 
 /**
  * Persistent data for a given clan.
  *
  * @param name Unique name for the clan
+ * @param prefix Displayed prefix for the clan. Default: first three letters of name, in caps.
+ * @param members set of member UUIDs
+ * @param elders set of elder UUIDS
  * @param coLeaders set of co-leader UUIDs
  * @param leader UUID for player who leads the clan.
  */
 @Serializable
-data class ClanData(val name: String, val members: Set<String>, val elders: Set<String>, val coLeaders: Set<String>, val leader: String)
+data class ClanData(val name: String,
+                    val prefix: String,
+                    val members: Set<String>,
+                    val elders: Set<String>,
+                    val coLeaders: Set<String>,
+                    val leader: String
+)
 
 /**
  * Mutable model for clan.
  *
  * @param name Name of clan. Must not change, and must be alphanumeric with minus or underscores.
  * @param leader Leader of clan.
+ * @param prefix
  * @param members set of members of clan.
  *
  * @throws IllegalArgumentException if there are duplicate members between clans or clans with duplicate names.
  * @author Willmo3
  */
-class Clan(val name: String, leader: UUID,
+class Clan(val name: String,
+           leader: UUID,
+           prefix: String = name.substring(0, min(3, name.length)).uppercase(),
            private val members: MutableSet<UUID> = mutableSetOf(),
            private val elders: MutableSet<UUID> = mutableSetOf(),
            private val coLeaders: MutableSet<UUID> = mutableSetOf(),) {
 
     // Leader should be publicly visible, but for now, we restrict set to internal.
     var leader = leader
+        private set
+
+    // Visible prefix for clan.
+    var prefix = prefix
         private set
 
     /**
@@ -46,6 +57,7 @@ class Clan(val name: String, leader: UUID,
     constructor(data: ClanData) : this(
         data.name,
         UUID.fromString(data.leader),
+        prefix = data.prefix,
         members = HashSet(data.members.map     { UUID.fromString(it) }),
         elders = HashSet(data.elders.map       { UUID.fromString(it) }),
         coLeaders = HashSet(data.coLeaders.map { UUID.fromString(it) }),
@@ -59,6 +71,8 @@ class Clan(val name: String, leader: UUID,
             throw IllegalArgumentException("$pluginMessagePrefix: Invalid clan name!")
         } else if (allClanmates().any { !uniqueRank(it)} ) {
             throw IllegalArgumentException("$pluginMessagePrefix: All clan members must have a unique rank.")
+        } else if (prefix.length > 3) {
+            throw IllegalArgumentException("$pluginMessagePrefix: Invalid clan prefix!")
         }
     }
 
@@ -211,6 +225,7 @@ class Clan(val name: String, leader: UUID,
      */
     fun asDataTuple(): ClanData = ClanData(
         name,
+        prefix,
         HashSet(members.map   { it.toString() }),
         HashSet(elders.map    { it.toString() }),
         HashSet(coLeaders.map { it.toString() }),
