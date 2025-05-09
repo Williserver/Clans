@@ -85,7 +85,7 @@ class ClansPlugin : JavaPlugin() {
         }
         // initiate luckperms integration, if plugin present.
         if (server.pluginManager.isPluginEnabled("LuckPerms")) {
-            LuckPermsIntegrator(logger).initiateGroups()
+            LuckPermsIntegrator(logger).initiateTrack()
         }
 
         logger.info("Registered clan lifecycle listeners")
