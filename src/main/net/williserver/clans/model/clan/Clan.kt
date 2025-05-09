@@ -16,12 +16,13 @@ import kotlin.math.min
  * @param leader UUID for player who leads the clan.
  */
 @Serializable
-data class ClanData(val name: String,
-                    val prefix: String,
-                    val members: Set<String>,
-                    val elders: Set<String>,
-                    val coLeaders: Set<String>,
-                    val leader: String
+data class ClanData(
+    val name: String,
+    val prefix: String,
+    val members: Set<String>,
+    val elders: Set<String>,
+    val coLeaders: Set<String>,
+    val leader: String
 )
 
 /**
@@ -35,12 +36,14 @@ data class ClanData(val name: String,
  * @throws IllegalArgumentException if there are duplicate members between clans or clans with duplicate names.
  * @author Willmo3
  */
-class Clan(val name: String,
-           leader: UUID,
-           prefix: String = name.substring(0, min(3, name.length)).uppercase(),
-           private val members: MutableSet<UUID> = mutableSetOf(),
-           private val elders: MutableSet<UUID> = mutableSetOf(),
-           private val coLeaders: MutableSet<UUID> = mutableSetOf(),) {
+class Clan(
+        val name: String,
+        leader: UUID,
+        prefix: String = name.substring(0, min(3, name.length)).uppercase(),
+        private val members: MutableSet<UUID> = mutableSetOf(),
+        private val elders: MutableSet<UUID> = mutableSetOf(),
+        private val coLeaders: MutableSet<UUID> = mutableSetOf()
+    ) {
 
     // Leader should be publicly visible, but for now, we restrict set to internal.
     var leader = leader
