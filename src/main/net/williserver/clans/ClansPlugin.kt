@@ -174,6 +174,8 @@ class ClansPlugin : JavaPlugin() {
      * This class of listener is run second, since LuckPerms groups are persistent.
      */
     private fun registerLuckPermsIntegrationListeners(clansConfig: ClansConfig) {
-        LuckPermsIntegrator(logger, clansConfig.luckPermsTrackName).initiateTrack()
+        val integrator = LuckPermsIntegrator(logger, clansConfig.luckPermsTrackName)
+        integrator.initiateTrack()
+        bus.registerListener(CREATE, INTEGRATION, integrator.constructCreateListener())
     }
 }
