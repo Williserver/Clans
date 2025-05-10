@@ -27,6 +27,8 @@ class SessionManager {
         // Norm: Pair<UUID, UUID> (player demoting, player being demoted)
         // Currently unused
         ClanEvent.DEMOTE to mutableMapOf(),
+        // Norm: Pair<UUID, UUID> (previous leader, new leader)
+        ClanEvent.ANOINT to mutableMapOf(),
     )
 
     /**

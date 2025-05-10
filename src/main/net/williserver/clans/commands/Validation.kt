@@ -178,6 +178,7 @@ fun assertClanNameInList(s: CommandSender, list: ClanSet, name: String) =
         false
     } else true
 
+// TODO: remove redundant assertSenderNotLeader
 /**
  * Check whether a player is leader of the clan. If they are, send an error message.
  *
@@ -207,6 +208,22 @@ fun assertRankNotEquals(s: CommandSender, clan: Clan, targetPlayer: UUID, rank: 
         sendErrorMessage(s, message)
         false
     } else true
+
+/**
+ * Check whether a given player's rank is not equal to a given rank. If the ranks aren't equal, send an error message.
+ *
+ * @param s Sender to report errors to.
+ * @param clan Clan to get rank from.
+ * @param targetPlayer Player to check rank of.
+ * @param message Error message to send in case of trouble.
+ */
+fun assertRankEquals(s: CommandSender, clan: Clan, targetPlayer: UUID, rank: ClanRank, message: String) =
+    if (targetPlayer in clan && clan.rankOf(targetPlayer) != rank) {
+        sendErrorMessage(s, message)
+        false
+    } else true
+
+// TODO: validation object to wrap around sender
 
 /**
  * Check whether some timer is in bounds. If not, report the issue to the player.

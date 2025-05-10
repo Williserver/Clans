@@ -41,6 +41,7 @@ class ClansTabCompleter(private val clanSet: ClanSet): TabCompleter {
         when (args.size) {
         1 -> {
             completions.add("help")
+            completions.add("crown")
             completions.add("create")
             completions.add("demote")
             completions.add("disband")
@@ -58,7 +59,7 @@ class ClansTabCompleter(private val clanSet: ClanSet): TabCompleter {
             when (args[0].lowercase()) {
                 "info", "join"-> clanSet.clans().forEach { completions.add(it.name) }
                 "invite" -> getOnlinePlayers().forEach { completions.add(it.name) }
-                "kick", "promote", "demote" ->
+                "kick", "promote", "demote", "crown" ->
                     if (sender is Player && clanSet.isPlayerInClan(sender.uniqueId)) {
                         // Notice: all UUIDs must map to a name, as otherwise they would not have been in a clan.
                         clanSet.clanOf(sender.uniqueId)
@@ -74,7 +75,7 @@ class ClansTabCompleter(private val clanSet: ClanSet): TabCompleter {
         3 -> {
             // The third argument to kick will only ever be "confirm"
             when (args[0].lowercase()) {
-                "kick" -> completions.add("confirm")
+                "kick", "crown" -> completions.add("confirm")
             }
             completions.removeAll{ !it.startsWith(args[2].lowercase()) }
         }

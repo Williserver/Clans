@@ -3,6 +3,8 @@ package net.williserver.clans.session
 import net.williserver.clans.model.clan.Clan
 import java.util.*
 
+// TODO: clan member lifecycle
+
 /**
  * Events in the clan lifecycle to which listeners can be registered.
  * @author Willmo3
@@ -15,6 +17,7 @@ enum class ClanEvent {
     DISBAND,
     PROMOTE,
     DEMOTE,
+    ANOINT,
 }
 
 /**

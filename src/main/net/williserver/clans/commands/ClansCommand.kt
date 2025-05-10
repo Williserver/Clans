@@ -38,6 +38,7 @@ class ClansCommand(private val clanSet: ClanSet,
             val subcommand = args[0]
             val args = args.drop(1)
             when(subcommand.lowercase(Locale.getDefault())) {
+                "crown" -> crown(sender, args)
                 "create" -> create(sender, args)
                 "demote" -> demote(sender, args)
                 "disband" -> disband(sender, args)
@@ -79,6 +80,7 @@ class ClansCommand(private val clanSet: ClanSet,
         val chat = Component.text("\n- /cc: ", NamedTextColor.RED).append(Component.text("Send a message to only your clanmates", NamedTextColor.GRAY))
         // All other commands are prefixed by /clans
         val help = generateCommandHelp("help", "pull up this help menu.")
+        val coronate = generateCommandHelp("coronate", "promote a co-leader to be the new leader of your clan.")
         val create = generateCommandHelp("create (name)", "create a new clan under your visionary leadership.")
         val demote = generateCommandHelp("demote (playername)", "demote a player in your clan.")
         val disband = generateCommandHelp("disband", "disband the clan you own.")
@@ -93,6 +95,7 @@ class ClansCommand(private val clanSet: ClanSet,
         s.sendMessage(header
             .append(chat)
             .append(help)
+            .append(coronate)
             .append(create)
             .append(demote)
             .append(disband)
@@ -328,6 +331,38 @@ class ClansCommand(private val clanSet: ClanSet,
         }
         // Fire either promotion or demotion event.
         bus.fireEvent(event, ourClan, agent=s.uniqueId, target=target.uniqueId)
+        return true
+    }
+
+    /**
+     * Crown a player as leader of sender's clan. This entails sender demoting themself to co-leader.
+     *
+     * @param s Player who invoked the command.
+     * @param args Arguments to command. Should be one or two: (playername) or (playername confirm)
+     *
+     * @return whether the command was invoked with the correct number of arguments.
+     */
+    private fun crown(s: CommandSender, args: List<String>): Boolean {
+        // Argument structure validation. Two args: target to anoint, and whether to confirm.
+        if (args.size != 1 && args.size != 2) {
+            return false
+        }
+        // argument semantics validation.
+        if (!assertValidPlayer(s)
+            || !assertSenderInAClan(s, clanSet)
+            || !assertPlayerNameValid(s, args[0])) {
+            return true
+        }
+
+        val ourClan = clanSet.clanOf((s as Player).uniqueId)
+        val target = getOfflinePlayer(args[0])
+        if (!assertPlayerInThisClan(s, ourClan, target.uniqueId,
+                "Player ${args[0]} is not in our clan!")
+            || !assertRankEquals(s, ourClan, s.uniqueId, ClanRank.LEADER, "You must be leader to execute this command!")
+            || !assertRankEquals(s, ourClan, target.uniqueId, ClanRank.COLEADER, "The player you crown as leader must be a co-leader first!")) {
+            return true
+        }
+        // TODO: add confirmation, fire event.
         return true
     }
 
