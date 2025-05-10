@@ -158,6 +158,28 @@ class ClanTest {
     }
 
     @Test
+    fun testCoronate() {
+        val leader = UUID.randomUUID()
+        val coleader = UUID.randomUUID()
+        val elder = UUID.randomUUID()
+        val member = UUID.randomUUID()
+
+        val clan = Clan("TestClan",
+            leader,
+            members = mutableSetOf(member),
+            elders = mutableSetOf(elder),
+            coLeaders = mutableSetOf(coleader))
+
+        assertEquals(leader, clan.leader)
+        assertThrows(IllegalArgumentException::class.java) { clan.coronate(leader) }
+        assertThrows(IllegalArgumentException::class.java) { clan.coronate(elder) }
+        assertThrows(IllegalArgumentException::class.java) { clan.coronate(member) }
+        clan.coronate(coleader)
+        assertEquals(coleader, clan.leader)
+        assertEquals(ClanRank.COLEADER, clan.rankOf(leader))
+    }
+
+    @Test
     fun testDefaultPrefix() {
         val tc = Clan("Tc",
             UUID.randomUUID())

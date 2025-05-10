@@ -25,6 +25,8 @@ data class ClanData(
     val leader: String
 )
 
+// TODO: clan member lifecycle listener
+
 /**
  * Mutable model for clan.
  *
@@ -170,6 +172,23 @@ class Clan(
                 throw IllegalArgumentException("$pluginMessagePrefix: Cannot demote member, use kick!")
             }
         }
+    }
+
+    // TODO: tidy assertions
+
+    /**
+     * Promote a co-leader of the clan to leader. The previous leader will become a co-leader.
+     * @param newLeader Co-leader who will now become leader.
+     * @throws IllegalArgumentException if the provided UUID is not a member who is a co-leader
+     */
+    fun coronate(newLeader: UUID) {
+        if (!contains(newLeader)) {
+            throw IllegalArgumentException("$pluginMessagePrefix: Member $newLeader does not exist!")
+        } else if (rankOf(newLeader) != ClanRank.COLEADER) {
+            throw IllegalArgumentException("$pluginMessagePrefix: Only co-leaders can be coronated!")
+        }
+        coLeaders += leader
+        leader = newLeader
     }
 
     /*
