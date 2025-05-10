@@ -178,5 +178,6 @@ class ClansPlugin : JavaPlugin() {
         integrator.initiateTrack()
         bus.registerListener(CREATE, INTEGRATION, integrator.constructCreateListener())
         bus.registerListener(DISBAND, INTEGRATION, integrator.constructDisbandListener())
+        bus.registerListener(JOIN, INTEGRATION, integrator.constructJoinListener())
     }
 }
