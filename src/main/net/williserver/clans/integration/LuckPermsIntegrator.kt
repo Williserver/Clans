@@ -29,7 +29,7 @@ class LuckPermsIntegrator(private val logger: LogHandler, private val trackName:
     }
 
     /**
-     * Construct a listener that creates a group and adds its creator to it.
+     * @return a listener that creates a group and adds its creator to it.
      */
     fun constructCreateListener(): ClanLifecycleListener = { clan: Clan, _: UUID, creator: UUID ->
         // NOTE: joining load means this must be run as a separate thread!
@@ -48,7 +48,21 @@ class LuckPermsIntegrator(private val logger: LogHandler, private val trackName:
             luckperms.userManager.modifyUser(creator) {
                 val groupNode = InheritanceNode.builder(group).build()
                 it.data().add(groupNode)
-                logger.info("Added user ${it.username} to group \"${group.name}\".")
+                logger.info("$LOG_PREFIX: Added user ${it.username} to group \"${group.name}\".")
+            }
+        }
+    }
+
+    /**
+     * @return a listener that deletes a group.
+     */
+    fun constructDisbandListener(): ClanLifecycleListener = { clan: Clan, _: UUID, _: UUID ->
+        luckperms.groupManager.loadGroup(clan.name).thenApplyAsync {
+            if (it.isPresent) {
+                luckperms.groupManager.deleteGroup(it.get())
+                logger.info("$LOG_PREFIX: deleted group ${clan.name}")
+            } else {
+                logger.err("$LOG_PREFIX: Group not found under ${clan.name} -- was LuckPerms integration turned off at some point?")
             }
         }
     }

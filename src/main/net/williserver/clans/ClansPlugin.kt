@@ -177,5 +177,6 @@ class ClansPlugin : JavaPlugin() {
         val integrator = LuckPermsIntegrator(logger, clansConfig.luckPermsTrackName)
         integrator.initiateTrack()
         bus.registerListener(CREATE, INTEGRATION, integrator.constructCreateListener())
+        bus.registerListener(DISBAND, INTEGRATION, integrator.constructDisbandListener())
     }
 }
