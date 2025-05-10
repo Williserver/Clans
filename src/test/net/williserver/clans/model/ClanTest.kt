@@ -61,11 +61,11 @@ class ClanTest {
 
     @Test
     fun validClanName() {
-        assert(net.williserver.clans.model.clan.validClanName("123Test-Clan_"))
-        assert(!net.williserver.clans.model.clan.validClanName("\"\""))
-        assert(!net.williserver.clans.model.clan.validClanName("{123}"))
-        assert(!net.williserver.clans.model.clan.validClanName(""))
-        assert(!net.williserver.clans.model.clan.validClanName(" "))
+        assert(Clan.validClanName("123Test-Clan_"))
+        assert(!Clan.validClanName("\"\""))
+        assert(!Clan.validClanName("{123}"))
+        assert(!Clan.validClanName(""))
+        assert(!Clan.validClanName(" "))
     }
 
     @Test

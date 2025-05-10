@@ -259,15 +259,16 @@ class Clan(
             ClanRank.ELDER -> player != leader && player !in members() && player !in coLeaders()
             ClanRank.MEMBER -> player != leader && player !in elders() && player !in coLeaders()
         }
+
+    /*
+     * Misc helpers
+     */
+    companion object {
+        /**
+         * Check whether a clan name is valid -- i.e., contains only alphanumeric characters, underscore, and dash.
+         *
+         * @param name Name to validate.
+         */
+        fun validClanName(name: String): Boolean = name.matches("^([a-zA-Z0-9]|-|_)+$".toRegex())
+    }
 }
-
-/*
- * Misc helpers
- */
-
-/**
- * Check whether a clan name is valid -- i.e., contains only alphanumeric characters, underscore, and dash.
- *
- * @param name Name to validate.
- */
-fun validClanName(name: String): Boolean = name.matches("^([a-zA-Z0-9]|-|_)+$".toRegex())

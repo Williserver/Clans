@@ -4,7 +4,6 @@ import net.williserver.clans.model.*
 import net.williserver.clans.model.clan.Clan
 import net.williserver.clans.model.clan.ClanPermission
 import net.williserver.clans.model.clan.ClanRank
-import net.williserver.clans.model.clan.validClanName
 import net.williserver.clans.session.ClanEvent
 import net.williserver.clans.session.SessionManager
 import org.bukkit.Bukkit.getOfflinePlayer
@@ -144,7 +143,7 @@ fun assertSenderHasPermission(s: CommandSender, clan: Clan, permission: ClanPerm
  * @return Whether the name is valid.
  */
 fun assertValidClanName(s: CommandSender, name: String) =
-    if (!validClanName(name)) {
+    if (!Clan.validClanName(name)) {
         sendErrorMessage(s, "You have specified an invalid clan name.")
         sendErrorMessage(s, "Use only alphanumeric characters, underscore, and dash.")
         false
