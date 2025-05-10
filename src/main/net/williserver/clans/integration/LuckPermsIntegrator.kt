@@ -72,6 +72,16 @@ class LuckPermsIntegrator(private val logger: LogHandler, private val trackName:
         )
     }
 
+    /**
+     * @return A threaded asynchronous listener that removes a player from a group.
+     */
+    fun constructLeaveListener(): ClanLifecycleListener = { clan, _: UUID, leaver: UUID ->
+        asyncMatchGroup(clan.name,
+            ifFound =    { group -> removeFromGroup(group, leaver) },
+            ifNotFound = { errGroupNotPresent(clan.name) }
+        )
+    }
+
     /*
      * Internal helpers
      */
@@ -100,6 +110,17 @@ class LuckPermsIntegrator(private val logger: LogHandler, private val trackName:
             val groupNode = InheritanceNode.builder(group).build()
             it.data().add(groupNode)
             logger.info("$LOG_PREFIX: Added user ${it.username} to group \"${group.name}")
+        }
+
+    /**
+     * @param group LuckPerms group to remove player from.
+     * @param player UUID of player to remove from group.
+     */
+    private fun removeFromGroup(group: Group, player: UUID) =
+        luckperms.userManager.modifyUser(player) {
+            val groupNode = InheritanceNode.builder(group).build()
+            it.data().remove(groupNode)
+            logger.info("$LOG_PREFIX: Removed user ${it.username} from group \"${group.name}")
         }
 
     /**

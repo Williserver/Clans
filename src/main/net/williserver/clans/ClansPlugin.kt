@@ -164,7 +164,6 @@ class ClansPlugin : JavaPlugin() {
         bus.registerListener(JOIN, INTEGRATION, teamIntegrator.constructJoinTeamListener())
         bus.registerListener(LEAVE, INTEGRATION, teamIntegrator.constructLeaveTeamListener())
         // From the limited perspective of vanilla teams, a kick is just a player leaving.
-        // They lack sufficient context to impose stricter checks and so use the same leave listener.
         bus.registerListener(KICK, INTEGRATION, teamIntegrator.constructLeaveTeamListener())
     }
 
@@ -179,5 +178,8 @@ class ClansPlugin : JavaPlugin() {
         bus.registerListener(CREATE, INTEGRATION, integrator.constructCreateListener())
         bus.registerListener(DISBAND, INTEGRATION, integrator.constructDisbandListener())
         bus.registerListener(JOIN, INTEGRATION, integrator.constructJoinListener())
+        bus.registerListener(LEAVE, INTEGRATION, integrator.constructLeaveListener())
+        // From the perspective of LuckPerms, a kick is just a player leaving.
+        bus.registerListener(KICK, INTEGRATION, integrator.constructLeaveListener())
     }
 }
