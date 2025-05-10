@@ -2,9 +2,8 @@ package net.williserver.clans.commands.chat
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
-import net.williserver.clans.commands.assertSenderInAClan
+import net.williserver.clans.commands.ClansCommandValidator
 import net.williserver.clans.commands.sendClanMessage
-import net.williserver.clans.commands.assertValidPlayer
 import net.williserver.clans.model.ClanSet
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
@@ -25,8 +24,9 @@ class ChatCommand(private val clans: ClanSet): CommandExecutor {
             return false
         }
         // Argument semantics validation.
-        if (!assertValidPlayer(s)
-            || !assertSenderInAClan(s, clans)) {
+        val v = ClansCommandValidator(s)
+        if (!v.assertValidPlayer()
+            || !v.assertSenderInAClan(clans)) {
             return true
         }
 

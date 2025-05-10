@@ -153,10 +153,11 @@ class ClansCommand(private val clanSet: ClanSet,
             return true
         }
         // Argument semantics validation
-        if (!assertValidPlayer(s)
-            || !assertPlayerNotInAClan(s, clanSet, (s as Player).uniqueId, "You are already in a clan!")
-            || !assertValidClanName(s, args[0])
-            || !assertUniqueClanName(s, clanSet, args[0])) {
+        val v = ClansCommandValidator(s)
+        if (!v.assertValidPlayer()
+            || !v.assertPlayerNotInAClan(clanSet, (s as Player).uniqueId, "You are already in a clan!")
+            || !v.assertValidClanName(args[0])
+            || !v.assertUniqueClanName(clanSet, args[0])) {
             return true
         }
 
@@ -182,9 +183,10 @@ class ClansCommand(private val clanSet: ClanSet,
             return false
         }
         // Argument semantics validation.
-        if (!assertValidPlayer(s)
-            || !assertSenderInAClan(s, clanSet)
-            || !assertSenderHasPermission(s, clanSet.clanOf((s as Player).uniqueId), ClanPermission.DISBAND)) {
+        val v = ClansCommandValidator(s)
+        if (!v.assertValidPlayer()
+            || !v.assertSenderInAClan(clanSet)
+            || !v.assertSenderHasPermission(clanSet.clanOf((s as Player).uniqueId), ClanPermission.DISBAND)) {
             return true
         }
 
@@ -207,7 +209,7 @@ class ClansCommand(private val clanSet: ClanSet,
                 if (args[0].lowercase(Locale.getDefault()) != "confirm") {
                     return false
                 }
-                if (assertTimerInBounds(s, session, ClanEvent.DISBAND, clan, "disband")) {
+                if (v.assertTimerInBounds(session, ClanEvent.DISBAND, clan, "disband")) {
                     bus.fireEvent(ClanEvent.DISBAND, clan, agent=s.uniqueId, target=s.uniqueId)
                 }
                 true
@@ -229,11 +231,12 @@ class ClansCommand(private val clanSet: ClanSet,
             return false
         }
         // Argument semantics validation.
-        if (!assertValidPlayer(s)
-            || !assertSenderInAClan(s, clanSet)
-            || !assertSenderHasPermission(s, clanSet.clanOf((s as Player).uniqueId), ClanPermission.INVITE)
-            || !assertPlayerNameOnline(s, args[0])
-            || !assertPlayerNotInAClan(s, clanSet, getPlayer(args[0])!!.uniqueId,
+        val v = ClansCommandValidator(s)
+        if (!v.assertValidPlayer()
+            || !v.assertSenderInAClan(clanSet)
+            || !v.assertSenderHasPermission(clanSet.clanOf((s as Player).uniqueId), ClanPermission.INVITE)
+            || !v.assertPlayerNameOnline(args[0])
+            || !v.assertPlayerNotInAClan(clanSet, getPlayer(args[0])!!.uniqueId,
                 "${getPlayer(args[0])!!.name} is already in a clan!")) {
             return true
         }
@@ -269,9 +272,10 @@ class ClansCommand(private val clanSet: ClanSet,
             return false
         }
         // Argument semantics validation.
-        if (!assertValidPlayer(s)
-            || !assertClanNameInList(s, clanSet, args[0])
-            || !assertPlayerNotInAClan(s, clanSet, (s as Player).uniqueId, "You are already in a clan!")) {
+        val v = ClansCommandValidator(s)
+        if (!v.assertValidPlayer()
+            || !v.assertClanNameInList(clanSet, args[0])
+            || !v.assertPlayerNotInAClan(clanSet, (s as Player).uniqueId, "You are already in a clan!")) {
             return true
         }
         // Ensure player has an active invite to the clan.
@@ -315,18 +319,19 @@ class ClansCommand(private val clanSet: ClanSet,
             return false
         }
         // argument semantics validation.
-        if (!assertValidPlayer(s)
-            || !assertSenderInAClan(s, clanSet)
-            || !assertPlayerNameValid(s, args[0])) {
+        val v = ClansCommandValidator(s)
+        if (!v.assertValidPlayer()
+            || !v.assertSenderInAClan(clanSet)
+            || !v.assertPlayerNameValid(args[0])) {
             return true
         }
 
         val ourClan = clanSet.clanOf((s as Player).uniqueId)
         val target = getOfflinePlayer(args[0])
-        if (!assertPlayerInThisClan(s, ourClan, target.uniqueId,
+        if (!v.assertPlayerInThisClan(ourClan, target.uniqueId,
                 "Player ${args[0]} is not in our clan!")
-            || !assertRankNotEquals(s, ourClan, target.uniqueId, boundaryRank, boundaryMessage)
-            || !assertSenderOutranks(s, ourClan, target.uniqueId)) {
+            || !v.assertRankNotEquals(ourClan, target.uniqueId, boundaryRank, boundaryMessage)
+            || !v.assertSenderOutranks(ourClan, target.uniqueId)) {
             return true
         }
         // Fire either promotion or demotion event.
@@ -348,18 +353,19 @@ class ClansCommand(private val clanSet: ClanSet,
             return false
         }
         // argument semantics validation.
-        if (!assertValidPlayer(s)
-            || !assertSenderInAClan(s, clanSet)
-            || !assertPlayerNameValid(s, args[0])) {
+        val v = ClansCommandValidator(s)
+        if (!v.assertValidPlayer()
+            || !v.assertSenderInAClan(clanSet)
+            || !v.assertPlayerNameValid(args[0])) {
             return true
         }
 
         val ourClan = clanSet.clanOf((s as Player).uniqueId)
         val target = getOfflinePlayer(args[0])
-        if (!assertPlayerInThisClan(s, ourClan, target.uniqueId,
+        if (!v.assertPlayerInThisClan(ourClan, target.uniqueId,
                 "Player ${args[0]} is not in our clan!")
-            || !assertRankEquals(s, ourClan, s.uniqueId, ClanRank.LEADER, "You must be leader to execute this command!")
-            || !assertRankEquals(s, ourClan, target.uniqueId, ClanRank.COLEADER, "The player you crown as leader must be a co-leader first!")) {
+            || !v.assertRankEquals(ourClan, s.uniqueId, ClanRank.LEADER, "You must be leader to execute this command!")
+            || !v.assertRankEquals(ourClan, target.uniqueId, ClanRank.COLEADER, "The player you crown as leader must be a co-leader first!")) {
             return true
         }
         // TODO: add confirmation, fire event.
@@ -381,9 +387,10 @@ class ClansCommand(private val clanSet: ClanSet,
             return false
         }
         // Argument semantics validation.
-        if (!assertValidPlayer(s)
-            || !assertSenderInAClan(s, clanSet)
-            || !assertSenderNotLeader(s, clanSet.clanOf((s as Player).uniqueId))) {
+        val v = ClansCommandValidator(s)
+        if (!v.assertValidPlayer()
+            || !v.assertSenderInAClan(clanSet)
+            || !v.assertSenderNotLeader(clanSet.clanOf((s as Player).uniqueId))) {
             return true
         }
 
@@ -403,7 +410,7 @@ class ClansCommand(private val clanSet: ClanSet,
                     return false
                 }
                 // Leave clan if the timer was started.
-                if (assertTimerInBounds(s, session, ClanEvent.LEAVE, s.uniqueId, "leave")) {
+                if (v.assertTimerInBounds(session, ClanEvent.LEAVE, s.uniqueId, "leave")) {
                     bus.fireEvent(ClanEvent.LEAVE, clanSet.clanOf(s.uniqueId), agent=s.uniqueId, target=s.uniqueId)
                 }
                 true
@@ -427,16 +434,17 @@ class ClansCommand(private val clanSet: ClanSet,
             return false
         }
         // Argument semantics validation.
-        if (!assertValidPlayer(s)
-             || !assertSenderInAClan(s, clanSet)
-             || ! assertPlayerNameValid(s, args[0])) {
+        val v = ClansCommandValidator(s)
+        if (!v.assertValidPlayer()
+             || !v.assertSenderInAClan(clanSet)
+             || !v.assertPlayerNameValid(args[0])) {
              return true
         }
         val clanToKickFrom = clanSet.clanOf((s as Player).uniqueId)
         val playerToKick = getOfflinePlayer(args[0])
-        if (!assertSenderHasPermission(s, clanToKickFrom, ClanPermission.KICK)
-             || !assertPlayerInThisClan(s, clanToKickFrom, playerToKick.uniqueId, "")
-             || !assertSenderOutranks(s, clanToKickFrom, playerToKick.uniqueId)) {
+        if (!v.assertSenderHasPermission(clanToKickFrom, ClanPermission.KICK)
+             || !v.assertPlayerInThisClan(clanToKickFrom, playerToKick.uniqueId, "")
+             || !v.assertSenderOutranks(clanToKickFrom, playerToKick.uniqueId)) {
             return true
         }
 
@@ -456,7 +464,7 @@ class ClansCommand(private val clanSet: ClanSet,
                     return false
                 }
                 // Kick player from clan if timer started.
-                if (assertTimerInBounds(s, session, ClanEvent.KICK, Pair(s.uniqueId, playerToKick.uniqueId), "kick")) {
+                if (v.assertTimerInBounds(session, ClanEvent.KICK, Pair(s.uniqueId, playerToKick.uniqueId), "kick")) {
                     bus.fireEvent(ClanEvent.KICK, clanSet.clanOf(s.uniqueId), agent=s.uniqueId, target=playerToKick.uniqueId)
                 }
                 true
@@ -480,7 +488,8 @@ class ClansCommand(private val clanSet: ClanSet,
             return false // Malformed command -- clan info needs a name!
         }
         // Argument semantics validation.
-        if (!assertClanNameInList(s, clanSet, args[0])) {
+        val v = ClansCommandValidator(s)
+        if (!v.assertClanNameInList(clanSet, args[0])) {
             return true
         }
 
