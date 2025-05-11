@@ -103,9 +103,8 @@ class Clan(
      * @throws IllegalArgumentException If member not in this clan.
      */
     fun leave(member: UUID) {
-        if (!contains(member)) {
-            throw IllegalArgumentException("$pluginMessagePrefix: Member $member does not exist!")
-        } else if (member == leader) {
+        execeptionIfNotInClan(member)
+        if (member == leader) {
             throw IllegalArgumentException("$pluginMessagePrefix: Member $member leads this clan!")
         }
 
@@ -123,9 +122,7 @@ class Clan(
      * @throws IllegalArgumentException if the rank becomes too high -- co-leaders must be promoted via separate function, since there can only be one leader.
      */
     fun promote(promotedMember: UUID) {
-        if (!contains(promotedMember)) {
-            throw IllegalArgumentException("$pluginMessagePrefix: Member $promotedMember does not exist!")
-        }
+        execeptionIfNotInClan(promotedMember)
         // Add the member to the corresponding set, or throw an error
         when (rankOf(promotedMember)) {
             ClanRank.LEADER -> {
@@ -152,9 +149,7 @@ class Clan(
      * @throws IllegalArgumentException if the rank becomes too low, or attempts to demote the leader.
      */
     fun demote(demotedMember: UUID) {
-        if (!contains(demotedMember)) {
-            throw IllegalArgumentException("$pluginMessagePrefix: Member $demotedMember does not exist!")
-        }
+        execeptionIfNotInClan(demotedMember)
         // Remove the member from the corresponding set, or throw an error.
         when (rankOf(demotedMember)) {
             ClanRank.LEADER -> {
@@ -174,17 +169,14 @@ class Clan(
         }
     }
 
-    // TODO: tidy assertions
-
     /**
      * Promote a co-leader of the clan to leader. The previous leader will become a co-leader.
      * @param newLeader Co-leader who will now become leader.
      * @throws IllegalArgumentException if the provided UUID is not a member who is a co-leader
      */
     fun coronate(newLeader: UUID) {
-        if (!contains(newLeader)) {
-            throw IllegalArgumentException("$pluginMessagePrefix: Member $newLeader does not exist!")
-        } else if (rankOf(newLeader) != ClanRank.COLEADER) {
+        execeptionIfNotInClan(newLeader)
+        if (rankOf(newLeader) != ClanRank.COLEADER) {
             throw IllegalArgumentException("$pluginMessagePrefix: Only co-leaders can be coronated!")
         }
         coLeaders += leader
@@ -222,7 +214,7 @@ class Clan(
      * @return the rank of member in this clan.
      * @throws IllegalArgumentException If the specified member is not in this clan.
      */
-    fun rankOf(member: UUID): ClanRank =
+    fun rankOf(member: UUID) =
         when (member) {
             leader -> ClanRank.LEADER
             in coLeaders -> ClanRank.COLEADER
@@ -245,7 +237,7 @@ class Clan(
      * Convert the object back to a tuple of ClanData. Useful for serialization.
      * @return ClanData tuple form of this data.
      */
-    fun asDataTuple(): ClanData = ClanData(
+    fun asDataTuple() = ClanData(
         name,
         prefix,
         HashSet(members.map   { it.toString() }),
@@ -279,8 +271,18 @@ class Clan(
             ClanRank.MEMBER -> player != leader && player !in elders() && player !in coLeaders()
         }
 
+    /**
+     * @param player Player to assert in clan.
+     * @throws IllegalArgumentException if the player is not in the clan yet.
+     */
+    private fun execeptionIfNotInClan(player: UUID) {
+        if (!contains(player)) {
+            throw IllegalArgumentException("$pluginMessagePrefix: No player with UUID $player found in this clan!")
+        }
+    }
+
     /*
-     * Misc helpers
+     * Static helpers
      */
     companion object {
         /**
