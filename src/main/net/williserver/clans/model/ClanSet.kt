@@ -158,41 +158,7 @@ class ClanSet(data: Set<ClanData>) {
      * Clans event listener factories.
      */
 
-    /**
-     * Construct join listener to add a player to a clan in this model.
-     * Fire when a player joins a clan.
-     * @return the listener
-     */
-    fun constructJoinListener(): ClanLifecycleListener = { clan, _, joiner ->
-        exceptionIfClanNotInList(clan)
-        if (isPlayerInClan(joiner)) {
-            throw IllegalArgumentException("$pluginMessagePrefix: Player $joiner is already in a clan.")
-        }
-        clan.join(joiner)
-    }
-
-    /**
-     * Construct leave listener to remove a player from clan in this model.
-     * Fire when a player leaves a clan.
-     * @return The listener.
-     */
-    fun constructLeaveListener(): ClanLifecycleListener = { clan, _, leaver ->
-        exceptionIfClanNotInList(clan)
-        clan.leave(leaver)
-    }
-
-    /**
-     * Construct kick listener to kick a player from clan in this model.
-     * Fire when one player kicks another from the clan.
-     * @return the listener.
-     */
-    fun constructKickListener(): ClanLifecycleListener = { clan, agent, kickedPlayer ->
-        exceptionIfClanNotInList(clan)
-        if (clan.rankOf(kickedPlayer) >= clan.rankOf(agent)) {
-            throw IllegalArgumentException("$pluginMessagePrefix: Kick attempted by player with insufficient rank!")
-        }
-        clan.leave(kickedPlayer)
-    }
+    // TODO: constructAnointListener
 
     /**
      * Construct create listener to add a clan to this model.
@@ -220,21 +186,6 @@ class ClanSet(data: Set<ClanData>) {
     }
 
     /**
-     * Construct promotion listener to promote a player in a clan in this model.
-     * Fire when a player is promoted.
-     * @return the listener.
-     */
-    fun constructPromoteListener(): ClanLifecycleListener = { clan, promoter, promotee ->
-        exceptionIfClanNotInList(clan)
-        if (promoter !in clan || promotee !in clan) {
-            throw IllegalArgumentException("$pluginMessagePrefix: Player not in clan.")
-        } else if (clan.rankOf(promoter) <= clan.rankOf(promotee)) {
-            throw IllegalArgumentException("$pluginMessagePrefix: Promoter does not outrank promoted player.")
-        }
-        clan.promote(promotee)
-    }
-
-    /**
      * Construct demotion listener to demote a player in a clan in this model.
      * Fire when a player is demoted.
      * @return the listener.
@@ -251,7 +202,56 @@ class ClanSet(data: Set<ClanData>) {
         clan.demote(demotee)
     }
 
-    // TODO: constructAnointListener
+    /**
+     * Construct join listener to add a player to a clan in this model.
+     * Fire when a player joins a clan.
+     * @return the listener
+     */
+    fun constructJoinListener(): ClanLifecycleListener = { clan, _, joiner ->
+        exceptionIfClanNotInList(clan)
+        if (isPlayerInClan(joiner)) {
+            throw IllegalArgumentException("$pluginMessagePrefix: Player $joiner is already in a clan.")
+        }
+        clan.join(joiner)
+    }
+
+    /**
+     * Construct kick listener to kick a player from clan in this model.
+     * Fire when one player kicks another from the clan.
+     * @return the listener.
+     */
+    fun constructKickListener(): ClanLifecycleListener = { clan, agent, kickedPlayer ->
+        exceptionIfClanNotInList(clan)
+        if (clan.rankOf(kickedPlayer) >= clan.rankOf(agent)) {
+            throw IllegalArgumentException("$pluginMessagePrefix: Kick attempted by player with insufficient rank!")
+        }
+        clan.leave(kickedPlayer)
+    }
+
+    /**
+     * Construct leave listener to remove a player from clan in this model.
+     * Fire when a player leaves a clan.
+     * @return The listener.
+     */
+    fun constructLeaveListener(): ClanLifecycleListener = { clan, _, leaver ->
+        exceptionIfClanNotInList(clan)
+        clan.leave(leaver)
+    }
+
+    /**
+     * Construct promotion listener to promote a player in a clan in this model.
+     * Fire when a player is promoted.
+     * @return the listener.
+     */
+    fun constructPromoteListener(): ClanLifecycleListener = { clan, promoter, promotee ->
+        exceptionIfClanNotInList(clan)
+        if (promoter !in clan || promotee !in clan) {
+            throw IllegalArgumentException("$pluginMessagePrefix: Player not in clan.")
+        } else if (clan.rankOf(promoter) <= clan.rankOf(promotee)) {
+            throw IllegalArgumentException("$pluginMessagePrefix: Promoter does not outrank promoted player.")
+        }
+        clan.promote(promotee)
+    }
 
     /*
      * ClanList internal helpers.
