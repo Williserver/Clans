@@ -174,12 +174,13 @@ class Clan(
      * @param newLeader Co-leader who will now become leader.
      * @throws IllegalArgumentException if the provided UUID is not a member who is a co-leader
      */
-    fun coronate(newLeader: UUID) {
+    fun crown(newLeader: UUID) {
         execeptionIfNotInClan(newLeader)
         if (rankOf(newLeader) != ClanRank.COLEADER) {
             throw IllegalArgumentException("$pluginMessagePrefix: Only co-leaders can be coronated!")
         }
         coLeaders += leader
+        coLeaders -= newLeader
         leader = newLeader
     }
 
