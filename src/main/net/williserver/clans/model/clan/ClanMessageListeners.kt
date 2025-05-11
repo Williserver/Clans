@@ -88,6 +88,28 @@ fun constructDemoteMessageListener(): ClanLifecycleListener = { clan, demoter, d
 }
 
 /**
+ * @return a listener that sends a message to all clan members when a player is crowned.
+ */
+fun constructCrownMessageListener(): ClanLifecycleListener = { clan, oldLeader, newLeader ->
+    val oldLeaderName = Bukkit.getOfflinePlayer(oldLeader).name
+    val newLeaderName = Bukkit.getOfflinePlayer(newLeader).name
+
+    val newLeaderMessage = prefix(clan.name)
+        .append(Component.text(
+            "$oldLeaderName has crowned $newLeaderName as our clan's new leader!",
+            NamedTextColor.GREEN))
+
+    val newCoMessage = prefix(clan.name)
+        .append(Component.text(
+            "$oldLeaderName will continue as a clan co-leader.",
+            NamedTextColor.GREEN
+        ))
+
+    sendClanMessage(clan, newLeaderMessage)
+    sendClanMessage(clan, newCoMessage)
+}
+
+/**
  * @param name Clan name to format
  * @return a formatted prefix component for a clan name.
  */

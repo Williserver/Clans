@@ -144,6 +144,7 @@ class ClansPlugin : JavaPlugin() {
      * These listeners will be run last, since they should have no persistent data impact.
      */
     private fun registerCosmeticListeners() {
+        bus.registerListener(CORONATE, COSMETIC, constructCrownMessageListener())
         bus.registerListener(CREATE, COSMETIC, constructCreateMessageListener())
         bus.registerListener(DEMOTE, COSMETIC, constructDemoteMessageListener())
         bus.registerListener(DISBAND, COSMETIC, constructDisbandMessageListener())
