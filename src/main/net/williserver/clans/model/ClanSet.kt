@@ -145,6 +145,8 @@ class ClanSet(data: Set<ClanData>) {
      */
     override fun equals(other: Any?): Boolean = other is ClanSet && other.clans() == clans()
 
+    override fun hashCode() = clans.hashCode()
+
     /*
      * ClanList serialization helpers.
      */
@@ -152,7 +154,7 @@ class ClanSet(data: Set<ClanData>) {
     /**
      * @return This list as clan data tuples, suitable to be written as JSON.
      */
-    fun asDataTuples(): List<ClanData> = clans.map { it.asDataTuple() }
+    fun asDataTuples() = clans.map { it.asDataTuple() }
 
     /*
      * Clans event listener factories.
