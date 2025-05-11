@@ -164,9 +164,8 @@ class ClanSet(data: Set<ClanData>) {
      * @return the listener
      */
     fun constructJoinListener(): ClanLifecycleListener = { clan, _, joiner ->
-        if (clan !in clans()) {
-            throw IllegalArgumentException("$pluginMessagePrefix: Clan ${clan.name} is not in this list!")
-        }
+        exceptionIfClanNotInList(clan)
+        // TODO: validate the user is not in any other clan either.
         clan.join(joiner)
     }
 
@@ -176,9 +175,7 @@ class ClanSet(data: Set<ClanData>) {
      * @return The listener.
      */
     fun constructLeaveListener(): ClanLifecycleListener = { clan, _, leaver ->
-        if (clan !in clans()) {
-            throw IllegalArgumentException("$pluginMessagePrefix: Clan ${clan.name} is not in this list!")
-        }
+        exceptionIfClanNotInList(clan)
         clan.leave(leaver)
     }
 
@@ -188,9 +185,8 @@ class ClanSet(data: Set<ClanData>) {
      * @return the listener.
      */
     fun constructKickListener(): ClanLifecycleListener = { clan, agent, kickedPlayer ->
-        if (clan !in clans()) {
-            throw IllegalArgumentException("$pluginMessagePrefix: Clan ${clan.name} is not in this list!")
-        } else if (clan.rankOf(kickedPlayer) >= clan.rankOf(agent)) {
+        exceptionIfClanNotInList(clan)
+        if (clan.rankOf(kickedPlayer) >= clan.rankOf(agent)) {
             throw IllegalArgumentException("$pluginMessagePrefix: Kick attempted by player with insufficient rank!")
         }
         clan.leave(kickedPlayer)
@@ -214,8 +210,9 @@ class ClanSet(data: Set<ClanData>) {
      * @return the listener
      */
     fun constructDisbandListener(): ClanLifecycleListener = { clan, _, disbander ->
-        if (disbander !in clan || !clan.rankOf(disbander).hasPermission(ClanPermission.DISBAND)) {
-            throw IllegalArgumentException("$pluginMessagePrefix: This player does not have permission to disband the clan!")
+        exceptionIfClanNotInList(clan)
+        if (disbander != clan.leader) {
+            throw IllegalArgumentException("$pluginMessagePrefix: Disband attempted by non-leader member!")
         }
         removeClan(clan)
     }
@@ -226,9 +223,8 @@ class ClanSet(data: Set<ClanData>) {
      * @return the listener.
      */
     fun constructPromoteListener(): ClanLifecycleListener = { clan, promoter, promotee ->
-        if (clan !in clans()) {
-            throw IllegalArgumentException("$pluginMessagePrefix: Clan is not tracked in this list.")
-        } else if (promoter !in clan || promotee !in clan) {
+        exceptionIfClanNotInList(clan)
+        if (promoter !in clan || promotee !in clan) {
             throw IllegalArgumentException("$pluginMessagePrefix: Player not in clan.")
         } else if (clan.rankOf(promoter) <= clan.rankOf(promotee)) {
             throw IllegalArgumentException("$pluginMessagePrefix: Promoter does not outrank promoted player.")
@@ -242,9 +238,8 @@ class ClanSet(data: Set<ClanData>) {
      * @return the listener.
      */
     fun constructDemoteListener(): ClanLifecycleListener = { clan, demoter, demotee ->
-        if (clan !in clans()) {
-            throw IllegalArgumentException("$pluginMessagePrefix: Clan is not tracked in this list.")
-        } else if (demoter !in clan || demotee !in clan) {
+        exceptionIfClanNotInList(clan)
+        if (demoter !in clan || demotee !in clan) {
             throw IllegalArgumentException("$pluginMessagePrefix: Player not in clan.")
         } else if (clan.rankOf(demoter) <= clan.rankOf(demotee)) {
             throw IllegalArgumentException("$pluginMessagePrefix: Demoter does not outrank demoted player.")
@@ -254,6 +249,8 @@ class ClanSet(data: Set<ClanData>) {
         clan.demote(demotee)
     }
 
+    // TODO: constructAnointListener
+
     /*
      * ClanList internal helpers.
      */
@@ -261,11 +258,22 @@ class ClanSet(data: Set<ClanData>) {
     /**
      * Check whether given clan has members that are also in other clans in this list.
      * In good circumstances, this should never be the case.
+     * @param clan Clan to check.
      */
     private fun duplicateMembers(clan: Clan) =
         clans().any {
             otherClan -> otherClan != clan && otherClan.allClanmates().any { it in clan }
         }
+
+    /**
+     * @param clan Clan to assert in list
+     * @throws IllegalArgumentException if the clan is not tracked in this ClanList.
+     */
+    private fun exceptionIfClanNotInList(clan: Clan) {
+        if (clan !in clans()) {
+            throw IllegalArgumentException("$pluginMessagePrefix: Clan ${clan.name} is not in this list!")
+        }
+    }
 }
 
 /**
