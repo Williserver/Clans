@@ -354,8 +354,30 @@ private class ClansSubcommandExecutor(
             || !v.assertRankEquals(ourClan, target.uniqueId, ClanRank.COLEADER, "The player you crown as leader must be a co-leader first!")) {
             return true
         }
-        // TODO: add confirmation, fire event.
-        return true
+
+        // Either add a confirm timer, or fire event if present.
+        return when(args.size) {
+            1 -> {
+                session.registerTimer(ClanEvent.CORONATE, Pair(s.uniqueId, target.uniqueId), config.confirmTime.toLong())
+                sendInfoMessage(s, "You have begun to crown ${args[0]} as new leader of your clan!")
+                sendInfoMessage(s, "Enter \"/clans crown ${args[0]} confirm\" within ${config.confirmTime} seconds to confirm this choice.")
+                session.startTimer(ClanEvent.CORONATE, Pair(s.uniqueId, target.uniqueId))
+                true
+            }
+            2 -> {
+                // Minor edge case: since timers are not registered to clan, if all invariants are met while in another clan,
+                // we will be able to skip the confirm timer.
+                // This is not a problem, though -- to do so would require a lot of change for a limited time.
+                if (args[1].lowercase() != "confirm") {
+                    return false
+                }
+                if (v.assertTimerInBounds(session, ClanEvent.CORONATE, Pair(s.uniqueId, target.uniqueId), "coronate")) {
+                    bus.fireEvent(ClanEvent.CORONATE, ourClan, s.uniqueId, target.uniqueId)
+                }
+                true
+            }
+            else -> throw IllegalArgumentException("Illegal number of args -- should have been validated earlier.")
+        }
     }
 
     /**

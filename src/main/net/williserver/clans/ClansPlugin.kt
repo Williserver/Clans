@@ -120,6 +120,7 @@ class ClansPlugin : JavaPlugin() {
      * that should be met before other listeners fire.
      */
     private fun registerCoreModelListeners() {
+        bus.registerListener(CORONATE, MODEL, clanSet.constructCoronateListener())
         bus.registerListener(CREATE, MODEL, clanSet.constructCreateListener())
         bus.registerListener(DEMOTE, MODEL, clanSet.constructDemoteListener())
         bus.registerListener(DISBAND, MODEL, clanSet.constructDisbandListener())

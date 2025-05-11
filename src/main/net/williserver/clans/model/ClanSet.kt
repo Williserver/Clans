@@ -4,7 +4,6 @@ import kotlinx.serialization.json.Json
 import net.williserver.clans.LogHandler
 import net.williserver.clans.model.clan.Clan
 import net.williserver.clans.model.clan.ClanData
-import net.williserver.clans.model.clan.ClanPermission
 import net.williserver.clans.model.clan.ClanRank
 import net.williserver.clans.pluginMessagePrefix
 import net.williserver.clans.session.ClanLifecycleListener
@@ -169,7 +168,7 @@ class ClanSet(data: Set<ClanData>) {
         if (clan.leader != oldLeader) {
             throw IllegalArgumentException("$pluginMessagePrefix: Player $oldLeader is not leader of this clan.")
         }
-        clan.coronate(newLeader)
+        clan.crown(newLeader)
     }
 
     /**
