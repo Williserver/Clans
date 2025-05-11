@@ -75,6 +75,19 @@ class ListenersTest {
     }
 
     @Test
+    fun testJoinAlreadyInClan() {
+        // ClanSet listeners should not allow players to be in multiple clans!
+        val duplicate = UUID.randomUUID()
+        val clan = Clan("TestClan", UUID.randomUUID(), elders= mutableSetOf(duplicate))
+        val otherClan = Clan("TestClan2", UUID.randomUUID())
+        val clanSet = ClanSet(setOf(clan.asDataTuple(), otherClan.asDataTuple()))
+
+        val bus = ClanEventBus()
+        bus.registerListener(ClanEvent.JOIN, ClanListenerType.MODEL, clanSet.constructJoinListener())
+        assertThrows(IllegalArgumentException::class.java) { bus.fireEvent(ClanEvent.JOIN, otherClan, duplicate, duplicate) }
+    }
+
+    @Test
     fun testPromote() {
         val leader = UUID.randomUUID()
         val promotee = UUID.randomUUID()

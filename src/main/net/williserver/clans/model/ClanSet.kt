@@ -165,7 +165,9 @@ class ClanSet(data: Set<ClanData>) {
      */
     fun constructJoinListener(): ClanLifecycleListener = { clan, _, joiner ->
         exceptionIfClanNotInList(clan)
-        // TODO: validate the user is not in any other clan either.
+        if (isPlayerInClan(joiner)) {
+            throw IllegalArgumentException("$pluginMessagePrefix: Player $joiner is already in a clan.")
+        }
         clan.join(joiner)
     }
 
