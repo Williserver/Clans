@@ -1,7 +1,8 @@
-package net.williserver.clans.commands
+package net.williserver.clans.commands.base
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
+import net.williserver.clans.commands.*
 import net.williserver.clans.model.*
 import net.williserver.clans.model.clan.Clan
 import net.williserver.clans.model.clan.ClanPermission

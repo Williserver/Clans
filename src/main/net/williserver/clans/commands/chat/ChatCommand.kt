@@ -2,7 +2,7 @@ package net.williserver.clans.commands.chat
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
-import net.williserver.clans.commands.ClansCommandValidator
+import net.williserver.clans.commands.base.ClansCommandValidator
 import net.williserver.clans.commands.sendClanMessage
 import net.williserver.clans.model.ClanSet
 import org.bukkit.command.Command

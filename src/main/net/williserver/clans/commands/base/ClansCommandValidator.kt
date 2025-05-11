@@ -1,5 +1,6 @@
-package net.williserver.clans.commands
+package net.williserver.clans.commands.base
 
+import net.williserver.clans.commands.sendErrorMessage
 import net.williserver.clans.model.*
 import net.williserver.clans.model.clan.Clan
 import net.williserver.clans.model.clan.ClanPermission
@@ -213,8 +214,6 @@ class ClansCommandValidator(private val s: CommandSender) {
             sendErrorMessage(s, message)
             false
         } else true
-
-    // TODO: validation object to wrap around sender
 
     /**
      * Check whether some timer is in bounds. If not, report the issue to the player.
