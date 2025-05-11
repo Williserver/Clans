@@ -39,39 +39,31 @@ class ListenersTest {
         assert(clan.name in clanSet)
     }
 
+    // All event listeners should complain with a NoSuchElementException if the clan is not present.
     @Test
-    fun testLeaveUntrackedClan() {
+    fun testEventUntrackedClan() {
         val leader = UUID.randomUUID()
         val member = UUID.randomUUID()
-        val trackedClan = Clan("TestClan", leader, members= mutableSetOf(member))
-
-        val untrackedClan = Clan("OtherClan", leader, members = mutableSetOf(member))
-        val clanSet = ClanSet(setOf(trackedClan.asDataTuple()))
-
-        val bus = ClanEventBus()
-        bus.registerListener(ClanEvent.LEAVE, ClanListenerType.MODEL, clanSet.constructLeaveListener())
-        assertThrows(IllegalArgumentException::class.java) {bus.fireEvent(ClanEvent.LEAVE, untrackedClan, member, member)}
-
-        bus.fireEvent(ClanEvent.LEAVE, trackedClan, member, member)
-        assert(member !in trackedClan)
-    }
-
-    @Test
-    fun testJoinUntrackedClan() {
-        val clan = Clan("TestClan", UUID.randomUUID())
+        val untrackedClan = Clan("TestClan", leader, members= mutableSetOf(member))
         val clanSet = ClanSet(setOf())
 
         val bus = ClanEventBus()
+        bus.registerListener(ClanEvent.DEMOTE, ClanListenerType.MODEL, clanSet.constructDemoteListener())
+        bus.registerListener(ClanEvent.DISBAND, ClanListenerType.MODEL, clanSet.constructDisbandListener())
         bus.registerListener(ClanEvent.JOIN, ClanListenerType.MODEL, clanSet.constructJoinListener())
+        bus.registerListener(ClanEvent.KICK, ClanListenerType.MODEL, clanSet.constructKickListener())
+        bus.registerListener(ClanEvent.LEAVE, ClanListenerType.MODEL, clanSet.constructLeaveListener())
+        bus.registerListener(ClanEvent.PROMOTE, ClanListenerType.MODEL, clanSet.constructPromoteListener())
+        // TODO: switch to anoint listener when made
+        bus.registerListener(ClanEvent.ANOINT, ClanListenerType.MODEL, clanSet.constructPromoteListener())
 
-        val randoJoining = UUID.randomUUID()
-        assertThrows(IllegalArgumentException::class.java)
-            { bus.fireEvent(ClanEvent.JOIN, clan, randoJoining, randoJoining) }
-
-        clanSet.addClan(clan)
-        assert(randoJoining !in clan)
-        bus.fireEvent(ClanEvent.JOIN, clan, randoJoining, randoJoining)
-        assert(randoJoining in clan)
+        // For each event, fire it with a clan not in this list. It should throw NoSuchElementException.
+        ClanEvent.entries.forEach {
+            // Ignore create event -- by definition, it is not tracked yet.
+            if (it != ClanEvent.CREATE) {
+                assertThrows(NoSuchElementException::class.java) { bus.fireEvent(it, untrackedClan, leader, member)}
+            }
+        }
     }
 
     @Test

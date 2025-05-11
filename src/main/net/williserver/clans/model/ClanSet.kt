@@ -269,11 +269,11 @@ class ClanSet(data: Set<ClanData>) {
 
     /**
      * @param clan Clan to assert in list
-     * @throws IllegalArgumentException if the clan is not tracked in this ClanList.
+     * @throws NoSuchElementException if the clan is not tracked in this ClanList.
      */
     private fun exceptionIfClanNotInList(clan: Clan) {
         if (clan !in clans()) {
-            throw IllegalArgumentException("$pluginMessagePrefix: Clan ${clan.name} is not in this list!")
+            throw NoSuchElementException("$pluginMessagePrefix: Clan ${clan.name} is not in this list!")
         }
     }
 }
