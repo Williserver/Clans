@@ -34,38 +34,55 @@ class ClansCommand(private val clanSet: ClanSet,
                    private val bus: ClanEventBus
 ): CommandExecutor {
 
-    override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean =
+    override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>) =
         if (args.isNotEmpty()) {
             val subcommand = args[0]
-            val args = args.drop(1)
-            when(subcommand.lowercase(Locale.getDefault())) {
-                "crown" -> crown(sender, args)
-                "create" -> create(sender, args)
-                "demote" -> demote(sender, args)
-                "disband" -> disband(sender, args)
-                "info" -> info(sender, args)
-                "invite" -> invite(sender, args)
-                "join" -> join(sender, args)
-                "kick" -> kick(sender, args)
-                "help" -> help(sender, args)
-                "leave" -> leave(sender, args)
-                "list" -> list(sender, args)
-                "promote" -> promote(sender, args)
-                else -> false
-            }
-        } else help(sender, args.toList())
+            val execute = ClansSubcommandExecutor(sender, args.drop(1), clanSet, config, session, bus)
 
-    /*
-     * Subcommands
-     */
+            when(subcommand.lowercase(Locale.getDefault())) {
+                "crown"   -> execute.crown()
+                "create"  -> execute.create()
+                "demote"  -> execute.demote()
+                "disband" -> execute.disband()
+                "info"    -> execute.info()
+                "invite"  -> execute.invite()
+                "join"    -> execute.join()
+                "kick"    -> execute.kick()
+                "help"    -> execute.help()
+                "leave"   -> execute.leave()
+                "list"    -> execute.list()
+                "promote" -> execute.promote()
+                else      -> false
+            }
+
+        } else ClansSubcommandExecutor(sender, args.toList(), clanSet, config, session, bus).help()
+
+/**
+ * Shares state needed to execute subcommands of the base clans command.
+ * New instance constructed when subcommand run.
+ *
+ * @param s Entity command is executed on behalf of.
+ * @param args List of arguments to invoke subcommand with.
+ * @param clanSet clan model for this session.
+ * @param config Configuration options for this session.
+ * @param session Session-specific data, like timers.
+ * @param bus Event bus with registered listeners for events in clan lifecycle that may be caused by command invocation.
+ * @author Willmo3
+ */
+private class ClansSubcommandExecutor(
+    private val s: CommandSender,
+    private val args: List<String>,
+    private val clanSet: ClanSet,
+    private val config: ClansConfig,
+    private val session: SessionManager,
+    private val bus: ClanEventBus
+) {
+    private val v = ClansCommandValidator(s)
 
     /**
      * Usage information for plugin commands.
-     *
-     * @param s Command sender; will recieve help messages.
-     * @param args Args for command. Since this is the help command, should only be one arg.
-     */
-    private fun help(s: CommandSender, args: List<String>): Boolean {
+     **/
+    fun help(): Boolean {
         // Help should not be invoked with any args beyond the subcommand
         if (args.isNotEmpty()) {
             return false
@@ -75,7 +92,7 @@ class ClansCommand(private val clanSet: ClanSet,
         val bullet = Component.text("\n- /clans ", NamedTextColor.GOLD)
 
         fun generateCommandHelp(name: String, text: String)
-            = bullet.append(Component.text("$name: ", NamedTextColor.RED).append(Component.text(text, NamedTextColor.GRAY)))
+                = bullet.append(Component.text("$name: ", NamedTextColor.RED).append(Component.text(text, NamedTextColor.GRAY)))
 
         // Special case: cc is outside of scope of normal clans command
         val chat = Component.text("\n- /cc: ", NamedTextColor.RED).append(Component.text("Send a message to only your clanmates", NamedTextColor.GRAY))
@@ -113,13 +130,9 @@ class ClansCommand(private val clanSet: ClanSet,
 
     /**
      * Send the invoker a message containing a list of all clans.
-     *
-     * @param s Entity invoking commnad; will recieve the list.
-     * @param args Args for list; should be only one.
-     *
      * TODO: add pages when too many clans.
      */
-    private fun list(s: CommandSender, args: List<String>): Boolean {
+    fun list(): Boolean {
         // Argument structure validation. No args
         if (args.isNotEmpty()) {
             return false
@@ -129,10 +142,10 @@ class ClansCommand(private val clanSet: ClanSet,
         val sortedClans = clanSet.clans()
             .sortedBy { it.allClanmates().size }
             .fold(Component.text())
-                { text, thisClan ->
-                    text.append(Component.text("\n- ${thisClan.name}: ", NamedTextColor.GOLD))
-                        .append(Component.text("${thisClan.allClanmates().size} clanmates", NamedTextColor.RED))
-                }
+            { text, thisClan ->
+                text.append(Component.text("\n- ${thisClan.name}: ", NamedTextColor.GOLD))
+                    .append(Component.text("${thisClan.allClanmates().size} clanmates", NamedTextColor.RED))
+            }
 
         sendPrefixedMessage(s, listTitle.append(sortedClans))
         return true
@@ -140,11 +153,8 @@ class ClansCommand(private val clanSet: ClanSet,
 
     /**
      * Create a new clan.
-     *
-     * @param s Command sender; must be a player.
-     * @param args Arguments to command, such as name.
-     */
-    private fun create(s: CommandSender, args: List<String>): Boolean {
+     **/
+    fun create(): Boolean {
         // Argument structure validation. One arg: new clan name.
         if (args.size > 1) {
             return false
@@ -154,7 +164,6 @@ class ClansCommand(private val clanSet: ClanSet,
             return true
         }
         // Argument semantics validation
-        val v = ClansCommandValidator(s)
         if (!v.assertValidPlayer()
             || !v.assertPlayerNotInAClan(clanSet, (s as Player).uniqueId, "You are already in a clan!")
             || !v.assertValidClanName(args[0])
@@ -173,18 +182,14 @@ class ClansCommand(private val clanSet: ClanSet,
      * Disband the sending player's clan, if they have the requisite permissions.
      * First, the user must execute /clans disband. This starts a confirmation timer.
      * Then, the user must execute /clans disband confirm within the required time.
-     *
-     * @param s Command sender; must be a player.
-     * @param args Arguments to command. Should be none -- implicit argument is the clan player is a member of.
-     */
-    private fun disband(s: CommandSender, args: List<String>): Boolean {
+     **/
+    fun disband(): Boolean {
         // Argument structure validation.
         // Expect /clans disband or /clans disband confirm
         if (args.size > 1) {
             return false
         }
         // Argument semantics validation.
-        val v = ClansCommandValidator(s)
         if (!v.assertValidPlayer()
             || !v.assertSenderInAClan(clanSet)
             || !v.assertSenderHasPermission(clanSet.clanOf((s as Player).uniqueId), ClanPermission.DISBAND)) {
@@ -221,18 +226,14 @@ class ClansCommand(private val clanSet: ClanSet,
 
     /**
      * Invite a player to our clan.
-     *
-     * @param s Player who invoked the command.
-     * @param args Arguments to command. Should be one: the player invited.
-     * @return Whether the command was invoked with the correct number of arguments.
+     ** @return Whether the command was invoked with the correct number of arguments.
      */
-    private fun invite(s: CommandSender, args: List<String>): Boolean {
+    fun invite(): Boolean {
         // Argument structure validation: 1 arg: target
         if (args.size != 1) {
             return false
         }
         // Argument semantics validation.
-        val v = ClansCommandValidator(s)
         if (!v.assertValidPlayer()
             || !v.assertSenderInAClan(clanSet)
             || !v.assertSenderHasPermission(clanSet.clanOf((s as Player).uniqueId), ClanPermission.INVITE)
@@ -262,18 +263,14 @@ class ClansCommand(private val clanSet: ClanSet,
 
     /**
      * Join a new clan.
-     *
-     * @param s Player who invoked the command, will join the target clan if an invitation is active.
-     * @param args Arguments to command. Should be one: the name of the clan to join.
-     * @return Whether the command was invoked with the correct number of arguments.
+     ** @return Whether the command was invoked with the correct number of arguments.
      */
-    private fun join(s: CommandSender, args: List<String>): Boolean {
+    fun join(): Boolean {
         // Argument structure validation: 1 arg: target
         if (args.size != 1) {
             return false
         }
         // Argument semantics validation.
-        val v = ClansCommandValidator(s)
         if (!v.assertValidPlayer()
             || !v.assertClanNameInList(clanSet, args[0])
             || !v.assertPlayerNotInAClan(clanSet, (s as Player).uniqueId, "You are already in a clan!")) {
@@ -292,35 +289,28 @@ class ClansCommand(private val clanSet: ClanSet,
 
     /**
      * Promote a member of sender's clan.
-     *
-     * @param s Player who invoked the command.
-     * @param args Arguments to command. Should be one: the name of the player to promote.
      * @return Whether the command was invoked with the correct number of args.
      */
-    private fun promote(s: CommandSender, args: List<String>): Boolean =
-        changeRank(s, args, ClanEvent.PROMOTE, ClanRank.COLEADER, "Target player has reached rank co-leader -- to make them leader, use \"/clans anoint (playername)\" instead!")
+    fun promote() =
+        changeRank(ClanEvent.PROMOTE, ClanRank.COLEADER, "Target player has reached rank co-leader -- to make them leader, use \"/clans anoint (playername)\" instead!")
 
     /**
      * Demote a member of sender's clan.
-     *
-     * @param s Player who invoked the command.
-     * @param args Arguments to command. Should be one: the name of the player to demote.
      * @return Whether the command was invoked with the correct number of args.
      */
-    private fun demote(s: CommandSender, args: List<String>): Boolean =
-        changeRank(s, args, ClanEvent.DEMOTE, ClanRank.MEMBER, "Target player has reached rank member -- to remove them from the clan, use \"/clans kick (playername)\".")
+    fun demote() =
+        changeRank(ClanEvent.DEMOTE, ClanRank.MEMBER, "Target player has reached rank member -- to remove them from the clan, use \"/clans kick (playername)\".")
 
     /**
      * Internal implementation for promote, demote. Should not be called outside those contexts.
      */
-    private fun changeRank(s: CommandSender, args: List<String>, event: ClanEvent, boundaryRank: ClanRank, boundaryMessage: String): Boolean {
+    fun changeRank(event: ClanEvent, boundaryRank: ClanRank, boundaryMessage: String): Boolean {
         assert(event == ClanEvent.DEMOTE || event == ClanEvent.PROMOTE)
         // Argument structure validation. 1 arg: target to change rank of.
         if (args.size != 1) {
             return false
         }
         // argument semantics validation.
-        val v = ClansCommandValidator(s)
         if (!v.assertValidPlayer()
             || !v.assertSenderInAClan(clanSet)
             || !v.assertPlayerNameValid(args[0])) {
@@ -341,20 +331,15 @@ class ClansCommand(private val clanSet: ClanSet,
     }
 
     /**
-     * Crown a player as leader of sender's clan. This entails sender demoting themself to co-leader.
-     *
-     * @param s Player who invoked the command.
-     * @param args Arguments to command. Should be one or two: (playername) or (playername confirm)
-     *
+     * Crown a player as leader of sender's clan. This entails sender demoting themself to co-leader.*
      * @return whether the command was invoked with the correct number of arguments.
      */
-    private fun crown(s: CommandSender, args: List<String>): Boolean {
+    fun crown(): Boolean {
         // Argument structure validation. Two args: target to anoint, and whether to confirm.
         if (args.size != 1 && args.size != 2) {
             return false
         }
         // argument semantics validation.
-        val v = ClansCommandValidator(s)
         if (!v.assertValidPlayer()
             || !v.assertSenderInAClan(clanSet)
             || !v.assertPlayerNameValid(args[0])) {
@@ -377,18 +362,14 @@ class ClansCommand(private val clanSet: ClanSet,
      * Make a player leave their clan.
      * First, the user executes /clans leave. This starts the leave timer.
      * Then the user executes /clans leave confirm.
-     *
-     * @param s Player who invoked the command, will leave their clan.
-     * @param args Arguments to command. Should be none.
      * @return Whether the command was invoked with the correct number of arguments.
      */
-    private fun leave(s: CommandSender, args: List<String>): Boolean {
+     fun leave(): Boolean {
         // Argument structure validation: one arg: (optional) confirm
         if (args.size > 1) {
             return false
         }
         // Argument semantics validation.
-        val v = ClansCommandValidator(s)
         if (!v.assertValidPlayer()
             || !v.assertSenderInAClan(clanSet)
             || !v.assertSenderNotLeader(clanSet.clanOf((s as Player).uniqueId))) {
@@ -425,27 +406,24 @@ class ClansCommand(private val clanSet: ClanSet,
      * A user executes /clans kick (player) to make a player they outrank leave.
      * Then that user executes /clans kick (player) confirm to confirm kicking that player.
      *
-     * @param s Player sending command.
-     * @param args Arguments to command, should be one: name of player to kick.
      * @return Whether the command was invoked with the correct number of arguments.
      */
-    private fun kick(s: CommandSender, args: List<String>): Boolean {
+    fun kick(): Boolean {
         // Argument structure validation. One required argument: player to kick. One optional argument: confirmation.
         if (args.isEmpty() || args.size > 2) {
             return false
         }
         // Argument semantics validation.
-        val v = ClansCommandValidator(s)
         if (!v.assertValidPlayer()
-             || !v.assertSenderInAClan(clanSet)
-             || !v.assertPlayerNameValid(args[0])) {
-             return true
+            || !v.assertSenderInAClan(clanSet)
+            || !v.assertPlayerNameValid(args[0])) {
+            return true
         }
         val clanToKickFrom = clanSet.clanOf((s as Player).uniqueId)
         val playerToKick = getOfflinePlayer(args[0])
         if (!v.assertSenderHasPermission(clanToKickFrom, ClanPermission.KICK)
-             || !v.assertPlayerInThisClan(clanToKickFrom, playerToKick.uniqueId, "")
-             || !v.assertSenderOutranks(clanToKickFrom, playerToKick.uniqueId)) {
+            || !v.assertPlayerInThisClan(clanToKickFrom, playerToKick.uniqueId, "")
+            || !v.assertSenderOutranks(clanToKickFrom, playerToKick.uniqueId)) {
             return true
         }
 
@@ -479,17 +457,13 @@ class ClansCommand(private val clanSet: ClanSet,
      *  Clan $clanName
      *  Leader: $leadername
      *  Members: $members
-     *
-     * @param s Command sender. Can be any message receiving entity.
-     * @param args Arguments to command. Should be one -- the name of the clan.
-     */
-    private fun info(s: CommandSender, args: List<String>): Boolean {
+     **/
+    fun info(): Boolean {
         // Argument structure validation. One arg: name
         if (args.size != 1) {
             return false // Malformed command -- clan info needs a name!
         }
         // Argument semantics validation.
-        val v = ClansCommandValidator(s)
         if (!v.assertClanNameInList(clanSet, args[0])) {
             return true
         }
@@ -497,9 +471,9 @@ class ClansCommand(private val clanSet: ClanSet,
         // Convert a collection into a single component
         fun componentify(title: String, collection: Iterable<UUID>) = collection.fold(
             Component.text("$title: ", NamedTextColor.RED))
-            { others, uuid ->
-                others.append(Component.text("${getOfflinePlayer(uuid).name}, ", NamedTextColor.GREEN))
-            }
+        { others, uuid ->
+            others.append(Component.text("${getOfflinePlayer(uuid).name}, ", NamedTextColor.GREEN))
+        }
 
         // If clan present, prepare and send message with information.
         val correspondingClan = clanSet.get(args[0])
@@ -513,4 +487,5 @@ class ClansCommand(private val clanSet: ClanSet,
         sendPrefixedMessage(s, header.append(leaderTitle).append(leaderName).append(coleaders).append(elders).append(members))
         return true
     }
-}
+} // end private class subcommand executor
+} // end

@@ -1,7 +1,7 @@
 package net.williserver.clans
 
 import net.williserver.clans.commands.base.ClansCommand
-import net.williserver.clans.commands.ClansTabCompleter
+import net.williserver.clans.commands.base.ClansTabCompleter
 import net.williserver.clans.commands.chat.ChatCommand
 import net.williserver.clans.commands.chat.ChatTabCompleter
 import net.williserver.clans.integration.*

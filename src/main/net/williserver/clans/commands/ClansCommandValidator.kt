@@ -1,6 +1,5 @@
-package net.williserver.clans.commands.base
+package net.williserver.clans.commands
 
-import net.williserver.clans.commands.sendErrorMessage
 import net.williserver.clans.model.*
 import net.williserver.clans.model.clan.Clan
 import net.williserver.clans.model.clan.ClanPermission

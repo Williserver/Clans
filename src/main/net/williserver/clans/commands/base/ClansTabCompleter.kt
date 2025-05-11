@@ -1,4 +1,4 @@
-package net.williserver.clans.commands
+package net.williserver.clans.commands.base
 
 import net.williserver.clans.model.ClanSet
 import org.bukkit.Bukkit.getOfflinePlayer
