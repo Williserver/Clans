@@ -21,14 +21,14 @@ class SessionManager {
         ClanEvent.DISBAND to mutableMapOf(),
         // Norm: Pair<UUID, UUID> (player kicking, player being kicked)
         ClanEvent.KICK to mutableMapOf(),
+        // Norm: Pair<UUID, UUID> (previous leader, new leader)
+        ClanEvent.CORONATE to mutableMapOf(),
         // Norm: Pair<UUID, UUID> (player promoting, player being promoted)
         // Currently unused
         ClanEvent.PROMOTE to mutableMapOf(),
         // Norm: Pair<UUID, UUID> (player demoting, player being demoted)
         // Currently unused
         ClanEvent.DEMOTE to mutableMapOf(),
-        // Norm: Pair<UUID, UUID> (previous leader, new leader)
-        ClanEvent.ANOINT to mutableMapOf(),
     )
 
     /**

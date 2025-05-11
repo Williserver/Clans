@@ -11,13 +11,13 @@ import java.util.*
  */
 enum class ClanEvent {
     CREATE,
+    CORONATE,
     JOIN,
     LEAVE,
     KICK,
     DISBAND,
     PROMOTE,
     DEMOTE,
-    ANOINT,
 }
 
 /**

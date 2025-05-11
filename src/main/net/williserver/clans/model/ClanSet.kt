@@ -160,7 +160,17 @@ class ClanSet(data: Set<ClanData>) {
      * Clans event listener factories.
      */
 
-    // TODO: constructAnointListener
+    /**
+     * Construct coronate listener to change leaders of a clan.
+     * @return the listener
+     */
+    fun constructCoronateListener(): ClanLifecycleListener = { clan, oldLeader, newLeader ->
+        exceptionIfClanNotInList(clan)
+        if (clan.leader != oldLeader) {
+            throw IllegalArgumentException("$pluginMessagePrefix: Player $oldLeader is not leader of this clan.")
+        }
+        clan.coronate(newLeader)
+    }
 
     /**
      * Construct create listener to add a clan to this model.

@@ -39,33 +39,6 @@ class ListenersTest {
         assert(clan.name in clanSet)
     }
 
-    // All event listeners should complain with a NoSuchElementException if the clan is not present.
-    @Test
-    fun testEventUntrackedClan() {
-        val leader = UUID.randomUUID()
-        val member = UUID.randomUUID()
-        val untrackedClan = Clan("TestClan", leader, members= mutableSetOf(member))
-        val clanSet = ClanSet(setOf())
-
-        val bus = ClanEventBus()
-        bus.registerListener(ClanEvent.DEMOTE, ClanListenerType.MODEL, clanSet.constructDemoteListener())
-        bus.registerListener(ClanEvent.DISBAND, ClanListenerType.MODEL, clanSet.constructDisbandListener())
-        bus.registerListener(ClanEvent.JOIN, ClanListenerType.MODEL, clanSet.constructJoinListener())
-        bus.registerListener(ClanEvent.KICK, ClanListenerType.MODEL, clanSet.constructKickListener())
-        bus.registerListener(ClanEvent.LEAVE, ClanListenerType.MODEL, clanSet.constructLeaveListener())
-        bus.registerListener(ClanEvent.PROMOTE, ClanListenerType.MODEL, clanSet.constructPromoteListener())
-        // TODO: switch to anoint listener when made
-        bus.registerListener(ClanEvent.ANOINT, ClanListenerType.MODEL, clanSet.constructPromoteListener())
-
-        // For each event, fire it with a clan not in this list. It should throw NoSuchElementException.
-        ClanEvent.entries.forEach {
-            // Ignore create event -- by definition, it is not tracked yet.
-            if (it != ClanEvent.CREATE) {
-                assertThrows(NoSuchElementException::class.java) { bus.fireEvent(it, untrackedClan, leader, member)}
-            }
-        }
-    }
-
     @Test
     fun testJoinAlreadyInClan() {
         // ClanSet listeners should not allow players to be in multiple clans!
@@ -121,5 +94,54 @@ class ListenersTest {
         assertEquals(ClanRank.MEMBER, clan.rankOf(demotee))
         // Cannot demote below member -- use kick instead
         assertThrows(IllegalArgumentException::class.java) { bus.fireEvent(ClanEvent.DEMOTE, clan, otherColeader, demotee) }
+    }
+
+    @Test
+    fun testAnoint() {
+        val leader = UUID.randomUUID()
+        val member = UUID.randomUUID()
+        val elder = UUID.randomUUID()
+        val coleader = UUID.randomUUID()
+
+        val clan = Clan("TestClan", leader, members = mutableSetOf(member), elders = mutableSetOf(elder), coLeaders = mutableSetOf(coleader))
+        val clanSet = ClanSet(setOf(clan.asDataTuple()))
+
+        val bus = ClanEventBus()
+        bus.registerListener(ClanEvent.CORONATE, ClanListenerType.MODEL, clanSet.constructCoronateListener())
+        // Only a co-leader, promoted by a leader, should work!
+        assertThrows(IllegalArgumentException::class.java) { bus.fireEvent(ClanEvent.CORONATE, clan, leader, leader)}
+        assertThrows(IllegalArgumentException::class.java) { bus.fireEvent(ClanEvent.CORONATE, clan, leader, elder)}
+        assertThrows(IllegalArgumentException::class.java) { bus.fireEvent(ClanEvent.CORONATE, clan, leader, member)}
+        assertThrows(IllegalArgumentException::class.java) { bus.fireEvent(ClanEvent.CORONATE, clan, coleader, coleader)}
+
+        bus.fireEvent(ClanEvent.CORONATE, clan, leader, coleader)
+        assertEquals(coleader, clan.leader)
+        assertEquals(ClanRank.COLEADER, clan.rankOf(leader))
+    }
+
+    // All event listeners should complain with a NoSuchElementException if the clan is not present.
+    @Test
+    fun testEventUntrackedClan() {
+        val leader = UUID.randomUUID()
+        val member = UUID.randomUUID()
+        val untrackedClan = Clan("TestClan", leader, members= mutableSetOf(member))
+        val clanSet = ClanSet(setOf())
+
+        val bus = ClanEventBus()
+        bus.registerListener(ClanEvent.DEMOTE, ClanListenerType.MODEL, clanSet.constructDemoteListener())
+        bus.registerListener(ClanEvent.DISBAND, ClanListenerType.MODEL, clanSet.constructDisbandListener())
+        bus.registerListener(ClanEvent.JOIN, ClanListenerType.MODEL, clanSet.constructJoinListener())
+        bus.registerListener(ClanEvent.KICK, ClanListenerType.MODEL, clanSet.constructKickListener())
+        bus.registerListener(ClanEvent.LEAVE, ClanListenerType.MODEL, clanSet.constructLeaveListener())
+        bus.registerListener(ClanEvent.PROMOTE, ClanListenerType.MODEL, clanSet.constructPromoteListener())
+        bus.registerListener(ClanEvent.CORONATE, ClanListenerType.MODEL, clanSet.constructCoronateListener())
+
+        // For each event, fire it with a clan not in this list. It should throw NoSuchElementException.
+        ClanEvent.entries.forEach {
+            // Ignore create event -- by definition, it is not tracked yet.
+            if (it != ClanEvent.CREATE) {
+                assertThrows(NoSuchElementException::class.java) { bus.fireEvent(it, untrackedClan, leader, member)}
+            }
+        }
     }
 }
