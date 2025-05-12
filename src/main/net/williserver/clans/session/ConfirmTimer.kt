@@ -1,6 +1,6 @@
 package net.williserver.clans.session
 
-import net.williserver.clans.pluginMessagePrefix
+import net.williserver.clans.ClansPlugin.Companion.pluginMessagePrefix
 import java.util.Date
 
 /**

@@ -1,8 +1,7 @@
 package net.williserver.clans.model.clan
 import kotlinx.serialization.Serializable
-import net.williserver.clans.pluginMessagePrefix
+import net.williserver.clans.ClansPlugin.Companion.pluginMessagePrefix
 import java.util.*
-import kotlin.collections.HashSet
 import kotlin.math.min
 
 /**

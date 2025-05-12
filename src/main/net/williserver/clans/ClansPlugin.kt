@@ -14,7 +14,6 @@ import net.williserver.clans.session.SessionManager
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 
-const val pluginMessagePrefix = "[CLANS]"
 
 /**
  * ClansPlugin. A lightweight predecessor to Polis, designed for user-oriented teams management.
@@ -183,5 +182,12 @@ class ClansPlugin : JavaPlugin() {
         bus.registerListener(LEAVE, INTEGRATION, integrator.constructLeaveListener())
         // From the perspective of LuckPerms, a kick is just a player leaving.
         bus.registerListener(KICK, INTEGRATION, integrator.constructLeaveListener())
+    }
+
+    /**
+     * Static state
+     */
+    companion object {
+        const val pluginMessagePrefix = "[CLANS]"
     }
 }

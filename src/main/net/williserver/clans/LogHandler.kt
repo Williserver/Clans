@@ -1,6 +1,8 @@
 package net.williserver.clans
 
 import java.util.logging.Logger
+import net.williserver.clans.ClansPlugin.Companion.pluginMessagePrefix
+
 
 /**
  * Utility wrapper to allow logging outside Bukkit server environments.

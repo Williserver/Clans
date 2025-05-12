@@ -5,7 +5,7 @@ import net.williserver.clans.LogHandler
 import net.williserver.clans.model.clan.Clan
 import net.williserver.clans.model.clan.ClanData
 import net.williserver.clans.model.clan.ClanRank
-import net.williserver.clans.pluginMessagePrefix
+import net.williserver.clans.ClansPlugin.Companion.pluginMessagePrefix
 import net.williserver.clans.session.ClanLifecycleListener
 import java.io.File
 import java.io.FileReader

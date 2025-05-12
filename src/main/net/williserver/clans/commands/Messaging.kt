@@ -3,7 +3,7 @@ package net.williserver.clans.commands
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.williserver.clans.model.clan.Clan
-import net.williserver.clans.pluginMessagePrefix
+import net.williserver.clans.ClansPlugin.Companion.pluginMessagePrefix
 import org.bukkit.Bukkit
 import org.bukkit.Bukkit.broadcast
 import org.bukkit.command.CommandSender

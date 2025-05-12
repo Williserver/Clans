@@ -7,7 +7,7 @@ import net.williserver.clans.model.*
 import net.williserver.clans.model.clan.Clan
 import net.williserver.clans.model.clan.ClanPermission
 import net.williserver.clans.model.clan.ClanRank
-import net.williserver.clans.pluginMessagePrefix
+import net.williserver.clans.ClansPlugin.Companion.pluginMessagePrefix
 import net.williserver.clans.session.SessionManager
 import net.williserver.clans.session.ClanEvent
 import net.williserver.clans.session.ClanEventBus
