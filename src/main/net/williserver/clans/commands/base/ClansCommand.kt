@@ -8,8 +8,9 @@ import net.williserver.clans.model.clan.Clan
 import net.williserver.clans.model.clan.ClanPermission
 import net.williserver.clans.model.clan.ClanRank
 import net.williserver.clans.ClansPlugin.Companion.pluginMessagePrefix
-import net.williserver.clans.session.SessionManager
 import net.williserver.clans.session.ClanEvent
+import net.williserver.clans.session.SessionManager
+import net.williserver.clans.session.ClanEvent.*
 import net.williserver.clans.session.ClanEventBus
 import org.bukkit.Bukkit.*
 import org.bukkit.command.Command
@@ -174,7 +175,7 @@ private class ClansSubcommandExecutor(
         // Create a new clan with this player as its leader and starting member.
         val leader = s.uniqueId
         val newClan = Clan(args[0], leader)
-        bus.fireEvent(ClanEvent.CREATE, newClan, agent=leader, target=leader)
+        bus.fireEvent(CREATE, newClan, agent=leader, target=leader)
         return true
     }
 
@@ -200,10 +201,10 @@ private class ClansSubcommandExecutor(
         val clan = clanSet.clanOf(s.uniqueId)
         return when(args.size) {
             0 -> {
-                session.registerTimer(ClanEvent.DISBAND, clan, config.confirmTime.toLong())
+                session.registerTimer(DISBAND, clan, config.confirmTime.toLong())
                 sendInfoMessage(s, "You have begun to disband your clan!")
                 sendInfoMessage(s, "Enter \"/clans disband confirm\" within ${config.confirmTime} seconds to confirm this choice.")
-                session.startTimer(ClanEvent.DISBAND, clan)
+                session.startTimer(DISBAND, clan)
                 true
             }
             1 -> {
@@ -215,8 +216,8 @@ private class ClansSubcommandExecutor(
                 if (args[0].lowercase(Locale.getDefault()) != "confirm") {
                     return false
                 }
-                if (v.assertTimerInBounds(session, ClanEvent.DISBAND, clan, "disband")) {
-                    bus.fireEvent(ClanEvent.DISBAND, clan, agent=s.uniqueId, target=s.uniqueId)
+                if (v.assertTimerInBounds(session, DISBAND, clan, "disband")) {
+                    bus.fireEvent(DISBAND, clan, agent=s.uniqueId, target=s.uniqueId)
                 }
                 true
             }
@@ -246,7 +247,7 @@ private class ClansSubcommandExecutor(
         val targetClan = clanSet.clanOf(s.uniqueId)
         val targetPlayer = getPlayer(args[0])!!
         // Validate that player is not currently waiting on invitation.
-        if (session.isTimerInBounds(ClanEvent.JOIN, Pair(s.uniqueId, targetClan))) {
+        if (session.isTimerInBounds(JOIN, Pair(s.uniqueId, targetClan))) {
             sendErrorMessage(s, "${targetPlayer.name} is already waiting on an invitation from you.")
             return true
         }
@@ -256,8 +257,8 @@ private class ClansSubcommandExecutor(
         sendCongratsMessage(targetPlayer, "You have ${config.confirmTime} seconds to accept your invitation using \"/clans join ${targetClan.name}\".")
 
         // Invitation timer starts immediately after timer registered.
-        session.registerTimer(ClanEvent.JOIN, Pair(targetPlayer.uniqueId, targetClan), config.confirmTime.toLong())
-        session.startTimer(ClanEvent.JOIN, Pair(targetPlayer.uniqueId, targetClan))
+        session.registerTimer(JOIN, Pair(targetPlayer.uniqueId, targetClan), config.confirmTime.toLong())
+        session.startTimer(JOIN, Pair(targetPlayer.uniqueId, targetClan))
         return true
     }
 
@@ -278,12 +279,12 @@ private class ClansSubcommandExecutor(
         }
         // Ensure player has an active invite to the clan.
         val clan = clanSet.get(args[0])
-        if (!session.isTimerInBounds(ClanEvent.JOIN, Pair(s.uniqueId, clan))) {
+        if (!session.isTimerInBounds(JOIN, Pair(s.uniqueId, clan))) {
             sendErrorMessage(s, "You do not have an active invite to ${clan.name}.")
             return true
         }
         // Add player to the clan.
-        bus.fireEvent(ClanEvent.JOIN, clan, agent=s.uniqueId, target=s.uniqueId)
+        bus.fireEvent(JOIN, clan, agent=s.uniqueId, target=s.uniqueId)
         return true
     }
 
@@ -292,20 +293,20 @@ private class ClansSubcommandExecutor(
      * @return Whether the command was invoked with the correct number of args.
      */
     fun promote() =
-        changeRank(ClanEvent.PROMOTE, ClanRank.COLEADER, "Target player has reached rank co-leader -- to make them leader, use \"/clans anoint (playername)\" instead!")
+        changeRank(PROMOTE, ClanRank.COLEADER, "Target player has reached rank co-leader -- to make them leader, use \"/clans anoint (playername)\" instead!")
 
     /**
      * Demote a member of sender's clan.
      * @return Whether the command was invoked with the correct number of args.
      */
     fun demote() =
-        changeRank(ClanEvent.DEMOTE, ClanRank.MEMBER, "Target player has reached rank member -- to remove them from the clan, use \"/clans kick (playername)\".")
+        changeRank(DEMOTE, ClanRank.MEMBER, "Target player has reached rank member -- to remove them from the clan, use \"/clans kick (playername)\".")
 
     /**
      * Internal implementation for promote, demote. Should not be called outside those contexts.
      */
     fun changeRank(event: ClanEvent, boundaryRank: ClanRank, boundaryMessage: String): Boolean {
-        assert(event == ClanEvent.DEMOTE || event == ClanEvent.PROMOTE)
+        assert(event == DEMOTE || event == PROMOTE)
         // Argument structure validation. 1 arg: target to change rank of.
         if (args.size != 1) {
             return false
@@ -358,10 +359,10 @@ private class ClansSubcommandExecutor(
         // Either add a confirm timer, or fire event if present.
         return when(args.size) {
             1 -> {
-                session.registerTimer(ClanEvent.CORONATE, Pair(s.uniqueId, target.uniqueId), config.confirmTime.toLong())
+                session.registerTimer(CORONATE, Pair(s.uniqueId, target.uniqueId), config.confirmTime.toLong())
                 sendInfoMessage(s, "You have begun to crown ${args[0]} as new leader of your clan!")
                 sendInfoMessage(s, "Enter \"/clans crown ${args[0]} confirm\" within ${config.confirmTime} seconds to confirm this choice.")
-                session.startTimer(ClanEvent.CORONATE, Pair(s.uniqueId, target.uniqueId))
+                session.startTimer(CORONATE, Pair(s.uniqueId, target.uniqueId))
                 true
             }
             2 -> {
@@ -371,8 +372,8 @@ private class ClansSubcommandExecutor(
                 if (args[1].lowercase() != "confirm") {
                     return false
                 }
-                if (v.assertTimerInBounds(session, ClanEvent.CORONATE, Pair(s.uniqueId, target.uniqueId), "coronate")) {
-                    bus.fireEvent(ClanEvent.CORONATE, ourClan, s.uniqueId, target.uniqueId)
+                if (v.assertTimerInBounds(session, CORONATE, Pair(s.uniqueId, target.uniqueId), "coronate")) {
+                    bus.fireEvent(CORONATE, ourClan, s.uniqueId, target.uniqueId)
                 }
                 true
             }
@@ -405,8 +406,8 @@ private class ClansSubcommandExecutor(
             0 -> {
                 sendInfoMessage(s, "Really leave your clan?")
                 sendInfoMessage(s, "Type \"/clans leave confirm\" within ${config.confirmTime} seconds to leave.")
-                session.registerTimer(ClanEvent.LEAVE, s.uniqueId, config.confirmTime.toLong())
-                session.startTimer(ClanEvent.LEAVE, s.uniqueId)
+                session.registerTimer(LEAVE, s.uniqueId, config.confirmTime.toLong())
+                session.startTimer(LEAVE, s.uniqueId)
                 true
             }
             // Leave the user's clan.
@@ -416,8 +417,8 @@ private class ClansSubcommandExecutor(
                     return false
                 }
                 // Leave clan if the timer was started.
-                if (v.assertTimerInBounds(session, ClanEvent.LEAVE, s.uniqueId, "leave")) {
-                    bus.fireEvent(ClanEvent.LEAVE, clanSet.clanOf(s.uniqueId), agent=s.uniqueId, target=s.uniqueId)
+                if (v.assertTimerInBounds(session, LEAVE, s.uniqueId, "leave")) {
+                    bus.fireEvent(LEAVE, clanSet.clanOf(s.uniqueId), agent=s.uniqueId, target=s.uniqueId)
                 }
                 true
             }
@@ -457,8 +458,8 @@ private class ClansSubcommandExecutor(
                 sendInfoMessage(s, "Really kick ${playerToKick.name} from your clan?")
                 sendInfoMessage(s, "Type \"/clans kick ${playerToKick.name} confirm\" within ${config.confirmTime} seconds.")
                 // Register confirm timer for this user to kick another.
-                session.registerTimer(ClanEvent.KICK, Pair(s.uniqueId, playerToKick.uniqueId), config.confirmTime.toLong())
-                session.startTimer(ClanEvent.KICK, Pair(s.uniqueId, playerToKick.uniqueId))
+                session.registerTimer(KICK, Pair(s.uniqueId, playerToKick.uniqueId), config.confirmTime.toLong())
+                session.startTimer(KICK, Pair(s.uniqueId, playerToKick.uniqueId))
                 true
             }
             2 -> {
@@ -467,8 +468,8 @@ private class ClansSubcommandExecutor(
                     return false
                 }
                 // Kick player from clan if timer started.
-                if (v.assertTimerInBounds(session, ClanEvent.KICK, Pair(s.uniqueId, playerToKick.uniqueId), "kick")) {
-                    bus.fireEvent(ClanEvent.KICK, clanSet.clanOf(s.uniqueId), agent=s.uniqueId, target=playerToKick.uniqueId)
+                if (v.assertTimerInBounds(session, KICK, Pair(s.uniqueId, playerToKick.uniqueId), "kick")) {
+                    bus.fireEvent(KICK, clanSet.clanOf(s.uniqueId), agent=s.uniqueId, target=playerToKick.uniqueId)
                 }
                 true
             } else -> throw IllegalStateException("$pluginMessagePrefix: Internal error: Wrong number of arguments to /clans kick -- this should have been caught earlier!")
