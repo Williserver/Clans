@@ -263,7 +263,7 @@ private class ClansSubcommandExecutor(
 
     /**
      * Join a new clan.
-     ** @return Whether the command was invoked with the correct number of arguments.
+     * @return Whether the command was invoked with the correct number of arguments.
      */
     fun join(): Boolean {
         // Argument structure validation: 1 arg: target
@@ -394,7 +394,9 @@ private class ClansSubcommandExecutor(
         // Argument semantics validation.
         if (!v.assertValidPlayer()
             || !v.assertSenderInAClan(clanSet)
-            || !v.assertSenderNotLeader(clanSet.clanOf((s as Player).uniqueId))) {
+            || !v.assertRankNotEquals(clanSet.clanOf((s as Player).uniqueId),
+                s.uniqueId, ClanRank.LEADER,
+                "Promote another player to leader first!")) {
             return true
         }
 

@@ -172,22 +172,6 @@ class ClansCommandValidator(private val s: CommandSender) {
             false
         } else true
 
-    // TODO: remove redundant assertSenderNotLeader
-    /**
-     * Check whether a player is leader of the clan. If they are, send an error message.
-     *
-     * @param clan Clan player is a member of.
-     *
-     * @return Whether the player is not leader.
-     * @throws IllegalArgumentException if player is not in clan.
-     */
-    fun assertSenderNotLeader(clan: Clan) =
-        if (s is Player && clan.rankOf(s.uniqueId) == ClanRank.LEADER) {
-            sendErrorMessage(s, "You may not execute this command as leader.")
-            sendErrorMessage(s, "Promote another member to leader first.")
-            false
-        } else true
-
     /**
      * Check whether a given player's rank is equal to some other rank. If so, send an error message.
      *
