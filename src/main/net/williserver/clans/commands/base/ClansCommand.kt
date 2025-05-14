@@ -481,24 +481,31 @@ private class ClansSubcommandExecutor(
      *  Members: $members
      **/
     fun info(): Boolean {
-        // Argument structure validation. One arg: name
-        if (args.size != 1) {
+        // Argument structure validation. One optional arg: name
+        if (args.size > 1) {
             return false // Malformed command -- clan info needs a name!
         }
-        // Argument semantics validation.
-        if (!v.assertClanNameInList(clanSet, args[0])) {
-            return true
+
+        // Validate that a clan corresponds to this command/.
+        val correspondingClan = when(args.size) {
+            // Implicit argument: clanname of sender.
+            0 -> if (!v.assertValidPlayer() || !v.assertSenderInAClan(clanSet)) {
+                    return true
+                 } else clanSet.clanOf((s as Player).uniqueId)
+            // Explicit argument: assert it refers to a clan in this list
+            1 -> if (!v.assertClanNameInList(clanSet, args[0])) {
+                    return true
+                 } else clanSet.get(args[0])
+            else -> throw IllegalStateException("$pluginMessagePrefix: Internal error: Wrong number of arguments to /clans info -- this should have been caught earlier!")
         }
 
-        // Convert a collection into a single component
+        // Internal helper: Convert a collection into a single component
         fun componentify(title: String, collection: Iterable<UUID>) = collection.fold(
             Component.text("$title: ", NamedTextColor.RED))
         { others, uuid ->
             others.append(Component.text("${getOfflinePlayer(uuid).name}, ", NamedTextColor.GREEN))
         }
 
-        // If clan present, prepare and send message with information.
-        val correspondingClan = clanSet.get(args[0])
         val header = Component.text("Clan \"${correspondingClan.name}\":", NamedTextColor.GOLD)
         val leaderTitle = Component.text("\nLeader: ", NamedTextColor.RED)
         val leaderName = Component.text("${getOfflinePlayer(correspondingClan.leader).name}", NamedTextColor.GREEN)

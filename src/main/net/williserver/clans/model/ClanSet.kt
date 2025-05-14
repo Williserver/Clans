@@ -67,7 +67,7 @@ class ClanSet(data: Set<ClanData>) {
     /**
      * Remove a clan from the ClanList. This effectively deletes it.
      *
-     * @param clanToRemove Clan to remove from the list.
+     * @param clanToRem ove Clan to remove from the list.
      * @throws NoSuchElementException If the clan is not in this list.
      */
     fun removeClan(clanToRemove: Clan) {
