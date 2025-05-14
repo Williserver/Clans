@@ -18,6 +18,8 @@ import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import java.util.*
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * Base clans command for viewing and modifying clans.
@@ -108,7 +110,7 @@ private class ClansSubcommandExecutor(
         val join = generateCommandHelp("join (clan name)", "join a clan.")
         val kick = generateCommandHelp("kick (playername)", "kick a player from your clan.")
         val leave = generateCommandHelp("leave", "leave your clan.")
-        val list = generateCommandHelp("list", "output a list of clans.")
+        val list = generateCommandHelp("list (page)", "output a list of clans.")
         val promote = generateCommandHelp("promote (playername)", "Promote a player in your clan.")
 
         s.sendMessage(header
@@ -131,22 +133,45 @@ private class ClansSubcommandExecutor(
 
     /**
      * Send the invoker a message containing a list of all clans.
-     * TODO: add pages when too many clans.
      */
     fun list(): Boolean {
-        // Argument structure validation. No args
-        if (args.isNotEmpty()) {
+        // Argument structure validation. One optional arg: page no.
+        if (args.size > 1) {
             return false
+        }
+
+        val numClans = clanSet.clans().size
+        // Should not be one, or the modular arithmetic will be ruined.
+        val clansPerPage = 10
+        val page = when (args.size) {
+            0 -> 0
+            1 -> {
+                val upperBound = numClans / clansPerPage
+
+                // Avoid negative pages or out of bounds pages.
+                var parsedPage = max(args[0].toIntOrNull() ?: 0, 0)
+                parsedPage = min(parsedPage, upperBound)
+
+                // Edge case: a multiple of clansPerPage clans -- avoid extending to next page.
+                if (parsedPage > 0 && numClans % clansPerPage == 0) {
+                    parsedPage--
+                }
+
+                parsedPage
+            }
+            else -> throw IllegalStateException("$pluginMessagePrefix: Internal error: Wrong number of arguments to /clans list -- this should have been caught earlier!")
         }
 
         val listTitle = Component.text("List:", NamedTextColor.AQUA)
         val sortedClans = clanSet.clans()
             .sortedBy { it.allClanmates().size }
+            .subList(page * clansPerPage, min(page * clansPerPage + clansPerPage, numClans))
             .fold(Component.text())
             { text, thisClan ->
                 text.append(Component.text("\n- ${thisClan.name}: ", NamedTextColor.GOLD))
                     .append(Component.text("${thisClan.allClanmates().size} clanmates", NamedTextColor.RED))
             }
+            .append(Component.text("\n\nPage $page", NamedTextColor.GRAY))
 
         sendPrefixedMessage(s, listTitle.append(sortedClans))
         return true
