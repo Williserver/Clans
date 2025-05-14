@@ -143,21 +143,18 @@ private class ClansSubcommandExecutor(
         val numClans = clanSet.clans().size
         // Should not be one, or the modular arithmetic will be ruined.
         val clansPerPage = 10
-        val page = when (args.size) {
+        var lastPageNumber = numClans / clansPerPage
+        // Edge case: a multiple of clansPerPage clans -- last page is previous.
+        if (lastPageNumber > 0 && numClans % clansPerPage == 0) {
+            lastPageNumber--
+        }
+
+        val selectedPage = when (args.size) {
             0 -> 0
             1 -> {
-                val upperBound = numClans / clansPerPage
-
                 // Avoid negative pages or out of bounds pages.
-                var parsedPage = max(args[0].toIntOrNull() ?: 0, 0)
-                parsedPage = min(parsedPage, upperBound)
-
-                // Edge case: a multiple of clansPerPage clans -- avoid extending to next page.
-                if (parsedPage > 0 && numClans % clansPerPage == 0) {
-                    parsedPage--
-                }
-
-                parsedPage
+                val parsedPage = max(args[0].toIntOrNull() ?: 0, 0)
+                min(parsedPage, lastPageNumber)
             }
             else -> throw IllegalStateException("$pluginMessagePrefix: Internal error: Wrong number of arguments to /clans list -- this should have been caught earlier!")
         }
@@ -165,13 +162,13 @@ private class ClansSubcommandExecutor(
         val listTitle = Component.text("List:", NamedTextColor.AQUA)
         val sortedClans = clanSet.clans()
             .sortedBy { it.allClanmates().size }
-            .subList(page * clansPerPage, min(page * clansPerPage + clansPerPage, numClans))
+            .subList(selectedPage * clansPerPage, min(selectedPage * clansPerPage + clansPerPage, numClans))
             .fold(Component.text())
             { text, thisClan ->
                 text.append(Component.text("\n- ${thisClan.name}: ", NamedTextColor.GOLD))
                     .append(Component.text("${thisClan.allClanmates().size} clanmates", NamedTextColor.RED))
             }
-            .append(Component.text("\n\nPage $page", NamedTextColor.GRAY))
+            .append(Component.text("\n\nPage $selectedPage of $lastPageNumber", NamedTextColor.GRAY))
 
         sendPrefixedMessage(s, listTitle.append(sortedClans))
         return true
