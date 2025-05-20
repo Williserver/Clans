@@ -86,11 +86,6 @@ private class ClansSubcommandExecutor(
      * Usage information for plugin commands.
      **/
     fun help(): Boolean {
-        // Help should not be invoked with any args beyond the subcommand
-        if (args.isNotEmpty()) {
-            return false
-        }
-
         val header = prefixedMessage(Component.text("Commands:"))
         val bullet = Component.text("\n- /clans ", NamedTextColor.GOLD)
 
