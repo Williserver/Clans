@@ -11,7 +11,7 @@ import kotlin.test.assertFalse
 class ClanEventBusTest {
     @Test
     fun testRegisterFireCreateClan() {
-        val list = ClanSet(setOf())
+        val list = ClanSet(mutableSetOf())
         val newLeader = UUID.randomUUID()
         val newClan = Clan("TestClan", newLeader)
         assertFalse(newClan.name in list)
@@ -24,7 +24,7 @@ class ClanEventBusTest {
 
     @Test
     fun testRegisterFireDisbandClan() {
-        val list = ClanSet(setOf())
+        val list = ClanSet(mutableSetOf())
         val newLeader = UUID.randomUUID()
         val newClan = Clan("TestClan", newLeader)
         list.addClan(newClan)
@@ -38,7 +38,7 @@ class ClanEventBusTest {
     @Test
     fun testRegisterFireJoinClan() {
         val newClan = Clan("TestClan", UUID.randomUUID())
-        val list = ClanSet(setOf())
+        val list = ClanSet(mutableSetOf())
         list.addClan(newClan)
 
         val bus = ClanEventBus()
@@ -53,7 +53,7 @@ class ClanEventBusTest {
     fun testRegisterFireLeaveClan() {
         val newLeader = UUID.randomUUID()
         val newClan = Clan("TestClan", newLeader)
-        val list = ClanSet(setOf())
+        val list = ClanSet(mutableSetOf())
         list.addClan(newClan)
 
         val newMember = UUID.randomUUID()
@@ -76,7 +76,7 @@ class ClanEventBusTest {
         val leader = UUID.randomUUID()
         val member = UUID.randomUUID()
         val clan = Clan("TestClan", leader, members = mutableSetOf(member))
-        val list = ClanSet(setOf())
+        val list = ClanSet(mutableSetOf())
         list.addClan(clan)
         assert(list.isPlayerInClan(member))
         assert(member in clan)

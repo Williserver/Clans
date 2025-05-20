@@ -15,7 +15,7 @@ class ListenersTest {
     @Test
     fun testDisbandAgentLeader() {
         val clan = Clan("TestClan", UUID.randomUUID())
-        val clanSet = ClanSet(setOf(clan.asDataTuple()))
+        val clanSet = ClanSet(mutableSetOf(clan))
 
         val bus = ClanEventBus()
         bus.registerListener(ClanEvent.DISBAND, ClanListenerType.MODEL, clanSet.constructDisbandListener())
@@ -29,7 +29,7 @@ class ListenersTest {
     @Test
     fun testCreateAgentLeader() {
         val clan = Clan("TestClan", UUID.randomUUID())
-        val clanSet = ClanSet(setOf())
+        val clanSet = ClanSet(mutableSetOf())
 
         val bus = ClanEventBus()
         bus.registerListener(ClanEvent.CREATE, ClanListenerType.MODEL, clanSet.constructCreateListener())
@@ -45,7 +45,7 @@ class ListenersTest {
         val duplicate = UUID.randomUUID()
         val clan = Clan("TestClan", UUID.randomUUID(), elders= mutableSetOf(duplicate))
         val otherClan = Clan("TestClan2", UUID.randomUUID())
-        val clanSet = ClanSet(setOf(clan.asDataTuple(), otherClan.asDataTuple()))
+        val clanSet = ClanSet(mutableSetOf(clan, otherClan))
 
         val bus = ClanEventBus()
         bus.registerListener(ClanEvent.JOIN, ClanListenerType.MODEL, clanSet.constructJoinListener())
@@ -58,7 +58,7 @@ class ListenersTest {
         val promotee = UUID.randomUUID()
         val otherColeader = UUID.randomUUID()
         val clan = Clan("TestClan", leader, members = mutableSetOf(promotee), coLeaders = mutableSetOf(otherColeader))
-        val clanSet = ClanSet(setOf(clan.asDataTuple()))
+        val clanSet = ClanSet(mutableSetOf(clan))
 
         val bus = ClanEventBus()
         bus.registerListener(ClanEvent.PROMOTE, ClanListenerType.MODEL, clanSet.constructPromoteListener())
@@ -80,7 +80,7 @@ class ListenersTest {
         val demotee = UUID.randomUUID()
         val otherColeader = UUID.randomUUID()
         val clan = Clan("TestClan", leader, coLeaders = mutableSetOf(demotee, otherColeader))
-        val clanSet = ClanSet(setOf(clan.asDataTuple()))
+        val clanSet = ClanSet(mutableSetOf(clan))
 
         val bus = ClanEventBus()
         bus.registerListener(ClanEvent.DEMOTE, ClanListenerType.MODEL, clanSet.constructDemoteListener())
@@ -104,7 +104,7 @@ class ListenersTest {
         val coleader = UUID.randomUUID()
 
         val clan = Clan("TestClan", leader, members = mutableSetOf(member), elders = mutableSetOf(elder), coLeaders = mutableSetOf(coleader))
-        val clanSet = ClanSet(setOf(clan.asDataTuple()))
+        val clanSet = ClanSet(mutableSetOf(clan))
 
         val bus = ClanEventBus()
         bus.registerListener(ClanEvent.CORONATE, ClanListenerType.MODEL, clanSet.constructCoronateListener())
@@ -125,7 +125,7 @@ class ListenersTest {
         val leader = UUID.randomUUID()
         val member = UUID.randomUUID()
         val untrackedClan = Clan("TestClan", leader, members= mutableSetOf(member))
-        val clanSet = ClanSet(setOf())
+        val clanSet = ClanSet(mutableSetOf())
 
         val bus = ClanEventBus()
         bus.registerListener(ClanEvent.DEMOTE, ClanListenerType.MODEL, clanSet.constructDemoteListener())

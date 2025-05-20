@@ -1,9 +1,9 @@
 package net.williserver.clans.model
 
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import net.williserver.clans.LogHandler
 import net.williserver.clans.model.clan.Clan
-import net.williserver.clans.model.clan.ClanData
 import net.williserver.clans.model.clan.ClanRank
 import net.williserver.clans.ClansPlugin.Companion.pluginMessagePrefix
 import net.williserver.clans.session.ClanLifecycleListener
@@ -21,19 +21,16 @@ import kotlin.NoSuchElementException
  *
  * @author Willmo3
  */
-class ClanSet(data: Set<ClanData>) {
-    private val clans: MutableSet<Clan> = HashSet()
-
+@Serializable
+class ClanSet(private val clans: MutableSet<Clan> = HashSet()) {
     // Validate that all clan names are unique
     init {
-        for (datum in data) {
-            val clan = Clan(datum)
-            if (clan in clans) {
-                throw IllegalArgumentException("$pluginMessagePrefix: Internal error -- Clan with name ${datum.name} already exists.")
+        clans.forEach { clan ->
+            if (duplicateClanName(clan)) {
+                throw IllegalArgumentException("$pluginMessagePrefix: Internal error -- Clan with name ${clan.name} already exists.")
             } else if (duplicateMembers(clan)) {
-                throw IllegalArgumentException("$pluginMessagePrefix: A member in clan ${datum.name} is already in another clan.")
+                throw IllegalArgumentException("$pluginMessagePrefix: Internal error -- Clan with name ${clan.name} already has a member with the same name.")
             }
-            clans += clan
         }
     }
 
@@ -53,7 +50,7 @@ class ClanSet(data: Set<ClanData>) {
      * @throws IllegalArgumentException if invariants are violated
      */
     fun addClan(newClan: Clan) {
-        if (newClan in clans) {
+        if (contains(newClan.name)) {
             throw IllegalArgumentException("$pluginMessagePrefix: Internal error -- Clan with name ${newClan.name} already exists.")
         } else if (duplicateMembers(newClan)) {
             throw IllegalArgumentException("$pluginMessagePrefix: Internal error -- Leader already in a clan.")
@@ -66,7 +63,7 @@ class ClanSet(data: Set<ClanData>) {
     /**
      * Remove a clan from the ClanList. This effectively deletes it.
      *
-     * @param clanToRem ove Clan to remove from the list.
+     * @param clanToRemove Clan to remove from the list.
      * @throws NoSuchElementException If the clan is not in this list.
      */
     fun removeClan(clanToRemove: Clan) {
@@ -148,11 +145,6 @@ class ClanSet(data: Set<ClanData>) {
     /*
      * ClanList serialization helpers.
      */
-
-    /**
-     * @return This list as clan data tuples, suitable to be written as JSON.
-     */
-    fun asDataTuples() = clans.map { it.asDataTuple() }
 
     /*
      * Clans event listener factories.
@@ -278,6 +270,16 @@ class ClanSet(data: Set<ClanData>) {
         }
 
     /**
+     * Check whether a given clan has a clan name that is already in this list.
+     * @param clan Clan to check.
+     * @return Whether the clan name is already in use.
+     */
+    private fun duplicateClanName(clan: Clan) =
+        clans.any {
+                otherClan -> otherClan != clan && otherClan.name == clan.name
+        }
+
+    /**
      * @param clan Clan to assert in list
      * @throws NoSuchElementException if the clan is not tracked in this ClanList.
      */
@@ -301,7 +303,7 @@ class ClanSet(data: Set<ClanData>) {
          */
         fun writeToFile(logger: LogHandler, path: String, clanSet: ClanSet) {
             val writer = FileWriter(path)
-            writer.write(format.encodeToString(clanSet.asDataTuples()))
+            writer.write(format.encodeToString(clanSet))
             logger.info("Saved clan list to $path")
             writer.close()
         }
@@ -315,13 +317,13 @@ class ClanSet(data: Set<ClanData>) {
         fun readFromFile(logger: LogHandler, path: String): ClanSet {
             if (!File(path).exists()) {
                 logger.info("Found no clan list at $path\nReturning new empty list.")
-                return ClanSet(setOf())
+                return ClanSet(mutableSetOf())
             }
             val reader = FileReader(path)
             val jsonString = reader.readText()
             reader.close()
             logger.info("Loaded clan list from $path")
-            return ClanSet(format.decodeFromString<Set<ClanData>>(jsonString))
+            return format.decodeFromString<ClanSet>(jsonString)
         }
     }
 }

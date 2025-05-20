@@ -1,7 +1,6 @@
 package net.williserver.clans.model
 
 import net.williserver.clans.model.clan.Clan
-import net.williserver.clans.model.clan.ClanData
 import net.williserver.clans.model.clan.ClanRank
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
@@ -13,14 +12,13 @@ import java.util.*
  */
 class ClanTest {
     private fun generateValidClan(): Clan {
-        val leader = UUID.randomUUID().toString()
-        val data = ClanData("TestClan",
+        val leader = UUID.randomUUID()
+        return Clan("TestClan",
+            leader,
             "TST",
-            members=setOf(UUID.randomUUID().toString()),
-            elders=setOf(),
-            coLeaders=setOf(),
-            leader)
-        return Clan(data)
+            members=mutableSetOf(UUID.randomUUID()),
+            elders=mutableSetOf(),
+            coLeaders=mutableSetOf())
     }
 
     @Test

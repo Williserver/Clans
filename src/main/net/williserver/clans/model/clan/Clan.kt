@@ -4,27 +4,6 @@ import net.williserver.clans.ClansPlugin.Companion.pluginMessagePrefix
 import java.util.*
 import kotlin.math.min
 
-/**
- * Persistent data for a given clan.
- *
- * @param name Unique name for the clan
- * @param prefix Displayed prefix for the clan. Default: first three letters of name, in caps.
- * @param members set of member UUIDs
- * @param elders set of elder UUIDS
- * @param coLeaders set of co-leader UUIDs
- * @param leader UUID for player who leads the clan.
- */
-@Serializable
-data class ClanData(
-    val name: String,
-    val prefix: String,
-    val members: Set<String>,
-    val elders: Set<String>,
-    val coLeaders: Set<String>,
-    val leader: String
-)
-
-// TODO: clan member lifecycle listener
 
 /**
  * Mutable model for clan.
@@ -46,19 +25,6 @@ class Clan(
         private val elders: MutableSet<SUUID> = mutableSetOf(),
         private val coLeaders: MutableSet<SUUID> = mutableSetOf()
     ) {
-
-    /**
-     * Data tuple constructor for clan. Applies transformations to serializable data to get a canonical clan.
-     * @param data Tuple containing strings for clan data.
-     */
-    constructor(data: ClanData) : this(
-        data.name,
-        UUID.fromString(data.leader),
-        prefix = data.prefix,
-        members = HashSet(data.members.map     { UUID.fromString(it) }),
-        elders = HashSet(data.elders.map       { UUID.fromString(it) }),
-        coLeaders = HashSet(data.coLeaders.map { UUID.fromString(it) }),
-    )
 
     /*
      * Construction-time assertions, such as ensuring all rank holders are in the clan.
@@ -237,29 +203,29 @@ class Clan(
     fun prefix() = prefix
 
     /**
-     * Convert the object back to a tuple of ClanData. Useful for serialization.
-     * @return ClanData tuple form of this data.
-     */
-    fun asDataTuple() = ClanData(
-        name,
-        prefix,
-        HashSet(members.map   { it.toString() }),
-        HashSet(elders.map    { it.toString() }),
-        HashSet(coLeaders.map { it.toString() }),
-        leader.toString()
-    )
-
-    /**
      * @param other Object to compare against.
      * @return Whether other is equal to this clan; i.e. it is a clan with the same name.
-     * Notice this is a loose notion -- clans are assumed to have unique names!
      */
-    override fun equals(other: Any?): Boolean = other is Clan && other.name == name
+    override fun equals(other: Any?) = other is Clan
+        && other.name == name
+        && other.leader == leader
+        && other.prefix == prefix
+        && other.members == members
+        && other.elders == elders
+        && other.coLeaders == coLeaders
 
     /*
-     * Automatically generated hash function.
+     * Automatically generated hashcode function
      */
-    override fun hashCode(): Int = name.hashCode()
+    override fun hashCode(): Int {
+        var result = name.hashCode()
+        result = 31 * result + leader.hashCode()
+        result = 31 * result + prefix.hashCode()
+        result = 31 * result + members.hashCode()
+        result = 31 * result + elders.hashCode()
+        result = 31 * result + coLeaders.hashCode()
+        return result
+    }
 
     /**
      * @param player Player to check rank uniqueness.

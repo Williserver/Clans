@@ -2,7 +2,6 @@ package net.williserver.clans.model
 
 import net.williserver.clans.LogHandler
 import net.williserver.clans.model.clan.Clan
-import net.williserver.clans.model.clan.ClanData
 import net.williserver.clans.model.ClanSet.Companion.readFromFile
 import net.williserver.clans.model.ClanSet.Companion.writeToFile
 import org.junit.jupiter.api.Assertions.assertThrows
@@ -17,19 +16,19 @@ import kotlin.test.assertFalse
 class ClanSetTest {
     @Test
     fun testReadWrite() {
-        val leader = UUID.randomUUID().toString()
-        val clanData = ClanData("TestClan", "TST", members = setOf(), elders = setOf(), coLeaders = setOf(), leader)
-        val clanSet = ClanSet(setOf(clanData))
+        val leader = UUID.randomUUID()
+        val clanData = Clan("TestClan", leader = leader, "TST", members = mutableSetOf(UUID.randomUUID(), UUID.randomUUID()), elders = mutableSetOf(UUID.randomUUID()), coLeaders = mutableSetOf(UUID.randomUUID()))
+        val clanSet = ClanSet(mutableSetOf(clanData))
 
         writeToFile(LogHandler(null), "testClanList.json", clanSet)
         assertEquals(clanSet, readFromFile(LogHandler(null), "testClanList.json"))
     }
 
     @Test
-    fun testNoDuplicateClanNames() {
+    fun testNoDuplicateClanName() {
         val clan1 = Clan("DuplicateName", UUID.randomUUID())
         val clan2 = Clan("DuplicateName", UUID.randomUUID())
-        assertThrows(IllegalArgumentException::class.java) { ClanSet(setOf(clan1.asDataTuple(), clan2.asDataTuple())) }
+        assertThrows(IllegalArgumentException::class.java) { ClanSet(mutableSetOf(clan1, clan2)) }
     }
 
     @Test
@@ -40,23 +39,23 @@ class ClanSetTest {
         val clan1 = Clan("Clan1", leader1, members = mutableSetOf(dup), elders = mutableSetOf(), coLeaders = mutableSetOf())
         val clan2 = Clan("Clan2", leader2, members = mutableSetOf(dup), elders = mutableSetOf(), coLeaders = mutableSetOf())
 
-        assertThrows(IllegalArgumentException::class.java) { ClanSet(setOf(clan1.asDataTuple(), clan2.asDataTuple())) }
+        assertThrows(IllegalArgumentException::class.java) { ClanSet(mutableSetOf(clan1, clan2)) }
     }
 
     @Test
     fun testClanOf() {
-        val leader = UUID.randomUUID().toString()
-        val clanData = ClanData("TestClan", "TST", setOf(), setOf(), setOf(), leader)
-        val list = ClanSet(setOf(clanData))
-        assert(list.isPlayerInClan(UUID.fromString(clanData.leader)))
-        assertEquals(Clan(clanData), list.clanOf(UUID.fromString(clanData.leader)))
+        val leader = UUID.randomUUID()
+        val clan = Clan("TestClan", prefix = "TST", leader = leader, members = mutableSetOf(), elders = mutableSetOf(), coLeaders = mutableSetOf())
+        val list = ClanSet(mutableSetOf(clan))
+        assert(list.isPlayerInClan(clan.leader()))
+        assertEquals(clan, list.clanOf(clan.leader()))
     }
 
     @Test
     fun testPlayerNotInClan() {
-        val leader = UUID.randomUUID().toString()
-        val clanData = ClanData("TestClan", "TST", setOf(), setOf(), setOf(), leader)
-        val list = ClanSet(setOf(clanData))
+        val leader = UUID.randomUUID()
+        val clanData = Clan("TestClan", leader, "TST", mutableSetOf(), mutableSetOf(), mutableSetOf())
+        val list = ClanSet(mutableSetOf(clanData))
         assertFalse(list.isPlayerInClan(UUID.randomUUID()))
         assertThrows(NullPointerException::class.java) { list.clanOf(UUID.randomUUID()) }
     }
@@ -64,7 +63,7 @@ class ClanSetTest {
     @Test
     fun testAddClan() {
         val clan = Clan("TestClan", UUID.randomUUID())
-        val list = ClanSet(setOf(clan.asDataTuple()))
+        val list = ClanSet(mutableSetOf(clan))
 
         // Cannot add duplicate clans.
         val sameLeaderClan = Clan("NewTestClan", clan.leader())
@@ -82,7 +81,7 @@ class ClanSetTest {
     @Test
     fun testRemoveClan() {
         val clan = Clan("TestClan", UUID.randomUUID())
-        val list = ClanSet(setOf(clan.asDataTuple()))
+        val list = ClanSet(mutableSetOf(clan))
 
         assert(clan.name in list)
         list -= clan
