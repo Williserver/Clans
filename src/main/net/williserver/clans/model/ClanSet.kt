@@ -289,35 +289,40 @@ class ClanSet(data: Set<ClanData>) {
             throw NoSuchElementException("$pluginMessagePrefix: Clan ${clan.name} is not in this list!")
         }
     }
-}
 
-/**
- * Write a clanlist in json format to a file at path.
- *
- * @param path Destination for file.
- * @param clanSet clanlist object to write.
- */
-fun writeToFile(logger: LogHandler, path: String, clanSet: ClanSet) {
-    val writer = FileWriter(path)
-    writer.write(Json.encodeToString(clanSet.asDataTuples()))
-    logger.info("Saved clan list to $path")
-    writer.close()
-}
+    /*
+     * ClanSet file IO helpers.
+     */
+    companion object {
+        /**
+         * Write a clanlist in json format to a file at path.
+         *
+         * @param path Destination for file.
+         * @param clanSet clanlist object to write.
+         */
+        fun writeToFile(logger: LogHandler, path: String, clanSet: ClanSet) {
+            val writer = FileWriter(path)
+            writer.write(Json.encodeToString(clanSet.asDataTuples()))
+            logger.info("Saved clan list to $path")
+            writer.close()
+        }
 
-/**
- * Read a clanList from a json file at path.
- *
- * @param path Location of file.
- * @return ClanList read from file.
- */
-fun readFromFile(logger: LogHandler, path: String): ClanSet {
-    if (!File(path).exists()) {
-        logger.info("Found no clan list at $path\nReturning new empty list.")
-        return ClanSet(setOf())
+        /**
+         * Read a clanList from a json file at path.
+         *
+         * @param path Location of file.
+         * @return ClanList read from file.
+         */
+        fun readFromFile(logger: LogHandler, path: String): ClanSet {
+            if (!File(path).exists()) {
+                logger.info("Found no clan list at $path\nReturning new empty list.")
+                return ClanSet(setOf())
+            }
+            val reader = FileReader(path)
+            val jsonString = reader.readText()
+            reader.close()
+            logger.info("Loaded clan list from $path")
+            return ClanSet(Json.decodeFromString<Set<ClanData>>(jsonString))
+        }
     }
-    val reader = FileReader(path)
-    val jsonString = reader.readText()
-    reader.close()
-    logger.info("Loaded clan list from $path")
-    return ClanSet(Json.decodeFromString<Set<ClanData>>(jsonString))
 }

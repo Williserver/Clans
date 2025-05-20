@@ -7,6 +7,8 @@ import net.williserver.clans.commands.chat.ChatTabCompleter
 import net.williserver.clans.integration.*
 import net.williserver.clans.model.*
 import net.williserver.clans.model.clan.*
+import net.williserver.clans.model.ClanSet.Companion.readFromFile
+import net.williserver.clans.model.ClanSet.Companion.writeToFile
 import net.williserver.clans.session.ClanEvent.*
 import net.williserver.clans.session.ClanEventBus
 import net.williserver.clans.session.ClanListenerType.*

@@ -3,6 +3,8 @@ package net.williserver.clans.model
 import net.williserver.clans.LogHandler
 import net.williserver.clans.model.clan.Clan
 import net.williserver.clans.model.clan.ClanData
+import net.williserver.clans.model.ClanSet.Companion.readFromFile
+import net.williserver.clans.model.ClanSet.Companion.writeToFile
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import java.util.*
