@@ -89,7 +89,7 @@ class ClanEventBus {
      * @param target player affected by the event -- may be same as agent.
      */
     fun fireEvent(event: ClanEvent, clan: Clan, agent: UUID, target: UUID) {
-        // Ensure that listeners are fired in order using explicit for loop/
+        // Ensure that listeners are fired in order using explicit for loop
         for (i in ClanListenerType.entries.indices) {
             listeners[Pair(event, ClanListenerType.entries[i])]!!.forEach { it(clan, agent, target) }
         }

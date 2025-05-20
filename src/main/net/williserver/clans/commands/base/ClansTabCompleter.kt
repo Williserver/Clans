@@ -70,7 +70,7 @@ class ClansTabCompleter(private val clanSet: ClanSet): TabCompleter {
                 else -> {}
             }
             // Do not include lowercase or playernames will not work!
-            completions.removeAll{ !it.startsWith(args[1]) }
+
         }
         3 -> {
             // The third argument to kick will only ever be "confirm"

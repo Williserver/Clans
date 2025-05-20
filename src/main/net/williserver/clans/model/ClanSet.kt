@@ -14,6 +14,8 @@ import java.util.*
 import kotlin.NoSuchElementException
 
 
+// TODO: switch to pretty printing
+
 /**
  * Wrapper for collection of clans. Can represent main collection or subset.
  * Each clan must have a unique name, or an assertion will be thrown!

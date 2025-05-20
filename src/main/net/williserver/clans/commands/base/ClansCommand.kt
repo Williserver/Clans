@@ -42,7 +42,7 @@ class ClansCommand(private val clanSet: ClanSet,
             val subcommand = args[0]
             val execute = ClansSubcommandExecutor(sender, args.drop(1), clanSet, config, session, bus)
 
-            when(subcommand.lowercase(Locale.getDefault())) {
+            when(subcommand.lowercase()) {
                 "crown"   -> execute.crown()
                 "create"  -> execute.create()
                 "demote"  -> execute.demote()
@@ -230,7 +230,7 @@ private class ClansSubcommandExecutor(
                  * If so, remove the clan from this list.
                  */
                 // Argument structure validation: one arg, confirm
-                if (args[0].lowercase(Locale.getDefault()) != "confirm") {
+                if (args[0].lowercase() != "confirm") {
                     return false
                 }
                 if (v.assertTimerInBounds(session, DISBAND, clan, "disband")) {
@@ -430,7 +430,7 @@ private class ClansSubcommandExecutor(
             // Leave the user's clan.
             1 -> {
                 // Argument structure validation: word must be "confirm"
-                if (args[0].lowercase(Locale.getDefault()) != "confirm") {
+                if (args[0].lowercase() != "confirm") {
                     return false
                 }
                 // Leave clan if the timer was started.
@@ -481,7 +481,7 @@ private class ClansSubcommandExecutor(
             }
             2 -> {
                 // Argument structure validation: 2nd argument must be confirm.
-                if (args[1].lowercase(Locale.getDefault()) != "confirm") {
+                if (args[1].lowercase() != "confirm") {
                     return false
                 }
                 // Kick player from clan if timer started.
