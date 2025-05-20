@@ -30,28 +30,20 @@ class ClansPlugin : JavaPlugin() {
     private lateinit var bus: ClanEventBus
 
     override fun onEnable() {
-        /*
-         * Read base config
-         */
+        /* Read base config */
         saveDefaultConfig() // If file deleted, restore defaults
         val clansConfig = ClansConfigLoader(logger, config).config
         logger.info("Loaded config.")
 
-        /*
-         * Initialize ClanList.
-         */
+        /* Initialize ClanList. */
         clanSet = readFromFile(logger, path)
         logger.info("Initialized clanList.")
 
-        /*
-         * Initiate clans session.
-         */
+        /* Initiate clans session. */
         val session = SessionManager()
         logger.info("Initialized session.")
 
-        /*
-         * Begin registering listeners for major events in clan lifecycle.
-         */
+        /* Begin registering listeners for major events in clan lifecycle. */
         bus = ClanEventBus()
         /*
          * MODEL LISTENERS affect persistent data
@@ -88,18 +80,14 @@ class ClansPlugin : JavaPlugin() {
 
         logger.info("Finished registering clan lifecycle listeners.")
 
-        /*
-         * Register commands
-         */
+        /* Register commands */
         this.getCommand("cc")!!.setExecutor(ChatCommand(clanSet))
         this.getCommand("clans")!!.setExecutor(ClansCommand(clanSet, clansConfig, session, bus))
         this.getCommand("cc")!!.tabCompleter = ChatTabCompleter()
         this.getCommand("clans")!!.tabCompleter = ClansTabCompleter(clanSet)
         logger.info("Registered commands.")
 
-        /*
-         * Finish enabling
-         */
+        /* Finish enabling */
         logger.info("Enabled.")
     }
 
