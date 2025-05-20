@@ -13,9 +13,6 @@ import java.io.FileWriter
 import java.util.*
 import kotlin.NoSuchElementException
 
-
-// TODO: switch to pretty printing
-
 /**
  * Wrapper for collection of clans. Can represent main collection or subset.
  * Each clan must have a unique name, or an assertion will be thrown!
@@ -294,6 +291,8 @@ class ClanSet(data: Set<ClanData>) {
      * ClanSet file IO helpers.
      */
     companion object {
+        private val format = Json { prettyPrint=true }
+
         /**
          * Write a clanlist in json format to a file at path.
          *
@@ -302,7 +301,7 @@ class ClanSet(data: Set<ClanData>) {
          */
         fun writeToFile(logger: LogHandler, path: String, clanSet: ClanSet) {
             val writer = FileWriter(path)
-            writer.write(Json.encodeToString(clanSet.asDataTuples()))
+            writer.write(format.encodeToString(clanSet.asDataTuples()))
             logger.info("Saved clan list to $path")
             writer.close()
         }
@@ -322,7 +321,7 @@ class ClanSet(data: Set<ClanData>) {
             val jsonString = reader.readText()
             reader.close()
             logger.info("Loaded clan list from $path")
-            return ClanSet(Json.decodeFromString<Set<ClanData>>(jsonString))
+            return ClanSet(format.decodeFromString<Set<ClanData>>(jsonString))
         }
     }
 }
