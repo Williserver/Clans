@@ -528,7 +528,7 @@ private class ClansSubcommandExecutor(
 
         val header = Component.text("Clan \"${correspondingClan.name}\":", NamedTextColor.GOLD)
         val leaderTitle = Component.text("\nLeader: ", NamedTextColor.RED)
-        val leaderName = Component.text("${getOfflinePlayer(correspondingClan.leader).name}", NamedTextColor.GREEN)
+        val leaderName = Component.text("${getOfflinePlayer(correspondingClan.leader()).name}", NamedTextColor.GREEN)
         val coleaders = componentify("\nCo-leaders", correspondingClan.coLeaders())
         val elders = componentify("\nElders", correspondingClan.elders())
         val members = componentify("\nMembers", correspondingClan.members())

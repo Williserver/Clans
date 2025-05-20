@@ -26,8 +26,8 @@ class ScoreboardTeamIntegrator(private val logger: LogHandler) {
             logger.info("$LOG_PREFIX: added team ${clan.name}.")
 
             // Teams are displayed under prefix.
-            scoreboard.getTeam(clan.name)!!.displayName = clan.prefix
-            logger.info("$LOG_PREFIX: set team display name to ${clan.prefix}.")
+            scoreboard.getTeam(clan.name)!!.displayName = clan.prefix()
+            logger.info("$LOG_PREFIX: set team display name to ${clan.prefix()}.")
 
             val player = Bukkit.getOfflinePlayer(creator)
             scoreboard.getTeam(clan.name)!!.addPlayer(player)

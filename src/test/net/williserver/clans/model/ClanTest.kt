@@ -42,7 +42,7 @@ class ClanTest {
         clan.leave(newMember)
         assert(newMember !in clan)
         assertThrows(IllegalArgumentException::class.java) { clan.leave(newMember) }
-        assertThrows(IllegalArgumentException::class.java) { clan.leave(clan.leader) }
+        assertThrows(IllegalArgumentException::class.java) { clan.leave(clan.leader()) }
 
         // Test different ranks.
         clan.join(newMember)
@@ -172,7 +172,7 @@ class ClanTest {
             elders = mutableSetOf(elder),
             coLeaders = coleaders,)
 
-        assertEquals(leader, clan.leader)
+        assertEquals(leader, clan.leader())
         assert(leader !in coleaders)
         assert(coleader in coleaders)
 
@@ -181,7 +181,7 @@ class ClanTest {
         assertThrows(IllegalArgumentException::class.java) { clan.crown(member) }
 
         clan.crown(coleader)
-        assertEquals(coleader, clan.leader)
+        assertEquals(coleader, clan.leader())
         assertEquals(ClanRank.COLEADER, clan.rankOf(leader))
 
         assert(leader in coleaders)
@@ -192,16 +192,16 @@ class ClanTest {
     fun testDefaultPrefix() {
         val tc = Clan("Tc",
             UUID.randomUUID())
-        assertEquals("TC", tc.prefix)
+        assertEquals("TC", tc.prefix())
 
         val none = Clan("test",
             UUID.randomUUID())
-        assertEquals("TES", none.prefix)
+        assertEquals("TES", none.prefix())
 
         val specified = Clan("Test",
                             UUID.randomUUID(),
                             "TST")
-        assertEquals("TST", specified.prefix)
+        assertEquals("TST", specified.prefix())
 
         assertThrows(IllegalArgumentException::class.java) {
             Clan("prefix-too-long",

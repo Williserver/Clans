@@ -22,7 +22,7 @@ class ListenersTest {
         // Fire a disband event with a random player initiating
         assertThrows(IllegalArgumentException::class.java) { bus.fireEvent(ClanEvent.DISBAND, clan, UUID.randomUUID(), UUID.randomUUID()) }
 
-        bus.fireEvent(ClanEvent.DISBAND, clan, clan.leader, clan.leader)
+        bus.fireEvent(ClanEvent.DISBAND, clan, clan.leader(), clan.leader())
         assert(clan.name !in clanSet)
     }
 
@@ -35,7 +35,7 @@ class ListenersTest {
         bus.registerListener(ClanEvent.CREATE, ClanListenerType.MODEL, clanSet.constructCreateListener())
         assertThrows(IllegalArgumentException::class.java) { bus.fireEvent(ClanEvent.CREATE, clan, UUID.randomUUID(), UUID.randomUUID()) }
 
-        bus.fireEvent(ClanEvent.CREATE, clan, clan.leader, clan.leader)
+        bus.fireEvent(ClanEvent.CREATE, clan, clan.leader(), clan.leader())
         assert(clan.name in clanSet)
     }
 
@@ -115,7 +115,7 @@ class ListenersTest {
         assertThrows(IllegalArgumentException::class.java) { bus.fireEvent(ClanEvent.CORONATE, clan, coleader, coleader)}
 
         bus.fireEvent(ClanEvent.CORONATE, clan, leader, coleader)
-        assertEquals(coleader, clan.leader)
+        assertEquals(coleader, clan.leader())
         assertEquals(ClanRank.COLEADER, clan.rankOf(leader))
     }
 

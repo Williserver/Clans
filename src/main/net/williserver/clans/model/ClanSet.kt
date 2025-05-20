@@ -164,7 +164,7 @@ class ClanSet(data: Set<ClanData>) {
      */
     fun constructCoronateListener(): ClanLifecycleListener = { clan, oldLeader, newLeader ->
         exceptionIfClanNotInList(clan)
-        if (clan.leader != oldLeader) {
+        if (clan.leader() != oldLeader) {
             throw IllegalArgumentException("$pluginMessagePrefix: Player $oldLeader is not leader of this clan.")
         }
         clan.crown(newLeader)
@@ -176,7 +176,7 @@ class ClanSet(data: Set<ClanData>) {
      * @return the listener
      */
     fun constructCreateListener(): ClanLifecycleListener = { clan, _, creator ->
-        if (creator != clan.leader) {
+        if (creator != clan.leader()) {
             throw IllegalArgumentException("$pluginMessagePrefix: This player is not the leader of the new clan.")
         }
         addClan(clan)
@@ -189,7 +189,7 @@ class ClanSet(data: Set<ClanData>) {
      */
     fun constructDisbandListener(): ClanLifecycleListener = { clan, _, disbander ->
         exceptionIfClanNotInList(clan)
-        if (disbander != clan.leader) {
+        if (disbander != clan.leader()) {
             throw IllegalArgumentException("$pluginMessagePrefix: Disband attempted by non-leader member!")
         }
         removeClan(clan)

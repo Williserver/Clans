@@ -37,22 +37,15 @@ data class ClanData(
  * @throws IllegalArgumentException if there are duplicate members between clans or clans with duplicate names.
  * @author Willmo3
  */
+@Serializable
 class Clan(
         val name: String,
-        leader: UUID,
-        prefix: String = name.substring(0, min(3, name.length)).uppercase(),
-        private val members: MutableSet<UUID> = mutableSetOf(),
-        private val elders: MutableSet<UUID> = mutableSetOf(),
-        private val coLeaders: MutableSet<UUID> = mutableSetOf()
+        private var leader: SUUID,
+        private var prefix: String = name.substring(0, min(3, name.length)).uppercase(),
+        private val members: MutableSet<SUUID> = mutableSetOf(),
+        private val elders: MutableSet<SUUID> = mutableSetOf(),
+        private val coLeaders: MutableSet<SUUID> = mutableSetOf()
     ) {
-
-    // Leader should be publicly visible, but for now, we restrict set to internal.
-    var leader = leader
-        private set
-
-    // Visible prefix for clan.
-    var prefix = prefix
-        private set
 
     /**
      * Data tuple constructor for clan. Applies transformations to serializable data to get a canonical clan.
@@ -203,6 +196,11 @@ class Clan(
     fun coLeaders() = coLeaders.toSet()
 
     /**
+     * @return the leader of the clan.
+     */
+    fun leader() = leader
+
+    /**
      * @return all clanmates as an immutable set.
      */
     fun allClanmates() = members() + elders() + coLeaders() + leader
@@ -232,6 +230,11 @@ class Clan(
     /*
      * Assorted helpers.
      */
+
+    /**
+     * @return the clan's prefix
+     */
+    fun prefix() = prefix
 
     /**
      * Convert the object back to a tuple of ClanData. Useful for serialization.

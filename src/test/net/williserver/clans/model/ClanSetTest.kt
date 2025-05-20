@@ -67,7 +67,7 @@ class ClanSetTest {
         val list = ClanSet(setOf(clan.asDataTuple()))
 
         // Cannot add duplicate clans.
-        val sameLeaderClan = Clan("NewTestClan", clan.leader)
+        val sameLeaderClan = Clan("NewTestClan", clan.leader())
         assertThrows(IllegalArgumentException::class.java) { list += sameLeaderClan }
 
         val newLeader = UUID.randomUUID()
