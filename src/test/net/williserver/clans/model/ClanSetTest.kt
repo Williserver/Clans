@@ -17,7 +17,7 @@ class ClanSetTest {
     @Test
     fun testReadWrite() {
         val leader = UUID.randomUUID()
-        val clanData = Clan("TestClan", leader = leader, "TST", members = mutableSetOf(UUID.randomUUID(), UUID.randomUUID()), elders = mutableSetOf(UUID.randomUUID()), coLeaders = mutableSetOf(UUID.randomUUID()))
+        val clanData = Clan("TestClan", leader = leader, members = mutableSetOf(UUID.randomUUID(), UUID.randomUUID()), elders = mutableSetOf(UUID.randomUUID()), coLeaders = mutableSetOf(UUID.randomUUID()))
         val clanSet = ClanSet(mutableSetOf(clanData))
 
         writeToFile(LogHandler(null), "testClanList.json", clanSet)
@@ -45,7 +45,7 @@ class ClanSetTest {
     @Test
     fun testClanOf() {
         val leader = UUID.randomUUID()
-        val clan = Clan("TestClan", prefix = "TST", leader = leader, members = mutableSetOf(), elders = mutableSetOf(), coLeaders = mutableSetOf())
+        val clan = Clan("TestClan", leader = leader, members = mutableSetOf(), elders = mutableSetOf(), coLeaders = mutableSetOf())
         val list = ClanSet(mutableSetOf(clan))
         assert(list.isPlayerInClan(clan.leader()))
         assertEquals(clan, list.clanOf(clan.leader()))
@@ -54,7 +54,7 @@ class ClanSetTest {
     @Test
     fun testPlayerNotInClan() {
         val leader = UUID.randomUUID()
-        val clanData = Clan("TestClan", leader, "TST", mutableSetOf(), mutableSetOf(), mutableSetOf())
+        val clanData = Clan("TestClan", leader, mutableSetOf(), mutableSetOf(), mutableSetOf())
         val list = ClanSet(mutableSetOf(clanData))
         assertFalse(list.isPlayerInClan(UUID.randomUUID()))
         assertThrows(NullPointerException::class.java) { list.clanOf(UUID.randomUUID()) }

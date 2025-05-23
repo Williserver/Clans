@@ -15,7 +15,6 @@ class ClanTest {
         val leader = UUID.randomUUID()
         return Clan("TestClan",
             leader,
-            "TST",
             members=mutableSetOf(UUID.randomUUID()),
             elders=mutableSetOf(),
             coLeaders=mutableSetOf())
@@ -190,21 +189,10 @@ class ClanTest {
     fun testDefaultPrefix() {
         val tc = Clan("Tc",
             UUID.randomUUID())
-        assertEquals("TC", tc.prefix())
-
-        val none = Clan("test",
-            UUID.randomUUID())
-        assertEquals("TES", none.prefix())
+        assertEquals("TC", tc.generatePrefix())
 
         val specified = Clan("Test",
-                            UUID.randomUUID(),
-                            "TST")
-        assertEquals("TST", specified.prefix())
-
-        assertThrows(IllegalArgumentException::class.java) {
-            Clan("prefix-too-long",
-                UUID.randomUUID(),
-                "TEST")
-        }
+                            UUID.randomUUID())
+        assertEquals("TES", specified.generatePrefix())
     }
 }

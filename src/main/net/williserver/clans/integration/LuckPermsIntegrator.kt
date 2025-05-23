@@ -35,7 +35,7 @@ class LuckPermsIntegrator(private val logger: LogHandler, private val trackName:
     fun constructCreateListener(): ClanLifecycleListener = { clan: Clan, _: UUID, creator: UUID ->
         luckperms.groupManager.createAndLoadGroup(clan.name).thenApplyAsync { group ->
             luckperms.groupManager.modifyGroup(group.name) {
-                it.data().add(PrefixNode.builder("[${clan.prefix()}]", 100).build())
+                it.data().add(PrefixNode.builder("[${clan.generatePrefix()}]", 100).build())
             }
 
             // Add the group to the clans track. Note that this must exist to avoid undefined behavior!

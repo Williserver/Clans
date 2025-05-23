@@ -10,7 +10,6 @@ import kotlin.math.min
  *
  * @param name Name of clan. Must not change, and must be alphanumeric with minus or underscores.
  * @param leader Leader of clan.
- * @param prefix
  * @param members set of members of clan.
  *
  * @throws IllegalArgumentException if there are duplicate members between clans or clans with duplicate names.
@@ -20,7 +19,6 @@ import kotlin.math.min
 class Clan(
         val name: String,
         private var leader: SUUID,
-        private var prefix: String = name.substring(0, min(3, name.length)).uppercase(),
         private val members: MutableSet<SUUID> = mutableSetOf(),
         private val elders: MutableSet<SUUID> = mutableSetOf(),
         private val coLeaders: MutableSet<SUUID> = mutableSetOf()
@@ -34,8 +32,6 @@ class Clan(
             throw IllegalArgumentException("$pluginMessagePrefix: Invalid clan name!")
         } else if (allClanmates().any { !uniqueRank(it)} ) {
             throw IllegalArgumentException("$pluginMessagePrefix: All clan members must have a unique rank.")
-        } else if (prefix.length > 3) {
-            throw IllegalArgumentException("$pluginMessagePrefix: Invalid clan prefix!")
         }
     }
 
@@ -198,9 +194,9 @@ class Clan(
      */
 
     /**
-     * @return the clan's prefix
+     * @return A generated version of the clan's prefix.
      */
-    fun prefix() = prefix
+    fun generatePrefix() = name.substring(0, min(3, name.length)).uppercase()
 
     /**
      * @param other Object to compare against.
@@ -209,7 +205,6 @@ class Clan(
     override fun equals(other: Any?) = other is Clan
         && other.name == name
         && other.leader == leader
-        && other.prefix == prefix
         && other.members == members
         && other.elders == elders
         && other.coLeaders == coLeaders
@@ -220,7 +215,6 @@ class Clan(
     override fun hashCode(): Int {
         var result = name.hashCode()
         result = 31 * result + leader.hashCode()
-        result = 31 * result + prefix.hashCode()
         result = 31 * result + members.hashCode()
         result = 31 * result + elders.hashCode()
         result = 31 * result + coLeaders.hashCode()
