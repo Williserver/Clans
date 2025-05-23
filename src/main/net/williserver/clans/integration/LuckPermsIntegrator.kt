@@ -43,7 +43,7 @@ class LuckPermsIntegrator(private val logger: LogHandler, private val trackName:
         luckperms.groupManager.modifyGroup(clan.name) {
             // Remove existing group data and replace with new prefix.
             it.data().clear()
-            it.data().add(PrefixNode.builder("&7[${prefix}]", 100).build())
+            it.data().add(PrefixNode.builder("&7[${Clan.convertToPrefix(prefix)}]", 100).build())
         }
         logger.info("$LOG_PREFIX: Set prefix for group \"${clan.name}\" to \"${prefix}\".")
     }

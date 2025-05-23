@@ -254,5 +254,10 @@ class Clan(
          * @param name Name to validate.
          */
         fun validClanName(name: String): Boolean = name.matches("^([a-zA-Z0-9]|-|_)+$".toRegex())
+
+        /**
+         * Convert a given string to a prefix code.
+         */
+        fun convertToPrefix(value: String) = value.substring(0, min(3, value.length)).uppercase()
     }
 }
