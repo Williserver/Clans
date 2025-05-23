@@ -13,7 +13,9 @@ import net.williserver.clans.session.ClanEvent
 import net.williserver.clans.session.SessionManager
 import net.williserver.clans.session.ClanEvent.*
 import net.williserver.clans.session.ClanEventBus
+import org.bukkit.Bukkit
 import org.bukkit.Bukkit.*
+import org.bukkit.ChatColor
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
@@ -58,6 +60,7 @@ class ClansCommand(private val clanSet: ClanSet,
                 "leave"     -> execute.leave()
                 "list"      -> execute.list()
                 "promote"   -> execute.promote()
+                "setColor"  -> execute.setColor()
                 "setPrefix" -> execute.setPrefix()
                 else        -> false
             }
@@ -113,6 +116,8 @@ private class ClansSubcommandExecutor(
         val leave = generateCommandHelp("leave", "leave your clan.")
         val list = generateCommandHelp("list (page)", "output a list of clans.")
         val promote = generateCommandHelp("promote (playername)", "Promote a player in your clan.")
+        val setPrefix = generateCommandHelp("setPrefix (prefix)", "Set the prefix for your clan chat.")
+        val setColor = generateCommandHelp("setColor (color)", "Set the color for your clan chat.")
 
         s.sendMessage(header
             .append(chat)
@@ -128,6 +133,8 @@ private class ClansSubcommandExecutor(
             .append(leave)
             .append(list)
             .append(promote)
+            .append(setPrefix)
+            .append(setColor)
         )
         return true
     }
@@ -565,11 +572,40 @@ private class ClansSubcommandExecutor(
             return true
         }
 
-        if (integrator != null) {
-            integrator.setPrefix(clan, args[0])
-        }
+        integrator?.setPrefix(clan, args[0])
         sendClanMessage(clan, Component.text("The clan's prefix has been set to \"${args[0]}\".", NamedTextColor.BLUE))
         // Validation complete, perform operation.
+        return true
+    }
+
+    fun setColor(): Boolean {
+        // Argument structure validation: 1 arg: color.
+        if (args.size != 1) {
+            return false
+        }
+
+        // Argument semantics validation.
+        // Player is in a clan and has set permission.
+        if (!v.assertValidPlayer()
+            || !v.assertSenderInAClan(clanSet)) {
+            return true
+        }
+
+        val clan = clanSet.clanOf((s as Player).uniqueId)
+        if (!v.assertSenderHasPermission(clan, ClanPermission.SET)) {
+            return true
+        }
+
+        // TODO: clean this without exception.
+        val color = try {
+            ChatColor.valueOf(args[0].uppercase())
+        } catch (_: IllegalArgumentException) {
+            sendErrorMessage(s, "Invalid color: ${args[0]}")
+            return true
+        }
+
+        integrator?.setColor(clan, color.char)
+        sendClanMessage(clan, Component.text("The clan's color has been updated!", NamedTextColor.BLUE))
         return true
     }
 } // end private class subcommand executor

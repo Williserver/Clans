@@ -2,6 +2,7 @@ package net.williserver.clans.integration
 
 import net.luckperms.api.LuckPerms
 import net.luckperms.api.model.group.Group
+import net.luckperms.api.node.Node
 import net.luckperms.api.node.types.InheritanceNode
 import net.luckperms.api.node.types.PrefixNode
 import net.williserver.clans.LogHandler
@@ -42,9 +43,26 @@ class LuckPermsIntegrator(private val logger: LogHandler, private val trackName:
         luckperms.groupManager.modifyGroup(clan.name) {
             // Remove existing group data and replace with new prefix.
             it.data().clear()
-            it.data().add(PrefixNode.builder("[${prefix}]", 100).build())
+            it.data().add(PrefixNode.builder("&7[${prefix}]", 100).build())
         }
         logger.info("$LOG_PREFIX: Set prefix for group \"${clan.name}\" to \"${prefix}\".")
+    }
+
+    /**
+     * Update the color of a clan's prefix.
+     * @param clan Clan to update prefix of.
+     * @param colorCode Character color code
+     */
+    fun setColor(clan: Clan, colorCode: Char) {
+        luckperms.groupManager.modifyGroup(clan.name) {
+            // Invariant: node exists
+            val oldPrefix: Node = it.data().toCollection().find { node -> node is PrefixNode }!!
+            val oldPrefixString = (oldPrefix as PrefixNode).metaValue.substring(2)
+            val newPrefixString = "&$colorCode$oldPrefixString"
+            it.data().remove(oldPrefix)
+            it.data().add(PrefixNode.builder(newPrefixString, 100).build())
+            logger.info("$LOG_PREFIX: Set color for group \"${clan.name}\" to \"${colorCode}\".")
+        }
     }
 
     /*
