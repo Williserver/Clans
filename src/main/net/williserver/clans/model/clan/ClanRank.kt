@@ -8,6 +8,7 @@ enum class ClanPermission {
     DISBAND,
     INVITE,
     KICK,
+    SET,
 }
 
 /**
@@ -19,7 +20,7 @@ enum class ClanPermission {
 enum class ClanRank(private val rank: UInt, private val permissions: Array<ClanPermission>): Comparable<ClanRank> {
     MEMBER(0u, arrayOf()),
     ELDER(1u, arrayOf(ClanPermission.INVITE, ClanPermission.KICK) + MEMBER.permissions),
-    COLEADER(2u, arrayOf<ClanPermission>() + ELDER.permissions),
+    COLEADER(2u, arrayOf(ClanPermission.SET) + ELDER.permissions),
     LEADER(3u, arrayOf(ClanPermission.DISBAND) + COLEADER.permissions);
 
     /**

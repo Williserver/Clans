@@ -536,5 +536,27 @@ private class ClansSubcommandExecutor(
         sendPrefixedMessage(s, header.append(leaderTitle).append(leaderName).append(coleaders).append(elders).append(members))
         return true
     }
+
+    fun setPrefix(): Boolean {
+        // Argument structure validation: 1 arg: prefix
+        if (args.size != 1) {
+            return false
+        }
+
+        // Argument semantics validation.
+        // Player is in a clan and has set permission.
+        if (!v.assertValidPlayer()
+            || !v.assertSenderInAClan(clanSet)) {
+            return true
+        }
+
+        val clan = clanSet.clanOf((s as Player).uniqueId)
+        if (!v.assertSenderHasPermission(clan, ClanPermission.SET)) {
+            return true
+        }
+
+        // Validation complete, perform operation.
+        return true
+    }
 } // end private class subcommand executor
 } // end

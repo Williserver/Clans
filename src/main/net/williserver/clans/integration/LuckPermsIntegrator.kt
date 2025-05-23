@@ -21,6 +21,10 @@ class LuckPermsIntegrator(private val logger: LogHandler, private val trackName:
         const val LOG_PREFIX = "[LuckPerms Integration]"
     }
 
+    /*
+     * Public helpers
+     */
+
     /**
      * Initiate the luckperms group.
      */
@@ -30,13 +34,29 @@ class LuckPermsIntegrator(private val logger: LogHandler, private val trackName:
     }
 
     /**
+     * Update the group of a clan with a new prefix.
+     * @param clan Clan whose group should be updated.
+     * @param prefix New prefix for the group.
+     */
+    fun setPrefix(clan: Clan, prefix: String) {
+        luckperms.groupManager.modifyGroup(clan.name) {
+            // Remove existing group data and replace with new prefix.
+            it.data().clear()
+            it.data().add(PrefixNode.builder("[${prefix}]", 100).build())
+        }
+        logger.info("$LOG_PREFIX: Set prefix for group \"${clan.name}\" to \"${prefix}\".")
+    }
+
+    /*
+     * Listeners
+     */
+
+    /**
      * @return a threaded asynchronous listener that creates a group and adds its creator to it.
      */
     fun constructCreateListener(): ClanLifecycleListener = { clan: Clan, _: UUID, creator: UUID ->
         luckperms.groupManager.createAndLoadGroup(clan.name).thenApplyAsync { group ->
-            luckperms.groupManager.modifyGroup(group.name) {
-                it.data().add(PrefixNode.builder("[${clan.generatePrefix()}]", 100).build())
-            }
+            setPrefix(clan, clan.generatePrefix())
 
             // Add the group to the clans track. Note that this must exist to avoid undefined behavior!
             val track = luckperms.trackManager.getTrack(trackName)!!
