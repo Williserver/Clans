@@ -72,9 +72,11 @@ class ClansPlugin : JavaPlugin() {
             logger.info("Scoreboard teams integration disabled, not registering teams listeners.")
         }
         // Luckperms integration listeners.
+        var luckPermsIntegrator: LuckPermsIntegrator? = null
         if (clansConfig.luckpermsIntegration && server.pluginManager.isPluginEnabled("LuckPerms")) {
             logger.info("LuckPerms integration enabled, registering LP listeners.")
-            registerLuckPermsIntegrationListeners(clansConfig)
+            luckPermsIntegrator = LuckPermsIntegrator(logger, "clans")
+            registerLuckPermsIntegrationListeners(clansConfig, luckPermsIntegrator)
         } else {
             logger.info("LuckPerms integration disabled, not registering LP listeners.")
         }
@@ -84,7 +86,7 @@ class ClansPlugin : JavaPlugin() {
 
         /* Register commands */
         this.getCommand("cc")!!.setExecutor(ChatCommand(clanSet))
-        this.getCommand("clans")!!.setExecutor(ClansCommand(clanSet, clansConfig, session, bus))
+        this.getCommand("clans")!!.setExecutor(ClansCommand(clanSet, clansConfig, session, bus, luckPermsIntegrator))
         this.getCommand("cc")!!.tabCompleter = ChatTabCompleter()
         this.getCommand("clans")!!.tabCompleter = ClansTabCompleter(clanSet)
         logger.info("Registered commands.")
@@ -163,8 +165,7 @@ class ClansPlugin : JavaPlugin() {
      *
      * This class of listener is run second, since LuckPerms groups are persistent.
      */
-    private fun registerLuckPermsIntegrationListeners(clansConfig: ClansConfig) {
-        val integrator = LuckPermsIntegrator(logger, clansConfig.luckPermsTrackName)
+    private fun registerLuckPermsIntegrationListeners(clansConfig: ClansConfig, integrator: LuckPermsIntegrator) {
         integrator.initiateTrack()
         bus.registerListener(CREATE, INTEGRATION, integrator.constructCreateListener())
         bus.registerListener(DISBAND, INTEGRATION, integrator.constructDisbandListener())

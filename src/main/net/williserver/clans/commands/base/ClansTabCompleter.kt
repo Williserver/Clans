@@ -52,8 +52,9 @@ class ClansTabCompleter(private val clanSet: ClanSet): TabCompleter {
             completions.add("leave")
             completions.add("list")
             completions.add("promote")
+            completions.add("setPrefix")
             // Only add completions that correspond with the subcommand they're typing.
-            completions.removeAll{ !it.startsWith(args[0].lowercase()) }
+            completions.removeAll{ !it.startsWith(args[0]) }
         }
         2 -> {
             when (args[0].lowercase()) {

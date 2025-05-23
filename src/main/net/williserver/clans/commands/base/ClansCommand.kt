@@ -8,6 +8,7 @@ import net.williserver.clans.model.clan.Clan
 import net.williserver.clans.model.clan.ClanPermission
 import net.williserver.clans.model.clan.ClanRank
 import net.williserver.clans.ClansPlugin.Companion.pluginMessagePrefix
+import net.williserver.clans.integration.LuckPermsIntegrator
 import net.williserver.clans.session.ClanEvent
 import net.williserver.clans.session.SessionManager
 import net.williserver.clans.session.ClanEvent.*
@@ -28,37 +29,40 @@ import kotlin.math.min
  * @param config Configuration options for this session.
  * @param session Session-specific data, like timers.
  * @param bus Event bus with registered listeners for events in clan lifecycle that may be caused by command invocation.
+ * @param integrator LuckPerms integration, if enabled
  *
  * @author Willmo3
  */
 class ClansCommand(private val clanSet: ClanSet,
                    private val config: ClansConfig,
                    private val session: SessionManager,
-                   private val bus: ClanEventBus
+                   private val bus: ClanEventBus,
+                   private val integrator: LuckPermsIntegrator?,
 ): CommandExecutor {
 
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>) =
         if (args.isNotEmpty()) {
             val subcommand = args[0]
-            val execute = ClansSubcommandExecutor(sender, args.drop(1), clanSet, config, session, bus)
+            val execute = ClansSubcommandExecutor(sender, args.drop(1), clanSet, config, session, bus, integrator)
 
-            when(subcommand.lowercase()) {
-                "crown"   -> execute.crown()
-                "create"  -> execute.create()
-                "demote"  -> execute.demote()
-                "disband" -> execute.disband()
-                "info"    -> execute.info()
-                "invite"  -> execute.invite()
-                "join"    -> execute.join()
-                "kick"    -> execute.kick()
-                "help"    -> execute.help()
-                "leave"   -> execute.leave()
-                "list"    -> execute.list()
-                "promote" -> execute.promote()
-                else      -> false
+            when(subcommand) {
+                "crown"     -> execute.crown()
+                "create"    -> execute.create()
+                "demote"    -> execute.demote()
+                "disband"   -> execute.disband()
+                "info"      -> execute.info()
+                "invite"    -> execute.invite()
+                "join"      -> execute.join()
+                "kick"      -> execute.kick()
+                "help"      -> execute.help()
+                "leave"     -> execute.leave()
+                "list"      -> execute.list()
+                "promote"   -> execute.promote()
+                "setPrefix" -> execute.setPrefix()
+                else        -> false
             }
 
-        } else ClansSubcommandExecutor(sender, args.toList(), clanSet, config, session, bus).help()
+        } else ClansSubcommandExecutor(sender, args.toList(), clanSet, config, session, bus, integrator).help()
 
 /**
  * Shares state needed to execute subcommands of the base clans command.
@@ -70,6 +74,7 @@ class ClansCommand(private val clanSet: ClanSet,
  * @param config Configuration options for this session.
  * @param session Session-specific data, like timers.
  * @param bus Event bus with registered listeners for events in clan lifecycle that may be caused by command invocation.
+ * @param integrator LuckPerms integration, if present.
  * @author Willmo3
  */
 private class ClansSubcommandExecutor(
@@ -78,7 +83,8 @@ private class ClansSubcommandExecutor(
     private val clanSet: ClanSet,
     private val config: ClansConfig,
     private val session: SessionManager,
-    private val bus: ClanEventBus
+    private val bus: ClanEventBus,
+    private val integrator: LuckPermsIntegrator?,
 ) {
     private val v = ClansCommandValidator(s)
 
@@ -537,6 +543,10 @@ private class ClansSubcommandExecutor(
         return true
     }
 
+    /**
+     * Set the prefix of the clan the sender is in.
+     * @return Whether the command was invoked with the correct number of arguments.
+     */
     fun setPrefix(): Boolean {
         // Argument structure validation: 1 arg: prefix
         if (args.size != 1) {
@@ -555,6 +565,10 @@ private class ClansSubcommandExecutor(
             return true
         }
 
+        if (integrator != null) {
+            integrator.setPrefix(clan, args[0])
+        }
+        sendClanMessage(clan, Component.text("The clan's prefix has been set to \"${args[0]}\".", NamedTextColor.BLUE))
         // Validation complete, perform operation.
         return true
     }
