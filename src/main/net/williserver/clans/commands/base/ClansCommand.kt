@@ -169,7 +169,7 @@ private class ClansSubcommandExecutor(
 
         val listTitle = Component.text("List:", NamedTextColor.AQUA)
         val sortedClans = clanSet.clans()
-            .sortedBy { it.allClanmates().size }
+            .sortedByDescending { it.allClanmates().size }
             .subList(selectedPage * clansPerPage, min(selectedPage * clansPerPage + clansPerPage, numClans))
             .fold(Component.text())
             { text, thisClan ->
