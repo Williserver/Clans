@@ -95,7 +95,7 @@ private class ClansSubcommandExecutor(
      * Usage information for plugin commands.
      **/
     fun help(): Boolean {
-        val header = prefixedMessage(Component.text("Commands:"))
+        val header = prefixedMessage(Component.text("Commands:", NamedTextColor.DARK_AQUA))
         val bullet = Component.text("\n- /clans ", NamedTextColor.GOLD)
 
         fun generateCommandHelp(name: String, text: String)
@@ -167,7 +167,7 @@ private class ClansSubcommandExecutor(
             else -> throw IllegalStateException("$pluginMessagePrefix: Internal error: Wrong number of arguments to /clans list -- this should have been caught earlier!")
         }
 
-        val listTitle = Component.text("List:", NamedTextColor.AQUA)
+        val listTitle = Component.text("List:", NamedTextColor.DARK_AQUA)
         val sortedClans = clanSet.clans()
             .sortedByDescending { it.allClanmates().size }
             .subList(selectedPage * clansPerPage, min(selectedPage * clansPerPage + clansPerPage, numClans))
@@ -539,7 +539,7 @@ private class ClansSubcommandExecutor(
             others.append(Component.text("${getOfflinePlayer(uuid).name}, ", NamedTextColor.GREEN))
         }
 
-        val header = Component.text("Clan \"${correspondingClan.name}\":", NamedTextColor.GOLD)
+        val header = Component.text("Clan \"${correspondingClan.name}\":", NamedTextColor.DARK_AQUA)
         val leaderTitle = Component.text("\nLeader: ", NamedTextColor.RED)
         val leaderName = Component.text("${getOfflinePlayer(correspondingClan.leader()).name}", NamedTextColor.GREEN)
         val coleaders = componentify("\nCo-leaders", correspondingClan.coLeaders())
@@ -573,11 +573,16 @@ private class ClansSubcommandExecutor(
         }
 
         integrator?.setPrefix(clan, args[0])
-        sendClanMessage(clan, Component.text("The clan's prefix has been set to \"${args[0]}\".", NamedTextColor.BLUE))
+        sendClanMessage(clan, Component.text("The clan's prefix has been set to \"${args[0]}\".", NamedTextColor.DARK_AQUA))
         // Validation complete, perform operation.
         return true
     }
 
+    /**
+     * Set the color of the clan the sender is in.
+     * NOTE: this is currently LuckPerms-specific -- TODO: generalize!
+     * @return whether the command was invoked with the correct number of arguments.
+     */
     fun setColor(): Boolean {
         // Argument structure validation: 1 arg: color.
         if (args.size != 1) {
@@ -605,7 +610,7 @@ private class ClansSubcommandExecutor(
         }
 
         integrator?.setColor(clan, color.char)
-        sendClanMessage(clan, Component.text("The clan's color has been updated!", NamedTextColor.BLUE))
+        sendClanMessage(clan, Component.text("The clan's color has been updated!", NamedTextColor.DARK_AQUA))
         return true
     }
 } // end private class subcommand executor
