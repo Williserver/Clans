@@ -14,14 +14,14 @@ enum class ClanPermission {
 /**
  * Represents a rank in a clan -- effectively, a named wrapper around a number representing relative authority.
  *
- * @param rank Digit precedence for rank.
+ * @param permissions Set of permissions for this rank.
  * @author Willmo3
  */
-enum class ClanRank(private val rank: UInt, private val permissions: Array<ClanPermission>): Comparable<ClanRank> {
-    MEMBER(0u, arrayOf()),
-    ELDER(1u, arrayOf(ClanPermission.INVITE, ClanPermission.KICK) + MEMBER.permissions),
-    COLEADER(2u, arrayOf(ClanPermission.SET) + ELDER.permissions),
-    LEADER(3u, arrayOf(ClanPermission.DISBAND) + COLEADER.permissions);
+enum class ClanRank(private val permissions: Set<ClanPermission>): Comparable<ClanRank> {
+    MEMBER(setOf()),
+    ELDER(setOf(ClanPermission.INVITE, ClanPermission.KICK) + MEMBER.permissions),
+    COLEADER(setOf(ClanPermission.SET) + ELDER.permissions),
+    LEADER(setOf(ClanPermission.DISBAND) + COLEADER.permissions);
 
     /**
      * @return Whether this ClanRank has the specified permission in its permission slist.
