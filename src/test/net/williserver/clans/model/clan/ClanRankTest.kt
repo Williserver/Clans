@@ -1,12 +1,8 @@
-package net.williserver.clans.model
+package net.williserver.clans.model.clan
 
-import net.williserver.clans.model.clan.Clan
-import net.williserver.clans.model.clan.ClanPermission
-import net.williserver.clans.model.clan.ClanRank
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import java.util.*
+import java.util.UUID
 import kotlin.test.assertEquals
 
 /**
@@ -21,7 +17,7 @@ class ClanRankTest {
 
         assertEquals(ClanRank.LEADER, clan.rankOf(leader))
         assertEquals(ClanRank.MEMBER, clan.rankOf(member))
-        assertThrows(IllegalArgumentException::class.java) { clan.rankOf(UUID.randomUUID()) }
+        Assertions.assertThrows(IllegalArgumentException::class.java) { clan.rankOf(UUID.randomUUID()) }
     }
 
     @Test
@@ -32,8 +28,8 @@ class ClanRankTest {
         val clan = Clan("TestClan", leader, members = mutableSetOf(member), coLeaders = mutableSetOf(coleader))
 
         assert(clan.rankOf(leader).hasPermission(ClanPermission.DISBAND))
-        assertFalse(clan.rankOf(member).hasPermission(ClanPermission.DISBAND))
-        assertFalse(clan.rankOf(coleader).hasPermission(ClanPermission.DISBAND))
+        Assertions.assertFalse(clan.rankOf(member).hasPermission(ClanPermission.DISBAND))
+        Assertions.assertFalse(clan.rankOf(coleader).hasPermission(ClanPermission.DISBAND))
     }
 
     @Test
@@ -45,7 +41,7 @@ class ClanRankTest {
 
         assert(clan.rankOf(leader).hasPermission(ClanPermission.INVITE))
         assert(clan.rankOf(coleader).hasPermission(ClanPermission.INVITE))
-        assertFalse(clan.rankOf(member).hasPermission(ClanPermission.INVITE))
+        Assertions.assertFalse(clan.rankOf(member).hasPermission(ClanPermission.INVITE))
     }
 
     @Test
@@ -57,6 +53,6 @@ class ClanRankTest {
 
         assert(clan.rankOf(leader).hasPermission(ClanPermission.KICK))
         assert(clan.rankOf(coleader).hasPermission(ClanPermission.KICK))
-        assertFalse(clan.rankOf(member).hasPermission(ClanPermission.KICK))
+        Assertions.assertFalse(clan.rankOf(member).hasPermission(ClanPermission.KICK))
     }
 }

@@ -4,7 +4,6 @@ import net.williserver.clans.ClansPlugin.Companion.pluginMessagePrefix
 import java.util.*
 import kotlin.math.min
 
-
 /**
  * Mutable model for clan.
  *

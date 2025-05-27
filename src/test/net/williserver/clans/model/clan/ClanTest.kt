@@ -1,11 +1,8 @@
-package net.williserver.clans.model
+package net.williserver.clans.model.clan
 
-import net.williserver.clans.model.clan.Clan
-import net.williserver.clans.model.clan.ClanRank
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import java.util.*
+import java.util.UUID
 
 /**
  * @author Willmo3
@@ -27,7 +24,7 @@ class ClanTest {
         assert(newMember !in clan)
         clan.join(newMember)
         assert(newMember in clan)
-        assertThrows(IllegalArgumentException::class.java) { clan.join(newMember) }
+        Assertions.assertThrows(IllegalArgumentException::class.java) { clan.join(newMember) }
     }
 
     @Test
@@ -38,8 +35,8 @@ class ClanTest {
         assert(newMember in clan)
         clan.leave(newMember)
         assert(newMember !in clan)
-        assertThrows(IllegalArgumentException::class.java) { clan.leave(newMember) }
-        assertThrows(IllegalArgumentException::class.java) { clan.leave(clan.leader()) }
+        Assertions.assertThrows(IllegalArgumentException::class.java) { clan.leave(newMember) }
+        Assertions.assertThrows(IllegalArgumentException::class.java) { clan.leave(clan.leader()) }
 
         // Test different ranks.
         clan.join(newMember)
@@ -69,9 +66,27 @@ class ClanTest {
     fun testConstructClanLeaderDuplicateRank() {
         val leader = UUID.randomUUID()
 
-        assertThrows(IllegalArgumentException::class.java) { Clan("TestClan", leader, coLeaders = mutableSetOf(leader)) }
-        assertThrows(IllegalArgumentException::class.java) { Clan("TestClan", leader, elders = mutableSetOf(leader)) }
-        assertThrows(IllegalArgumentException::class.java) { Clan("TestClan", leader, members = mutableSetOf(leader)) }
+        Assertions.assertThrows(IllegalArgumentException::class.java) {
+            Clan(
+                "TestClan",
+                leader,
+                coLeaders = mutableSetOf(leader)
+            )
+        }
+        Assertions.assertThrows(IllegalArgumentException::class.java) {
+            Clan(
+                "TestClan",
+                leader,
+                elders = mutableSetOf(leader)
+            )
+        }
+        Assertions.assertThrows(IllegalArgumentException::class.java) {
+            Clan(
+                "TestClan",
+                leader,
+                members = mutableSetOf(leader)
+            )
+        }
     }
 
     @Test
@@ -79,9 +94,29 @@ class ClanTest {
         val leader = UUID.randomUUID()
         val coLeader = UUID.randomUUID()
 
-        assertThrows(IllegalArgumentException::class.java) { Clan("TestClan", leader, coLeaders = mutableSetOf(leader)) }
-        assertThrows(IllegalArgumentException::class.java) { Clan("TestClan", leader, coLeaders = mutableSetOf(coLeader), elders = mutableSetOf(coLeader)) }
-        assertThrows(IllegalArgumentException::class.java) { Clan("TestClan", leader, coLeaders = mutableSetOf(coLeader), members = mutableSetOf(coLeader)) }
+        Assertions.assertThrows(IllegalArgumentException::class.java) {
+            Clan(
+                "TestClan",
+                leader,
+                coLeaders = mutableSetOf(leader)
+            )
+        }
+        Assertions.assertThrows(IllegalArgumentException::class.java) {
+            Clan(
+                "TestClan",
+                leader,
+                coLeaders = mutableSetOf(coLeader),
+                elders = mutableSetOf(coLeader)
+            )
+        }
+        Assertions.assertThrows(IllegalArgumentException::class.java) {
+            Clan(
+                "TestClan",
+                leader,
+                coLeaders = mutableSetOf(coLeader),
+                members = mutableSetOf(coLeader)
+            )
+        }
     }
 
     @Test
@@ -89,9 +124,29 @@ class ClanTest {
         val leader = UUID.randomUUID()
         val elder = UUID.randomUUID()
 
-        assertThrows(IllegalArgumentException::class.java ) { Clan("TestClan", leader, elders = mutableSetOf(leader)) }
-        assertThrows(IllegalArgumentException::class.java) { Clan("TestClan", leader, coLeaders = mutableSetOf(elder), elders = mutableSetOf(elder)) }
-        assertThrows(IllegalArgumentException::class.java) { Clan("TestClan", leader, elders = mutableSetOf(elder), members = mutableSetOf(elder)) }
+        Assertions.assertThrows(IllegalArgumentException::class.java) {
+            Clan(
+                "TestClan",
+                leader,
+                elders = mutableSetOf(leader)
+            )
+        }
+        Assertions.assertThrows(IllegalArgumentException::class.java) {
+            Clan(
+                "TestClan",
+                leader,
+                coLeaders = mutableSetOf(elder),
+                elders = mutableSetOf(elder)
+            )
+        }
+        Assertions.assertThrows(IllegalArgumentException::class.java) {
+            Clan(
+                "TestClan",
+                leader,
+                elders = mutableSetOf(elder),
+                members = mutableSetOf(elder)
+            )
+        }
     }
 
     @Test
@@ -128,9 +183,9 @@ class ClanTest {
         assert(clan.rankOf(member) == ClanRank.COLEADER)
 
         // Cannot promote beyond maximum rank
-        assertThrows(IllegalArgumentException::class.java) { clan.promote(member) }
-        assertThrows(IllegalArgumentException::class.java) { clan.promote(leader) }
-        assertThrows(IllegalArgumentException::class.java) { clan.demote(UUID.randomUUID()) }
+        Assertions.assertThrows(IllegalArgumentException::class.java) { clan.promote(member) }
+        Assertions.assertThrows(IllegalArgumentException::class.java) { clan.promote(leader) }
+        Assertions.assertThrows(IllegalArgumentException::class.java) { clan.demote(UUID.randomUUID()) }
     }
 
     @Test
@@ -149,9 +204,9 @@ class ClanTest {
         assert(clan.rankOf(coleader) == ClanRank.MEMBER)
 
         // Cannot demote below maximum rank.
-        assertThrows(IllegalArgumentException::class.java) { clan.demote(coleader) }
-        assertThrows(IllegalArgumentException::class.java) { clan.demote(leader) }
-        assertThrows(IllegalArgumentException::class.java) { clan.demote(UUID.randomUUID()) }
+        Assertions.assertThrows(IllegalArgumentException::class.java) { clan.demote(coleader) }
+        Assertions.assertThrows(IllegalArgumentException::class.java) { clan.demote(leader) }
+        Assertions.assertThrows(IllegalArgumentException::class.java) { clan.demote(UUID.randomUUID()) }
     }
 
     @Test
@@ -169,17 +224,17 @@ class ClanTest {
             elders = mutableSetOf(elder),
             coLeaders = coleaders,)
 
-        assertEquals(leader, clan.leader())
+        Assertions.assertEquals(leader, clan.leader())
         assert(leader !in coleaders)
         assert(coleader in coleaders)
 
-        assertThrows(IllegalArgumentException::class.java) { clan.crown(leader) }
-        assertThrows(IllegalArgumentException::class.java) { clan.crown(elder) }
-        assertThrows(IllegalArgumentException::class.java) { clan.crown(member) }
+        Assertions.assertThrows(IllegalArgumentException::class.java) { clan.crown(leader) }
+        Assertions.assertThrows(IllegalArgumentException::class.java) { clan.crown(elder) }
+        Assertions.assertThrows(IllegalArgumentException::class.java) { clan.crown(member) }
 
         clan.crown(coleader)
-        assertEquals(coleader, clan.leader())
-        assertEquals(ClanRank.COLEADER, clan.rankOf(leader))
+        Assertions.assertEquals(coleader, clan.leader())
+        Assertions.assertEquals(ClanRank.COLEADER, clan.rankOf(leader))
 
         assert(leader in coleaders)
         assert(coleader !in coleaders)
@@ -189,10 +244,10 @@ class ClanTest {
     fun testDefaultPrefix() {
         val tc = Clan("Tc",
             UUID.randomUUID())
-        assertEquals("TC", tc.generatePrefix())
+        Assertions.assertEquals("TC", tc.generatePrefix())
 
         val specified = Clan("Test",
                             UUID.randomUUID())
-        assertEquals("TES", specified.generatePrefix())
+        Assertions.assertEquals("TES", specified.generatePrefix())
     }
 }
