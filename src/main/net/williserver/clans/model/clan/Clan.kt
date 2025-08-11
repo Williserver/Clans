@@ -7,9 +7,12 @@ import kotlin.math.min
 /**
  * Mutable model for clan.
  *
- * @param name Name of clan. Must not change, and must be alphanumeric with minus or underscores.
- * @param leader Leader of clan.
- * @param members set of members of clan.
+ * @property name Name of clan. Must not change, and must be alphanumeric with minus or underscores.
+ * @property leader Leader of clan, may be changed through the clan's lifecycle.
+ * @property members set of clan members.
+ * @property elders set of clan elders.
+ * @property coLeaders set of clan co-leaders.
+ * @property options set of cosmetic clan options.
  *
  * @throws IllegalArgumentException if there are duplicate members between clans or clans with duplicate names.
  * @author Willmo3
@@ -20,11 +23,13 @@ class Clan(
         private var leader: SUUID,
         private val members: MutableSet<SUUID> = mutableSetOf(),
         private val elders: MutableSet<SUUID> = mutableSetOf(),
-        private val coLeaders: MutableSet<SUUID> = mutableSetOf()
+        private val coLeaders: MutableSet<SUUID> = mutableSetOf(),
+        private val options: MutableMap<ClanOption, String> = mutableMapOf(),
     ) {
 
-    /*
-     * Construction-time assertions, such as ensuring all rank holders are in the clan.
+    /**
+     * Perform construction time assertions, such as ensuring that all clans have a valid name.
+     * Additionally, initialize all options to defaults, if not provided.
      */
     init {
         if (!validClanName(name)) {
@@ -32,7 +37,17 @@ class Clan(
         } else if (allClanmates().any { !uniqueRank(it)} ) {
             throw IllegalArgumentException("$pluginMessagePrefix: All clan members must have a unique rank.")
         }
+
+        ClanOption.entries.forEach { option ->
+            if (option !in options) {
+                options[option] = option.default(this)
+            }
+        }
     }
+
+    /*
+     * Whole-clan data accessors.
+     */
 
     /*
      * Clan manipulators.

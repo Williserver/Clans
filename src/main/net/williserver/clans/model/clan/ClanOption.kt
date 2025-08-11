@@ -20,7 +20,21 @@ enum class ClanOption {
             COLOR -> value is String && NamedTextColor.NAMES.value(value) != null
         }
 
+    /**
+     * @param clan Clan to generate defaults for.
+     * @return The default value.
+     */
+    fun default(clan: Clan): String = when (this) {
+        PREFIX -> clan.name.substring(0, minOf(clan.name.length, PREFIX_LENGTH)).uppercase()
+        COLOR -> NamedTextColor.GRAY.toString()
+    }
+
     companion object {
+        /**
+         * Size of a clan team prefix.
+         */
+        const val PREFIX_LENGTH = 3
+
         /**
          * @param name Name to find corresponding object for.
          * @return The corresponding clan option, or null if none.
