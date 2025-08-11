@@ -105,7 +105,7 @@ private class ClansSubcommandExecutor(
         val chat = Component.text("\n- /cc: ", NamedTextColor.RED).append(Component.text("Send a message to only your clanmates", NamedTextColor.GRAY))
         // All other commands are prefixed by /clans
         val help = generateCommandHelp("help", "pull up this help menu.")
-        val coronate = generateCommandHelp("coronate", "promote a co-leader to be the new leader of your clan.")
+        val crown = generateCommandHelp("crown", "promote a co-leader to be the new leader of your clan.")
         val create = generateCommandHelp("create (name)", "create a new clan under your visionary leadership.")
         val demote = generateCommandHelp("demote (playername)", "demote a player in your clan.")
         val disband = generateCommandHelp("disband", "disband the clan you own.")
@@ -122,7 +122,7 @@ private class ClansSubcommandExecutor(
         s.sendMessage(header
             .append(chat)
             .append(help)
-            .append(coronate)
+            .append(crown)
             .append(create)
             .append(demote)
             .append(disband)
