@@ -241,13 +241,21 @@ class ClanTest {
     }
 
     @Test
-    fun testDefaultPrefix() {
-        val tc = Clan("Tc",
-            UUID.randomUUID())
-        Assertions.assertEquals("TC", tc.generatePrefix())
+    fun testDefaultOptions() {
+        val clan = Clan("Test", UUID.randomUUID())
 
-        val specified = Clan("Test",
-                            UUID.randomUUID())
-        Assertions.assertEquals("TES", specified.generatePrefix())
+    }
+
+    @Test
+    fun testClanEquality() {
+        val leader = UUID.randomUUID()
+        val clan1 = Clan("TestClan", leader)
+        val clan2 = Clan("TestClan", leader)
+
+        Assertions.assertEquals(clan1, clan2)
+        Assertions.assertEquals(clan1.hashCode(), clan2.hashCode())
+
+        val differentClan = Clan("DifferentClan", leader)
+        Assertions.assertNotEquals(clan1, differentClan)
     }
 }

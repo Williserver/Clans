@@ -1,5 +1,6 @@
 package net.williserver.clans.model.clan
 
+import net.kyori.adventure.text.format.NamedTextColor
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -54,5 +55,19 @@ class ClanOptionTest {
         assertNull(result)
         result = ClanOption.optionFromName("")
         assertNull(result)
+    }
+
+    @Test
+    fun testDefaultPrefix() {
+        val clan = Clan(name = "TestClan", leader = SUUID.randomUUID())
+        val defaultPrefix = ClanOption.PREFIX.default(clan)
+        assertEquals("TES", defaultPrefix)
+    }
+
+    @Test
+    fun testDefaultColor() {
+        val clan = Clan(name = "TestClan", leader = SUUID.randomUUID())
+        val defaultColor = ClanOption.COLOR.default(clan)
+        assertEquals("gray", defaultColor)
     }
 }
