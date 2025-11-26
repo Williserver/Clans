@@ -25,7 +25,7 @@ enum class ClanOption {
      * @return The default value.
      */
     fun default(clan: Clan): String = when (this) {
-        PREFIX -> clan.name.substring(0, minOf(clan.name.length, PREFIX_LENGTH)).uppercase()
+        PREFIX -> clan.name.take(minOf(clan.name.length, PREFIX_LENGTH)).uppercase()
         COLOR -> NamedTextColor.GRAY.toString()
     }
 

@@ -4,7 +4,7 @@ import net.williserver.clans.model.*
 import net.williserver.clans.model.clan.Clan
 import net.williserver.clans.model.clan.ClanPermission
 import net.williserver.clans.model.clan.ClanRank
-import net.williserver.clans.session.ClanEvent
+import net.williserver.clans.session.ClanLifecycleEvent
 import net.williserver.clans.session.SessionManager
 import org.bukkit.Bukkit.getOfflinePlayer
 import org.bukkit.Bukkit.getPlayer
@@ -206,7 +206,7 @@ class ClansCommandValidator(private val s: CommandSender) {
      * @param key Entity timer is registered under.
      * @param subcommand name of subcommand to issue error for.
      */
-    fun assertTimerInBounds(session: SessionManager, event: ClanEvent, key: Any, subcommand: String) =
+    fun assertTimerInBounds(session: SessionManager, event: ClanLifecycleEvent, key: Any, subcommand: String) =
         if (!session.isTimerRegistered(event, key)) {
             sendErrorMessage(s, "You have attempted to execute \"/clans $subcommand confirm\" before starting the timer.")
             sendErrorMessage(s, "Please start the timer with \"/clans $subcommand\" first, or ignore this message to change nothing.")

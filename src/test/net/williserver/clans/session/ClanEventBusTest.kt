@@ -17,8 +17,8 @@ class ClanEventBusTest {
         assertFalse(newClan.name in list)
 
         val bus = ClanEventBus()
-        bus.registerListener(ClanEvent.CREATE, ClanListenerType.MODEL, list.constructCreateListener())
-        bus.fireEvent(ClanEvent.CREATE, newClan, newLeader, newLeader)
+        bus.registerListener(ClanLifecycleEvent.CREATE, ClanListenerType.MODEL, list.constructCreateListener())
+        bus.fireEvent(ClanLifecycleEvent.CREATE, newClan, newLeader, newLeader)
         assert(newClan.name in list)
     }
 
@@ -30,8 +30,8 @@ class ClanEventBusTest {
         list.addClan(newClan)
 
         val bus = ClanEventBus()
-        bus.registerListener(ClanEvent.DISBAND, ClanListenerType.MODEL, list.constructDisbandListener())
-        bus.fireEvent(ClanEvent.DISBAND, newClan, newLeader, newLeader)
+        bus.registerListener(ClanLifecycleEvent.DISBAND, ClanListenerType.MODEL, list.constructDisbandListener())
+        bus.fireEvent(ClanLifecycleEvent.DISBAND, newClan, newLeader, newLeader)
         assert(newClan.name !in list)
     }
 
@@ -42,10 +42,10 @@ class ClanEventBusTest {
         list.addClan(newClan)
 
         val bus = ClanEventBus()
-        bus.registerListener(ClanEvent.JOIN, ClanListenerType.MODEL, list.constructJoinListener())
+        bus.registerListener(ClanLifecycleEvent.JOIN, ClanListenerType.MODEL, list.constructJoinListener())
 
         val newMember = UUID.randomUUID()
-        bus.fireEvent(ClanEvent.JOIN, newClan, newMember, newMember)
+        bus.fireEvent(ClanLifecycleEvent.JOIN, newClan, newMember, newMember)
         assert(newMember in newClan)
     }
 
@@ -62,8 +62,8 @@ class ClanEventBusTest {
 
         val bus = ClanEventBus()
         // When leave fires, the listener should register the change.
-        bus.registerListener(ClanEvent.LEAVE, ClanListenerType.MODEL, list.constructLeaveListener())
-        bus.fireEvent(ClanEvent.LEAVE, newClan, newMember, newMember)
+        bus.registerListener(ClanLifecycleEvent.LEAVE, ClanListenerType.MODEL, list.constructLeaveListener())
+        bus.fireEvent(ClanLifecycleEvent.LEAVE, newClan, newMember, newMember)
         assert(newMember !in newClan)
 
         // Only non-leader members who are in the clan should be able to leave.
@@ -82,14 +82,14 @@ class ClanEventBusTest {
         assert(member in clan)
 
         val bus = ClanEventBus()
-        bus.registerListener(ClanEvent.KICK, ClanListenerType.MODEL, list.constructKickListener())
-        bus.fireEvent(ClanEvent.KICK, clan, leader, member)
+        bus.registerListener(ClanLifecycleEvent.KICK, ClanListenerType.MODEL, list.constructKickListener())
+        bus.fireEvent(ClanLifecycleEvent.KICK, clan, leader, member)
 
         assertFalse(list.isPlayerInClan(member))
         assert(member !in clan)
 
         clan.join(member)
-        assertThrows(IllegalArgumentException::class.java) { bus.fireEvent(ClanEvent.KICK, clan, member, member) }
+        assertThrows(IllegalArgumentException::class.java) { bus.fireEvent(ClanLifecycleEvent.KICK, clan, member, member) }
     }
 
     @Test
@@ -99,15 +99,15 @@ class ClanEventBusTest {
         // Add an invitation for a new member.
         val newMember = UUID.randomUUID()
         val session = SessionManager()
-        session.registerTimer(ClanEvent.JOIN, Pair(newMember, clan), 300)
-        assert(session.isTimerRegistered(ClanEvent.JOIN, Pair(newMember, clan)))
+        session.registerTimer(ClanLifecycleEvent.JOIN, Pair(newMember, clan), 300)
+        assert(session.isTimerRegistered(ClanLifecycleEvent.JOIN, Pair(newMember, clan)))
 
         // When the player joins, the event should be gone.
         val bus = ClanEventBus()
-        bus.registerListener(ClanEvent.JOIN, ClanListenerType.SESSION, session.constructDeregisterInviteListener())
-        bus.fireEvent(ClanEvent.JOIN, clan, newMember, newMember)
+        bus.registerListener(ClanLifecycleEvent.JOIN, ClanListenerType.SESSION, session.constructDeregisterInviteListener())
+        bus.fireEvent(ClanLifecycleEvent.JOIN, clan, newMember, newMember)
 
-        assertFalse(session.isTimerRegistered(ClanEvent.JOIN, Pair(newMember, clan)))
+        assertFalse(session.isTimerRegistered(ClanLifecycleEvent.JOIN, Pair(newMember, clan)))
     }
 
     @Test
@@ -116,22 +116,22 @@ class ClanEventBusTest {
         var sum = 1
         val bus = ClanEventBus()
 
-        bus.registerListener(ClanEvent.CREATE, ClanListenerType.MODEL) { _, _, _ ->
+        bus.registerListener(ClanLifecycleEvent.CREATE, ClanListenerType.MODEL) { _, _, _ ->
             sum *= 2
         }
-        bus.registerListener(ClanEvent.CREATE, ClanListenerType.INTEGRATION) { _, _, _ ->
+        bus.registerListener(ClanLifecycleEvent.CREATE, ClanListenerType.INTEGRATION) { _, _, _ ->
             sum /= 2
         }
-        bus.registerListener(ClanEvent.CREATE, ClanListenerType.SESSION) { _, _, _ ->
+        bus.registerListener(ClanLifecycleEvent.CREATE, ClanListenerType.SESSION) { _, _, _ ->
             sum += 1
         }
-        bus.registerListener(ClanEvent.CREATE, ClanListenerType.COSMETIC) { _, _, _ ->
+        bus.registerListener(ClanLifecycleEvent.CREATE, ClanListenerType.COSMETIC) { _, _, _ ->
             sum *= 3
         }
 
         // Fire repeatedly to avoid potential set ordering traversal weirdness.
         for (i in 1..100) {
-            bus.fireEvent(ClanEvent.CREATE, Clan("TestClan", UUID.randomUUID()), UUID.randomUUID(), UUID.randomUUID())
+            bus.fireEvent(ClanLifecycleEvent.CREATE, Clan("TestClan", UUID.randomUUID()), UUID.randomUUID(), UUID.randomUUID())
         }
         assertEquals(101462409, sum)
     }

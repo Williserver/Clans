@@ -9,7 +9,7 @@ import java.util.*
  * Events in the clan lifecycle to which listeners can be registered.
  * @author Willmo3
  */
-enum class ClanEvent {
+enum class ClanLifecycleEvent {
     CREATE,
     CORONATE,
     JOIN,
@@ -18,6 +18,15 @@ enum class ClanEvent {
     DISBAND,
     PROMOTE,
     DEMOTE,
+}
+
+/**
+ * Options to listen for changes to.
+ * @author Willmo3
+ */
+enum class ClanOptionEvent {
+    SETCOLOR,
+    SETPREFIX,
 }
 
 /**
@@ -37,13 +46,23 @@ enum class ClanListenerType {
 }
 
 /**
- * Listener function, registered to a specific event.
+ * Major lifecycle function, registered to a specific event.
  * Clan and agent parameters are provided -- additional required state should be closed around.
+ *
  * @param clan Clan to which the event is occuring.
  * @param agent Player performing the action in the clan lifecycle, or none -- may be server initiated.
  * @param target Player affected by action.
  */
 typealias ClanLifecycleListener = (clan: Clan, agent: UUID, target: UUID) -> Unit
+
+/**
+ * Clan option modification listener.
+ *
+ * @param clan Clan to set option for
+ * @param agent Player performing the action in the clan lifecycle -- should have permission set.
+ * @param option Option written to
+ */
+typealias ClanOptionListener = (clan: Clan, agent: UUID, value: String) -> Unit
 
 /**
  * Event bus for major events in a clan's lifecycle.
@@ -54,44 +73,88 @@ typealias ClanLifecycleListener = (clan: Clan, agent: UUID, target: UUID) -> Uni
  */
 class ClanEventBus {
     /**
-     * Listeners that affect the underlying model. They are registered under:
-     * - the event they target (ClanEventType)
+     * Listeners for key events in the clan's lifecycle. They are registered under:
+     * - the event they target (ClanLifecycleEvent)
      * - the type of side effect they impose (ClanListenerType)
      */
-    private val listeners = hashMapOf<Pair<ClanEvent, ClanListenerType>, MutableSet<ClanLifecycleListener>>()
+    private val lifecycleListeners = hashMapOf<Pair<ClanLifecycleEvent, ClanListenerType>, MutableSet<ClanLifecycleListener>>()
+
+    /**
+     * Listeners for changes in clan options. They are registered under:
+     * - the option they target (ClanOptionEvent)
+     * - the type of side effect they impose. (ClanListenerType)
+     */
+    private val optionListeners = hashMapOf<Pair<ClanOptionEvent, ClanListenerType>, MutableSet<ClanOptionListener>>()
+
     init {
         // Initialize set of listeners for each type of clan event.
-        ClanEvent.entries.forEach { event ->
+        ClanLifecycleEvent.entries.forEach { event ->
             ClanListenerType.entries.forEach { listenerType ->
-                listeners[Pair(event, listenerType)] = mutableSetOf()
+                lifecycleListeners[Pair(event, listenerType)] = mutableSetOf()
+            }
+        }
+        ClanOptionEvent.entries.forEach { event ->
+            ClanListenerType.entries.forEach { listenerType ->
+                optionListeners[Pair(event, listenerType)] = mutableSetOf()
             }
         }
     }
 
     /**
+     * Register listener for a lifecycle event.
+     *
      * @param event Event in clan lifecycle to register listener for.
      * @param type type of impact listener will have on server state.
-     * @param listener Listener function for a given clan.
+     * @param listener Listener to register.
      * @return Whether the listener was registered -- i.e. an identical listener was not already registered.
      */
-    fun registerListener(event: ClanEvent, type: ClanListenerType, listener: ClanLifecycleListener) =
-        if (listener !in listeners[Pair(event, type)]!!) {
-            listeners[Pair(event, type)]!! += listener
+    fun registerListener(event: ClanLifecycleEvent, type: ClanListenerType, listener: ClanLifecycleListener) =
+        if (listener !in lifecycleListeners[Pair(event, type)]!!) {
+            lifecycleListeners[Pair(event, type)]!! += listener
             true
         } else false
 
     /**
-     * Notify all listeners that an event has occured.
+     * Register listener for an option event.
+     *
+     * @param option Option change to listen for.
+     * @param type Type of impact listener will have on server state.
+     * @param listener Listener to register.
+     * @return Whether the listener was registered -- i.e. an identical listener was not already registered.
+     */
+    fun registerListener(option: ClanOptionEvent, type: ClanListenerType, listener: ClanOptionListener) =
+        if (listener !in optionListeners[Pair(option, type)]!!) {
+            optionListeners[Pair(option, type)]!! += listener
+            true
+        } else false
+
+    /**
+     * Notify all lifecycle listeners that an event has occured.
      *
      * @param event Event that has just occured.
      * @param clan Clan affected by event.
      * @param agent player who initiated event.
      * @param target player affected by the event -- may be same as agent.
      */
-    fun fireEvent(event: ClanEvent, clan: Clan, agent: UUID, target: UUID) {
+    fun fireEvent(event: ClanLifecycleEvent, clan: Clan, agent: UUID, target: UUID) {
         // Ensure that listeners are fired in order using explicit for loop
         for (i in ClanListenerType.entries.indices) {
-            listeners[Pair(event, ClanListenerType.entries[i])]!!.forEach { it(clan, agent, target) }
+            lifecycleListeners[Pair(event, ClanListenerType.entries[i])]!!.forEach { it(clan, agent, target) }
+        }
+    }
+
+    /**
+     * Notify all option listeners that a set has occured.
+     *
+     * @param option Option that has just been set
+     * @param clan Clan receiving option change
+     * @param agent Player who initiated change
+     * @param option String value for changed option.
+     */
+    fun fireEvent(option: ClanOptionEvent, clan: Clan, agent: UUID, value: String) {
+        // Ensure that listeners are fired in order using explicit for loop
+        for (i in ClanListenerType.entries.indices) {
+            optionListeners[Pair(option, ClanListenerType.entries[i])]!!.forEach { it(clan, agent, value) }
         }
     }
 }

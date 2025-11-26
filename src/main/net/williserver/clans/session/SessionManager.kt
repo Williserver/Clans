@@ -12,23 +12,23 @@ class SessionManager {
     /**
      * Map of events to registered timers of each value.
      */
-    private val timerTable = mapOf<ClanEvent, MutableMap<Any, ConfirmTimer>>(
+    private val timerTable = mapOf<ClanLifecycleEvent, MutableMap<Any, ConfirmTimer>>(
         // Norm: Pair<UUID, Clan>
-        ClanEvent.JOIN to mutableMapOf(),
+        ClanLifecycleEvent.JOIN to mutableMapOf(),
         // Norm: UUID
-        ClanEvent.LEAVE to mutableMapOf(),
+        ClanLifecycleEvent.LEAVE to mutableMapOf(),
         // Norm: clan
-        ClanEvent.DISBAND to mutableMapOf(),
+        ClanLifecycleEvent.DISBAND to mutableMapOf(),
         // Norm: Pair<UUID, UUID> (player kicking, player being kicked)
-        ClanEvent.KICK to mutableMapOf(),
+        ClanLifecycleEvent.KICK to mutableMapOf(),
         // Norm: Pair<UUID, UUID> (previous leader, new leader)
-        ClanEvent.CORONATE to mutableMapOf(),
+        ClanLifecycleEvent.CORONATE to mutableMapOf(),
         // Norm: Pair<UUID, UUID> (player promoting, player being promoted)
         // Currently unused
-        ClanEvent.PROMOTE to mutableMapOf(),
+        ClanLifecycleEvent.PROMOTE to mutableMapOf(),
         // Norm: Pair<UUID, UUID> (player demoting, player being demoted)
         // Currently unused
-        ClanEvent.DEMOTE to mutableMapOf(),
+        ClanLifecycleEvent.DEMOTE to mutableMapOf(),
     )
 
     /**
@@ -41,7 +41,7 @@ class SessionManager {
      * @return Whether the timer was registered -- do not registered if one already registered.
      * @throws NullPointerException if event is not tracked.
      */
-    fun registerTimer(event: ClanEvent, key: Any, maxTime: Long) =
+    fun registerTimer(event: ClanLifecycleEvent, key: Any, maxTime: Long) =
         if (key in timerTable[event]!!) {
             // Fail with error (but not crash) if key already registered.
             false
@@ -59,7 +59,7 @@ class SessionManager {
      * @return Whether the timer was deregistered.
      * @throws NullPointerException if event is not tracked.
      */
-    fun deregisterTimer(event: ClanEvent, key: Any) =
+    fun deregisterTimer(event: ClanLifecycleEvent, key: Any) =
         if (key !in timerTable[event]!!) {
             // Fail with error (but not crash) if key not present
             false
@@ -77,7 +77,7 @@ class SessionManager {
      * @return whether a timer is registered under the given key for the given event.
      * @throws NullPointerException if the event is not tracked.
      */
-    fun isTimerRegistered(event: ClanEvent, key: Any) = key in timerTable[event]!!
+    fun isTimerRegistered(event: ClanLifecycleEvent, key: Any) = key in timerTable[event]!!
 
     /**
      * Start a timer corresponding to some event and key.
@@ -87,7 +87,7 @@ class SessionManager {
      *
      * @throws NullPointerException if timer has not yet been registered or event is not tracked.
      */
-    fun startTimer(event: ClanEvent, key: Any) {
+    fun startTimer(event: ClanLifecycleEvent, key: Any) {
         val timer = timerTable[event]!![key]!!
         timer.reset()
         timer.startTimer()
@@ -102,7 +102,7 @@ class SessionManager {
      *
      * @throws NullPointerException if event is not tracked.
      */
-    fun isTimerInBounds(event: ClanEvent, key: Any): Boolean {
+    fun isTimerInBounds(event: ClanLifecycleEvent, key: Any): Boolean {
         val timer = timerTable[event]!![key]
         return timer != null && timer.isRunning() && timer.inBounds()
     }
@@ -116,5 +116,5 @@ class SessionManager {
      * This prevents repeatedly leaving and rejoining a clan.
      */
     fun constructDeregisterInviteListener(): ClanLifecycleListener =
-        { clan: Clan, agent: UUID, _: UUID -> deregisterTimer(ClanEvent.JOIN, Pair(agent, clan))}
+        { clan: Clan, agent: UUID, _: UUID -> deregisterTimer(ClanLifecycleEvent.JOIN, Pair(agent, clan))}
 }

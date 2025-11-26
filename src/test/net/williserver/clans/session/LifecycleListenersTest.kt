@@ -11,18 +11,18 @@ import java.util.*
 /**
  * @author Willmo3
  */
-class ListenersTest {
+class LifecycleListenersTest {
     @Test
     fun testDisbandAgentLeader() {
         val clan = Clan("TestClan", UUID.randomUUID())
         val clanSet = ClanSet(mutableSetOf(clan))
 
         val bus = ClanEventBus()
-        bus.registerListener(ClanEvent.DISBAND, ClanListenerType.MODEL, clanSet.constructDisbandListener())
+        bus.registerListener(ClanLifecycleEvent.DISBAND, ClanListenerType.MODEL, clanSet.constructDisbandListener())
         // Fire a disband event with a random player initiating
-        assertThrows(IllegalArgumentException::class.java) { bus.fireEvent(ClanEvent.DISBAND, clan, UUID.randomUUID(), UUID.randomUUID()) }
+        assertThrows(IllegalArgumentException::class.java) { bus.fireEvent(ClanLifecycleEvent.DISBAND, clan, UUID.randomUUID(), UUID.randomUUID()) }
 
-        bus.fireEvent(ClanEvent.DISBAND, clan, clan.leader(), clan.leader())
+        bus.fireEvent(ClanLifecycleEvent.DISBAND, clan, clan.leader(), clan.leader())
         assert(clan.name !in clanSet)
     }
 
@@ -32,10 +32,10 @@ class ListenersTest {
         val clanSet = ClanSet(mutableSetOf())
 
         val bus = ClanEventBus()
-        bus.registerListener(ClanEvent.CREATE, ClanListenerType.MODEL, clanSet.constructCreateListener())
-        assertThrows(IllegalArgumentException::class.java) { bus.fireEvent(ClanEvent.CREATE, clan, UUID.randomUUID(), UUID.randomUUID()) }
+        bus.registerListener(ClanLifecycleEvent.CREATE, ClanListenerType.MODEL, clanSet.constructCreateListener())
+        assertThrows(IllegalArgumentException::class.java) { bus.fireEvent(ClanLifecycleEvent.CREATE, clan, UUID.randomUUID(), UUID.randomUUID()) }
 
-        bus.fireEvent(ClanEvent.CREATE, clan, clan.leader(), clan.leader())
+        bus.fireEvent(ClanLifecycleEvent.CREATE, clan, clan.leader(), clan.leader())
         assert(clan.name in clanSet)
     }
 
@@ -48,8 +48,8 @@ class ListenersTest {
         val clanSet = ClanSet(mutableSetOf(clan, otherClan))
 
         val bus = ClanEventBus()
-        bus.registerListener(ClanEvent.JOIN, ClanListenerType.MODEL, clanSet.constructJoinListener())
-        assertThrows(IllegalArgumentException::class.java) { bus.fireEvent(ClanEvent.JOIN, otherClan, duplicate, duplicate) }
+        bus.registerListener(ClanLifecycleEvent.JOIN, ClanListenerType.MODEL, clanSet.constructJoinListener())
+        assertThrows(IllegalArgumentException::class.java) { bus.fireEvent(ClanLifecycleEvent.JOIN, otherClan, duplicate, duplicate) }
     }
 
     @Test
@@ -61,17 +61,17 @@ class ListenersTest {
         val clanSet = ClanSet(mutableSetOf(clan))
 
         val bus = ClanEventBus()
-        bus.registerListener(ClanEvent.PROMOTE, ClanListenerType.MODEL, clanSet.constructPromoteListener())
+        bus.registerListener(ClanLifecycleEvent.PROMOTE, ClanListenerType.MODEL, clanSet.constructPromoteListener())
 
         assertEquals(ClanRank.MEMBER, clan.rankOf(promotee))
         // Cannot promote yourself
-        assertThrows(IllegalArgumentException::class.java) {bus.fireEvent(ClanEvent.PROMOTE, clan, promotee, promotee) }
-        bus.fireEvent(ClanEvent.PROMOTE, clan, otherColeader, promotee)
+        assertThrows(IllegalArgumentException::class.java) {bus.fireEvent(ClanLifecycleEvent.PROMOTE, clan, promotee, promotee) }
+        bus.fireEvent(ClanLifecycleEvent.PROMOTE, clan, otherColeader, promotee)
         assertEquals(ClanRank.ELDER, clan.rankOf(promotee))
-        bus.fireEvent(ClanEvent.PROMOTE, clan, otherColeader, promotee)
+        bus.fireEvent(ClanLifecycleEvent.PROMOTE, clan, otherColeader, promotee)
         assertEquals(ClanRank.COLEADER, clan.rankOf(promotee))
         // Cannot promote beyond coleader -- even if we outrank
-        assertThrows(IllegalArgumentException::class.java) {bus.fireEvent(ClanEvent.PROMOTE, clan, leader, promotee) }
+        assertThrows(IllegalArgumentException::class.java) {bus.fireEvent(ClanLifecycleEvent.PROMOTE, clan, leader, promotee) }
     }
 
     @Test
@@ -83,17 +83,17 @@ class ListenersTest {
         val clanSet = ClanSet(mutableSetOf(clan))
 
         val bus = ClanEventBus()
-        bus.registerListener(ClanEvent.DEMOTE, ClanListenerType.MODEL, clanSet.constructDemoteListener())
+        bus.registerListener(ClanLifecycleEvent.DEMOTE, ClanListenerType.MODEL, clanSet.constructDemoteListener())
 
         assertEquals(ClanRank.COLEADER, clan.rankOf(demotee))
         // You cannot demote yourself!
-        assertThrows(IllegalArgumentException::class.java) { bus.fireEvent(ClanEvent.DEMOTE, clan, demotee, demotee) }
-        bus.fireEvent(ClanEvent.DEMOTE, clan, leader, demotee)
+        assertThrows(IllegalArgumentException::class.java) { bus.fireEvent(ClanLifecycleEvent.DEMOTE, clan, demotee, demotee) }
+        bus.fireEvent(ClanLifecycleEvent.DEMOTE, clan, leader, demotee)
         assertEquals(ClanRank.ELDER, clan.rankOf(demotee))
-        bus.fireEvent(ClanEvent.DEMOTE, clan, otherColeader, demotee)
+        bus.fireEvent(ClanLifecycleEvent.DEMOTE, clan, otherColeader, demotee)
         assertEquals(ClanRank.MEMBER, clan.rankOf(demotee))
         // Cannot demote below member -- use kick instead
-        assertThrows(IllegalArgumentException::class.java) { bus.fireEvent(ClanEvent.DEMOTE, clan, otherColeader, demotee) }
+        assertThrows(IllegalArgumentException::class.java) { bus.fireEvent(ClanLifecycleEvent.DEMOTE, clan, otherColeader, demotee) }
     }
 
     @Test
@@ -107,14 +107,14 @@ class ListenersTest {
         val clanSet = ClanSet(mutableSetOf(clan))
 
         val bus = ClanEventBus()
-        bus.registerListener(ClanEvent.CORONATE, ClanListenerType.MODEL, clanSet.constructCoronateListener())
+        bus.registerListener(ClanLifecycleEvent.CORONATE, ClanListenerType.MODEL, clanSet.constructCoronateListener())
         // Only a co-leader, promoted by a leader, should work!
-        assertThrows(IllegalArgumentException::class.java) { bus.fireEvent(ClanEvent.CORONATE, clan, leader, leader)}
-        assertThrows(IllegalArgumentException::class.java) { bus.fireEvent(ClanEvent.CORONATE, clan, leader, elder)}
-        assertThrows(IllegalArgumentException::class.java) { bus.fireEvent(ClanEvent.CORONATE, clan, leader, member)}
-        assertThrows(IllegalArgumentException::class.java) { bus.fireEvent(ClanEvent.CORONATE, clan, coleader, coleader)}
+        assertThrows(IllegalArgumentException::class.java) { bus.fireEvent(ClanLifecycleEvent.CORONATE, clan, leader, leader)}
+        assertThrows(IllegalArgumentException::class.java) { bus.fireEvent(ClanLifecycleEvent.CORONATE, clan, leader, elder)}
+        assertThrows(IllegalArgumentException::class.java) { bus.fireEvent(ClanLifecycleEvent.CORONATE, clan, leader, member)}
+        assertThrows(IllegalArgumentException::class.java) { bus.fireEvent(ClanLifecycleEvent.CORONATE, clan, coleader, coleader)}
 
-        bus.fireEvent(ClanEvent.CORONATE, clan, leader, coleader)
+        bus.fireEvent(ClanLifecycleEvent.CORONATE, clan, leader, coleader)
         assertEquals(coleader, clan.leader())
         assertEquals(ClanRank.COLEADER, clan.rankOf(leader))
     }
@@ -128,18 +128,18 @@ class ListenersTest {
         val clanSet = ClanSet(mutableSetOf())
 
         val bus = ClanEventBus()
-        bus.registerListener(ClanEvent.DEMOTE, ClanListenerType.MODEL, clanSet.constructDemoteListener())
-        bus.registerListener(ClanEvent.DISBAND, ClanListenerType.MODEL, clanSet.constructDisbandListener())
-        bus.registerListener(ClanEvent.JOIN, ClanListenerType.MODEL, clanSet.constructJoinListener())
-        bus.registerListener(ClanEvent.KICK, ClanListenerType.MODEL, clanSet.constructKickListener())
-        bus.registerListener(ClanEvent.LEAVE, ClanListenerType.MODEL, clanSet.constructLeaveListener())
-        bus.registerListener(ClanEvent.PROMOTE, ClanListenerType.MODEL, clanSet.constructPromoteListener())
-        bus.registerListener(ClanEvent.CORONATE, ClanListenerType.MODEL, clanSet.constructCoronateListener())
+        bus.registerListener(ClanLifecycleEvent.DEMOTE, ClanListenerType.MODEL, clanSet.constructDemoteListener())
+        bus.registerListener(ClanLifecycleEvent.DISBAND, ClanListenerType.MODEL, clanSet.constructDisbandListener())
+        bus.registerListener(ClanLifecycleEvent.JOIN, ClanListenerType.MODEL, clanSet.constructJoinListener())
+        bus.registerListener(ClanLifecycleEvent.KICK, ClanListenerType.MODEL, clanSet.constructKickListener())
+        bus.registerListener(ClanLifecycleEvent.LEAVE, ClanListenerType.MODEL, clanSet.constructLeaveListener())
+        bus.registerListener(ClanLifecycleEvent.PROMOTE, ClanListenerType.MODEL, clanSet.constructPromoteListener())
+        bus.registerListener(ClanLifecycleEvent.CORONATE, ClanListenerType.MODEL, clanSet.constructCoronateListener())
 
         // For each event, fire it with a clan not in this list. It should throw NoSuchElementException.
-        ClanEvent.entries.forEach {
+        ClanLifecycleEvent.entries.forEach {
             // Ignore create event -- by definition, it is not tracked yet.
-            if (it != ClanEvent.CREATE) {
+            if (it != ClanLifecycleEvent.CREATE) {
                 assertThrows(NoSuchElementException::class.java) { bus.fireEvent(it, untrackedClan, leader, member)}
             }
         }

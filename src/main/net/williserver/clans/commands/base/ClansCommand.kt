@@ -9,11 +9,10 @@ import net.williserver.clans.model.clan.ClanPermission
 import net.williserver.clans.model.clan.ClanRank
 import net.williserver.clans.ClansPlugin.Companion.pluginMessagePrefix
 import net.williserver.clans.integration.LuckPermsIntegrator
-import net.williserver.clans.session.ClanEvent
+import net.williserver.clans.session.ClanLifecycleEvent
 import net.williserver.clans.session.SessionManager
-import net.williserver.clans.session.ClanEvent.*
+import net.williserver.clans.session.ClanLifecycleEvent.*
 import net.williserver.clans.session.ClanEventBus
-import org.bukkit.Bukkit
 import org.bukkit.Bukkit.*
 import org.bukkit.ChatColor
 import org.bukkit.command.Command
@@ -335,7 +334,7 @@ private class ClansSubcommandExecutor(
     /**
      * Internal implementation for promote, demote. Should not be called outside those contexts.
      */
-    fun changeRank(event: ClanEvent, boundaryRank: ClanRank, boundaryMessage: String): Boolean {
+    fun changeRank(event: ClanLifecycleEvent, boundaryRank: ClanRank, boundaryMessage: String): Boolean {
         assert(event == DEMOTE || event == PROMOTE)
         // Argument structure validation. 1 arg: target to change rank of.
         if (args.size != 1) {
