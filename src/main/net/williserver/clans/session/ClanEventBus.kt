@@ -1,6 +1,7 @@
 package net.williserver.clans.session
 
 import net.williserver.clans.model.clan.Clan
+import net.williserver.clans.model.clan.ClanOption
 import java.util.*
 
 // TODO: clan member lifecycle
@@ -18,15 +19,6 @@ enum class ClanLifecycleEvent {
     DISBAND,
     PROMOTE,
     DEMOTE,
-}
-
-/**
- * Options to listen for changes to.
- * @author Willmo3
- */
-enum class ClanOptionEvent {
-    SETCOLOR,
-    SETPREFIX,
 }
 
 /**
@@ -62,7 +54,7 @@ typealias ClanLifecycleListener = (clan: Clan, agent: UUID, target: UUID) -> Uni
  * @param agent Player performing the action in the clan lifecycle -- should have permission set.
  * @param option Option written to
  */
-typealias ClanOptionListener = (clan: Clan, agent: UUID, value: String) -> Unit
+typealias ClanOptionListener = (clan: Clan, agent: UUID, option: ClanOption, value: String) -> Unit
 
 /**
  * Event bus for major events in a clan's lifecycle.
@@ -84,7 +76,7 @@ class ClanEventBus {
      * - the option they target (ClanOptionEvent)
      * - the type of side effect they impose. (ClanListenerType)
      */
-    private val optionListeners = hashMapOf<Pair<ClanOptionEvent, ClanListenerType>, MutableSet<ClanOptionListener>>()
+    private val optionListeners = hashMapOf<Pair<ClanOption, ClanListenerType>, MutableSet<ClanOptionListener>>()
 
     init {
         // Initialize set of listeners for each type of clan event.
@@ -93,9 +85,9 @@ class ClanEventBus {
                 lifecycleListeners[Pair(event, listenerType)] = mutableSetOf()
             }
         }
-        ClanOptionEvent.entries.forEach { event ->
+        ClanOption.entries.forEach { option ->
             ClanListenerType.entries.forEach { listenerType ->
-                optionListeners[Pair(event, listenerType)] = mutableSetOf()
+                optionListeners[Pair(option, listenerType)] = mutableSetOf()
             }
         }
     }
@@ -122,7 +114,7 @@ class ClanEventBus {
      * @param listener Listener to register.
      * @return Whether the listener was registered -- i.e. an identical listener was not already registered.
      */
-    fun registerListener(option: ClanOptionEvent, type: ClanListenerType, listener: ClanOptionListener) =
+    fun registerListener(option: ClanOption, type: ClanListenerType, listener: ClanOptionListener) =
         if (listener !in optionListeners[Pair(option, type)]!!) {
             optionListeners[Pair(option, type)]!! += listener
             true
@@ -151,10 +143,10 @@ class ClanEventBus {
      * @param agent Player who initiated change
      * @param option String value for changed option.
      */
-    fun fireEvent(option: ClanOptionEvent, clan: Clan, agent: UUID, value: String) {
+    fun fireEvent(option: ClanOption, clan: Clan, agent: UUID, value: String) {
         // Ensure that listeners are fired in order using explicit for loop
         for (i in ClanListenerType.entries.indices) {
-            optionListeners[Pair(option, ClanListenerType.entries[i])]!!.forEach { it(clan, agent, value) }
+            optionListeners[Pair(option, ClanListenerType.entries[i])]!!.forEach { it(clan, agent, option,value) }
         }
     }
 }

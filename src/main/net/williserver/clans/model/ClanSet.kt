@@ -6,7 +6,10 @@ import net.williserver.clans.LogHandler
 import net.williserver.clans.model.clan.Clan
 import net.williserver.clans.model.clan.ClanRank
 import net.williserver.clans.ClansPlugin.Companion.pluginMessagePrefix
+import net.williserver.clans.model.clan.ClanOption
+import net.williserver.clans.model.clan.ClanPermission
 import net.williserver.clans.session.ClanLifecycleListener
+import net.williserver.clans.session.ClanOptionListener
 import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
@@ -253,6 +256,21 @@ class ClanSet(private val clans: MutableSet<Clan> = HashSet()) {
             throw IllegalArgumentException("$pluginMessagePrefix: Promoter does not outrank promoted player.")
         }
         clan.promote(promotee)
+    }
+
+    /**
+     * Construct a set option listener for some option.
+     */
+    fun constructOptionListener(): ClanOptionListener = { clan, agent, option, value ->
+        exceptionIfClanNotInList(clan)
+        if (agent !in clan) {
+            throw IllegalArgumentException("$pluginMessagePrefix: Player not in clan.")
+        } else if (!clan.rankOf(agent).hasPermission(ClanPermission.SET)) {
+            throw IllegalArgumentException("$pluginMessagePrefix: Player does not have permisison to set.")
+        } else if (!option.validOption(value)) {
+            throw IllegalArgumentException("$pluginMessagePrefix: Option does not support $value.")
+        }
+        clan.setOption(option, value);
     }
 
     /*
