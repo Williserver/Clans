@@ -2,6 +2,7 @@ package net.williserver.clans.commands
 
 import net.williserver.clans.model.*
 import net.williserver.clans.model.clan.Clan
+import net.williserver.clans.model.clan.ClanOption
 import net.williserver.clans.model.clan.ClanPermission
 import net.williserver.clans.model.clan.ClanRank
 import net.williserver.clans.session.ClanLifecycleEvent
@@ -19,6 +20,19 @@ import java.util.*
  * @param s Sender producing command.
  */
 class ClansCommandValidator(private val s: CommandSender) {
+    /**
+     * Check whether a given option value is valid. If not, send an error message.
+     *
+     * @param option Option to validate value for.
+     * @param value Value to validate.
+     * @return Whether the value is valid.
+     */
+    fun assertValidOptionValue(option: ClanOption, value: String) =
+        if (!option.validOption(value)) {
+            sendErrorMessage(s, "You have specified an invalid value for the option \"$option\".")
+            sendErrorMessage(s, "Valid values are: ${option.validValuesDescription()}.")
+            false
+        } else true
 
     /**
      * Determine whether a command sender is a player.

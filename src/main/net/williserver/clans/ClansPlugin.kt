@@ -76,7 +76,7 @@ class ClansPlugin : JavaPlugin() {
         if (clansConfig.luckpermsIntegration && server.pluginManager.isPluginEnabled("LuckPerms")) {
             logger.info("LuckPerms integration enabled, registering LP listeners.")
             luckPermsIntegrator = LuckPermsIntegrator(logger, "clans")
-            registerLuckPermsIntegrationListeners(clansConfig, luckPermsIntegrator)
+            registerLuckPermsIntegrationListeners(luckPermsIntegrator)
         } else {
             logger.info("LuckPerms integration disabled, not registering LP listeners.")
         }
@@ -119,6 +119,12 @@ class ClansPlugin : JavaPlugin() {
         bus.registerListener(LEAVE, MODEL, clanSet.constructLeaveListener())
         bus.registerListener(PROMOTE, MODEL, clanSet.constructPromoteListener())
         bus.registerListener(KICK, MODEL, clanSet.constructKickListener())
+
+        // Option changes happen through a uniform interface, so we can use the same listener.
+        // We differentiate by type of option during integration.
+        val setListener = clanSet.constructOptionListener()
+        bus.registerListener(ClanOption.COLOR, MODEL, setListener)
+        bus.registerListener(ClanOption.PREFIX, MODEL, setListener)
     }
 
     /**
@@ -165,7 +171,7 @@ class ClansPlugin : JavaPlugin() {
      *
      * This class of listener is run second, since LuckPerms groups are persistent.
      */
-    private fun registerLuckPermsIntegrationListeners(clansConfig: ClansConfig, integrator: LuckPermsIntegrator) {
+    private fun registerLuckPermsIntegrationListeners(integrator: LuckPermsIntegrator) {
         integrator.initiateTrack()
         bus.registerListener(CREATE, INTEGRATION, integrator.constructCreateListener())
         bus.registerListener(DISBAND, INTEGRATION, integrator.constructDisbandListener())

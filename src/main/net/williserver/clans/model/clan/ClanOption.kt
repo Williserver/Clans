@@ -21,6 +21,15 @@ enum class ClanOption {
         }
 
     /**
+     * @return Description of valid values for this option.
+     */
+    fun validValuesDescription() =
+        when (this) {
+            PREFIX -> "A non-empty string of up to $PREFIX_LENGTH characters"
+            COLOR -> "A named color, e.g. 'red', 'blue', 'aqua', etc"
+        }
+
+    /**
      * @param clan Clan to generate defaults for.
      * @return The default value.
      */

@@ -9,6 +9,7 @@ import net.williserver.clans.model.clan.ClanPermission
 import net.williserver.clans.model.clan.ClanRank
 import net.williserver.clans.ClansPlugin.Companion.pluginMessagePrefix
 import net.williserver.clans.integration.LuckPermsIntegrator
+import net.williserver.clans.model.clan.ClanOption
 import net.williserver.clans.session.ClanLifecycleEvent
 import net.williserver.clans.session.SessionManager
 import net.williserver.clans.session.ClanLifecycleEvent.*
@@ -567,11 +568,15 @@ private class ClansSubcommandExecutor(
         }
 
         val clan = clanSet.clanOf((s as Player).uniqueId)
-        if (!v.assertSenderHasPermission(clan, ClanPermission.SET)) {
+        if (!v.assertSenderHasPermission(clan, ClanPermission.SET)
+            || !v.assertValidOptionValue(ClanOption.PREFIX, args[0])) {
             return true
         }
 
+        bus.fireEvent(ClanOption.PREFIX, clan, s.uniqueId, args[0])
+        // TODO: move this to a listener.
         integrator?.setPrefix(clan, args[0])
+        // TODO: move this to a listener.
         sendClanMessage(clan, Component.text("The clan's prefix has been set to \"${args[0]}\".", NamedTextColor.DARK_AQUA))
         // Validation complete, perform operation.
         return true
