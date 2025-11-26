@@ -8,6 +8,7 @@ import net.luckperms.api.node.types.PrefixNode
 import net.williserver.clans.LogHandler
 import net.williserver.clans.model.clan.Clan
 import net.williserver.clans.session.ClanLifecycleListener
+import net.williserver.clans.session.ClanOptionListener
 import org.bukkit.Bukkit
 import java.util.*
 
@@ -103,7 +104,7 @@ class LuckPermsIntegrator(private val logger: LogHandler, private val trackName:
     /**
      * @return A threaded asynchronous listener that adds a player to a group.
      */
-    fun constructJoinListener(): ClanLifecycleListener = { clan: Clan, _: UUID, joiner: UUID ->
+    fun constructJoinListener(): ClanLifecycleListener = { clan, _: UUID, joiner: UUID ->
         asyncMatchGroup(clan.name,
             ifFound =    { group -> addToGroup(group, joiner) },
             ifNotFound = { errGroupNotPresent(clan.name) }
@@ -119,6 +120,11 @@ class LuckPermsIntegrator(private val logger: LogHandler, private val trackName:
             ifNotFound = { errGroupNotPresent(clan.name) }
         )
     }
+
+    /**
+     * @return a listener that changes the LuckPerms group prefix when the clan prefix option is changed.W
+     */
+    fun constructPrefixListener(): ClanOptionListener = { clan, agent: UUID, option, value -> setPrefix(clan, value) }
 
     /*
      * Internal helpers

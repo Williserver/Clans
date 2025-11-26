@@ -179,6 +179,8 @@ class ClansPlugin : JavaPlugin() {
         bus.registerListener(LEAVE, INTEGRATION, integrator.constructLeaveListener())
         // From the perspective of LuckPerms, a kick is just a player leaving.
         bus.registerListener(KICK, INTEGRATION, integrator.constructLeaveListener())
+
+        bus.registerListener(ClanOption.PREFIX, INTEGRATION, integrator.constructPrefixListener())
     }
 
     /**
