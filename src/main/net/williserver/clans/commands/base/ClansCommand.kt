@@ -601,18 +601,12 @@ private class ClansSubcommandExecutor(
         }
 
         val clan = clanSet.clanOf((s as Player).uniqueId)
-        if (!v.assertSenderHasPermission(clan, ClanPermission.SET)) {
+        if (!v.assertSenderHasPermission(clan, ClanPermission.SET)
+            || !v.assertValidOptionValue(ClanOption.COLOR, args[0].lowercase())) {
             return true
         }
 
-        // TODO: clean this without exception.
-        val color = try {
-            ChatColor.valueOf(args[0].uppercase())
-        } catch (_: IllegalArgumentException) {
-            sendErrorMessage(s, "Invalid color: ${args[0]}")
-            return true
-        }
-
+        val color = ChatColor.valueOf(args[0].uppercase())
         integrator?.setColor(clan, color.char)
         sendClanMessage(clan, Component.text("The clan's color has been updated!", NamedTextColor.DARK_AQUA))
         return true
