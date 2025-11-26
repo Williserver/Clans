@@ -49,9 +49,27 @@ class Clan(
      * Whole-clan data accessors.
      */
 
+    /**
+     * @param optionName Name of option to get value of.
+     * @return The string associated with this option name.
+     */
+    fun getOption(optionName: String) = options[ClanOption.optionFromName(optionName)]!!
+
     /*
      * Clan manipulators.
      */
+
+    /**
+     * Change the value of a clan option.
+     * @param option Option to change value of.
+     * @param value Value to map option to.
+     */
+    fun setOption(option: ClanOption, value: String) {
+        if (!option.validOption(value)) {
+            throw IllegalArgumentException("$pluginMessagePrefix: Invalid option value!")
+        }
+        options[option] = value
+    }
 
     /**
      * Add a new player to the clan.

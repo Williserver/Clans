@@ -1,7 +1,10 @@
 package net.williserver.clans.model.clan
 
-import net.kyori.adventure.text.format.NamedTextColor
-import kotlin.test.Test
+import net.williserver.clans.model.ClanSet
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Test
+import java.util.UUID
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
@@ -69,5 +72,28 @@ class ClanOptionTest {
         val clan = Clan(name = "TestClan", leader = SUUID.randomUUID())
         val defaultColor = ClanOption.COLOR.default(clan)
         assertEquals("gray", defaultColor)
+    }
+
+    @Test
+    fun testSetClanColor() {
+        val newClan = Clan("TestClan", UUID.randomUUID())
+        Assertions.assertEquals(newClan.getOption("COLOR"), ClanOption.COLOR.default(newClan))
+
+        newClan.setOption(ClanOption.COLOR, "red")
+        Assertions.assertEquals(newClan.getOption("COLOR"), "red")
+
+        assertThrows(IllegalArgumentException::class.java) { newClan.setOption(ClanOption.COLOR, "notacolor") }
+    }
+
+    @Test
+    fun testSetClanPrefix() {
+        val newClan = Clan("TestClan", UUID.randomUUID())
+        Assertions.assertEquals(newClan.getOption("PREFIX"), ClanOption.PREFIX.default(newClan))
+
+        newClan.setOption(ClanOption.PREFIX, "TST")
+        Assertions.assertEquals(newClan.getOption("PREFIX"), "TST")
+
+        assertThrows(IllegalArgumentException::class.java) { newClan.setOption(ClanOption.PREFIX, "TOOLONG") }
+        assertThrows(IllegalArgumentException::class.java) { newClan.setOption(ClanOption.PREFIX, "") }
     }
 }
