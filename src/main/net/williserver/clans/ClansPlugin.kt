@@ -149,6 +149,9 @@ class ClansPlugin : JavaPlugin() {
         bus.registerListener(LEAVE, COSMETIC, constructLeaveMessageListener())
         bus.registerListener(PROMOTE, COSMETIC, constructPromoteMessageListener())
         bus.registerListener(KICK, COSMETIC, constructKickMessageListener())
+
+        bus.registerListener(ClanOption.PREFIX, COSMETIC, constructSetOptionListener())
+        bus.registerListener(ClanOption.COLOR, COSMETIC, constructSetOptionListener())
     }
 
     /**

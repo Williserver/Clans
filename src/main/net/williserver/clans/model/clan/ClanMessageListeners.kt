@@ -7,6 +7,7 @@ import net.williserver.clans.commands.sendClanMessage
 import net.williserver.clans.commands.sendInfoMessage
 import net.williserver.clans.commands.sendPrefixedMessage
 import net.williserver.clans.session.ClanLifecycleListener
+import net.williserver.clans.session.ClanOptionListener
 import org.bukkit.Bukkit
 
 /**
@@ -107,6 +108,21 @@ fun constructCrownMessageListener(): ClanLifecycleListener = { clan, oldLeader, 
 
     sendClanMessage(clan, newLeaderMessage)
     sendClanMessage(clan, newCoMessage)
+}
+
+/**
+ * @return a listener that sends a message to all clan members when the clan prefix is changed.
+ */
+fun constructSetOptionListener(): ClanOptionListener = { clan, setter, option, value->
+    val setterName = Bukkit.getOfflinePlayer(setter).name
+
+    val message = prefix(clan.name)
+        .append(Component.text(
+            "$setterName has updated the clan's ${option} to: ${value}",
+            NamedTextColor.DARK_AQUA
+        ))
+
+    sendClanMessage(clan, message)
 }
 
 /**
